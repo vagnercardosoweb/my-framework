@@ -1,0 +1,53 @@
+{
+  "name": "vagnercardosoweb/vcwebnetworks",
+  "description": "Framework para desenvolvimento de pequenos e grandes projetos em php.",
+  "version": "1.0.0",
+  "type": "project",
+  "license": "MIT",
+  "support": {
+    "email": "framework@vcwebnetworks.com.br",
+    "issues": "https://github.com/vagnercardosoweb/new-framework/issues",
+    "source": "https://github.com/vagnercardosoweb/new-framework"
+  },
+  "authors": [
+    {
+      "name": "Vagner dos Santos Cardoso",
+      "email": "vagner@vcwebnetworks.com.br",
+      "homepage": "https://www.vcwebnetworks.com.br/",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^7.2",
+    "ext-pdo": "*",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "ext-libxml": "*",
+    "ext-openssl": "*",
+    "ext-simplexml": "*",
+    "illuminate/support": "^5.8",
+    "monolog/monolog": "^1.24",
+    "phpmailer/phpmailer": "^6.0",
+    "robmorgan/phinx": "^0.10.7",
+    "slim/slim": "^3.12",
+    "symfony/var-dumper": "^4.3",
+    "twig/twig": "^2.11",
+    "vlucas/phpdotenv": "^3.3"
+  },
+  "autoload": {
+    "files": [
+      "app/helpers.php",
+      "../core/helpers.php"
+    ],
+    "psr-4": {
+      "App\\": "app/",
+      "Core\\": "../core"
+    }
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

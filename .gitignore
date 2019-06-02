@@ -1,0 +1,12 @@
+/**/.idea/
+/**/.env
+/**/vendor/
+/**/node_modules/
+/**/composer.lock
+/**/package-lock.json
+/**/yarn.lock
+/**/bower_components/
+/**/docker/mysql/
+/**/docker/pgsql/
+/**/storage/cache/
+/**/storage/logs/

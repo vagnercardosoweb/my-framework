@@ -1,0 +1,38 @@
+{% extends '@error/app.twig' %}
+{% set error_title = 'Error 500 (Internal Server Error)' %}
+
+{% block content %}
+  <div class="error-500">
+    <div class='content'>
+      <div class='header'>
+        <p>{{ error_title|raw }}</p>
+        <a href="{{ constant('BASE_URL') }}">Voltar!</a>
+      </div>
+      
+      <div class='box'>
+        <p>
+          Olá, acabamos de verificar que foi ocorrido um erro no sistema e já estamos sendo avisados do ocorrido e em alguns minutos o erro será resolvido.<br>
+          Obrigado e desculpe o constrangimento.
+        </p>
+        
+        {% if debug %}
+          {% if has_container('event') %}
+            {% if event_has('event.error.id') %}
+              <h1 style="text-align: center; color: red; font-weight: bold;">{{ event_emit('event.error.id') }}</h1>
+            {% endif %}
+          {% endif %}
+          
+          <div class="debug">
+            <p>{{ error.message|raw }}</p>
+            <small>{{ error.file }} [{{ error.line }}]</small>
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class='footer'>
+        <p>Version Framework: <b>{{ config('app.version.framework', '-') }}</b></p>
+        <p>Version Skeleton: <b>{{ config('app.version.skeleton', '-') }}</b></p>
+      </div>
+    </div>
+  </div>
+{% endblock %}
