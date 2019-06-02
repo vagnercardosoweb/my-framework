@@ -28,7 +28,7 @@ namespace App\Providers {
         {
             $this->container['view'] = function () {
                 return new View(
-                    config('twig.templates'), config('twig.options')
+                    config('view.templates'), config('view.options')
                 );
             };
         }
@@ -40,7 +40,7 @@ namespace App\Providers {
         {
             $this->view->addExtension(new DebugExtension());
 
-            foreach (config('twig.registers') as $key => $items) {
+            foreach (config('view.registers') as $key => $items) {
                 foreach ($items as $name => $item) {
                     switch ($key) {
                         case 'functions':

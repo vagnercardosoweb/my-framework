@@ -51,6 +51,7 @@ return [
     'providers' => [
         \App\Providers\ViewProvider::class,
         \App\Providers\ErrorProvider::class,
+        \App\Providers\ErrorSlackProvider::class,
         \App\Providers\SessionProvider::class,
         \App\Providers\DatabaseProvider::class,
         \App\Providers\MailerProvider::class,
@@ -59,7 +60,6 @@ return [
         \App\Providers\JwtProvider::class,
         \App\Providers\LoggerProvider::class,
         \App\Providers\EventProvider::class,
-        \App\Providers\ErrorSlackProvider::class,
     ],
 
     /**
@@ -73,8 +73,8 @@ return [
          */
 
         'automatic' => [
-            \App\Middlewares\GenerateKeysMiddleware::class,
             \App\Middlewares\TrailingSlashMiddleware::class,
+            \App\Middlewares\GenerateKeysMiddleware::class,
             \App\Middlewares\MaintenanceMiddleware::class,
             \App\Middlewares\OldInputMiddleware::class,
         ],
