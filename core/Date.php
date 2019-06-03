@@ -20,11 +20,11 @@ namespace App\Core {
      */
     class Date extends \DateTime
     {
-        const DATE_BR = 'd/m/Y';
+        const FORMAT_DATE_BR = 'd/m/Y';
 
-        const DATE_TIME_BR = 'd/m/Y H:i:s';
+        const FORMAT_DATE_TIME_BR = 'd/m/Y H:i:s';
 
-        const DATE_DATABASE = 'Y-m-d H:i:s';
+        const FORMAT_DATE_DATABASE = 'Y-m-d H:i:s';
 
         /***
          * @param string|int $time
@@ -50,9 +50,9 @@ namespace App\Core {
         public static function createFromTimestamp(int $timestamp, DateTimeZone $timezone = null)
         {
             try {
-                $time = new self('now', $timezone);
+                $date = new self('now', $timezone);
 
-                return $time->setTimestamp((int) $timestamp);
+                return $date->setTimestamp((int) $timestamp);
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException(
                     $e->getMessage(), $e->getCode(), $e->getPrevious()
