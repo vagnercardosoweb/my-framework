@@ -26,7 +26,24 @@ namespace App\Providers {
         public function register()
         {
             $this->container['mailer'] = function () {
-                return new Mailer();
+                return new Mailer([
+                    'debug' => config('mail.debug', 0),
+                    'charset' => config('mail.charset', null),
+                    'auth' => config('mail.auth', true),
+                    'secure' => config('mail.secure', 'tls'),
+                    'host' => config('mail.host', null),
+                    'post' => config('mail.post', 587),
+                    'username' => config('mail.username', null),
+                    'password' => config('mail.password', null),
+                    'from' => [
+                        'name' => config('mail.from.name', null),
+                        'mail' => config('mail.from.mail', null),
+                    ],
+                    'language' => [
+                        'code' => config('mail.language.code', null),
+                        'path' => config('mail.language.path', null),
+                    ],
+                ]);
             };
         }
     }

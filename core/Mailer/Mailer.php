@@ -10,15 +10,17 @@
 
 namespace Core\Mailer {
 
+    use Closure;
     use Core\App;
-    use PHPMailer\PHPMailer\Exception;
+    use Exception;
+    use InvalidArgumentException;
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
      * Class Mailer
      *
      * @package Core\Mailer
-     * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Mailer
     {
@@ -28,101 +30,139 @@ namespace Core\Mailer {
         protected $mail;
 
         /**
-         * @var string|bool
+         * Mailer constructor.
+         *
+         * @param array $options
          */
-        protected $error;
+        public function __construct(array $options)
+        {
+            $this->validateOptions($options);
+            $this->configureDefaultMailer($options);
+        }
 
         /**
-         * Mailer constructor.
+         * @param array $options
+         *
+         * @return void
          */
-        public function __construct()
+        protected function validateOptions(array &$options): void
         {
-            $this->mail = new PHPMailer(true);
-
-            // Inicia configurações
-            $this->mail->SMTPDebug = config('mail.debug');
-            $this->mail->CharSet = config('mail.charset');
-            $this->mail->isSMTP();
-            $this->mail->setLanguage('pt_br');
-            $this->mail->isHTML(true);
-
-            // SMTP Segurança
-            $this->mail->SMTPAuth = config('mail.auth');
-
-            if (!empty(config('mail.secure'))) {
-                $this->mail->SMTPSecure = config('mail.secure');
+            if (empty($options['host'])) {
+                throw new InvalidArgumentException(
+                    "Host not configured.", E_USER_ERROR
+                );
             }
 
-            // Servidor de e-mail
-            $this->mail->Host = (is_array(config('mail.host')) ? implode(';', config('mail.host')) : config('mail.host'));
-            $this->mail->Port = config('mail.port');
-            $this->mail->Username = config('mail.username');
-            $this->mail->Password = config('mail.password');
+            if (empty($options['username']) || empty($options['password'])) {
+                throw new InvalidArgumentException(
+                    "User and password not configured.", E_USER_ERROR
+                );
+            }
+        }
 
-            // Quem está enviando
-            if (config('mail.from.mail')) {
-                $this->mail->From = config('mail.from.mail');
+        /**
+         * @param array $options
+         *
+         * @return void
+         */
+        protected function configureDefaultMailer(array $options): void
+        {
+            // PHPMailer instance
+            $this->mail = new PHPMailer($options['exception'] ?? true);
 
-                if (!empty(config('mail.from.name'))) {
-                    $this->mail->FromName = config('mail.from.name');
+            // Settings
+            $this->mail->SMTPDebug = $options['debug'] ?? 0;
+            $this->mail->CharSet = $options['charset'] ?? PHPMailer::CHARSET_UTF8;
+            $this->mail->isSMTP();
+            $this->mail->isHTML(true);
+            $this->mail->setLanguage(
+                $options['language']['code'] ?? 'pt_br', $options['language']['path'] ?? ''
+            );
+
+            // Authentication
+            $this->mail->SMTPAuth = $options['auth'] ?? true;
+
+            if (!empty($options['secure'])) {
+                $this->mail->SMTPSecure = $options['secure'];
+            }
+
+            // Server e-mail
+            $this->mail->Host = $this->buildHost($options['host']);
+            $this->mail->Port = $options['port'] ?? 587;
+            $this->mail->Username = $options['username'];
+            $this->mail->Password = $options['password'];
+
+            // Default from
+            if (!empty($options['from']['mail'])) {
+                $this->mail->From = $options['from']['mail'];
+
+                if (!empty($options['from']['name'])) {
+                    $this->mail->FromName = $options['from']['name'];
                 }
             }
         }
 
         /**
-         * Monta e envia o e-mail
+         * @param string|array $host
          *
-         * @param string $view
-         * @param array $params
-         * @param callable $callback
-         * @param bool $SMTPKeepAlive
-         *
-         * @return $this
-         * @throws \Exception
+         * @return string
          */
-        public function send($view, array $params, callable $callback, $SMTPKeepAlive = false)
+        protected function buildHost($host): string
         {
-            $message = new Message($this->mail);
-            $message->body(App::getInstance()->resolve('view')->fetch("@mail.{$view}", $params));
-
-            call_user_func_array($callback, [$message, $params]);
-
-            // Conexão SMTP não fechará após cada email enviado, reduz a sobrecarga de SMTP
-            if ($SMTPKeepAlive) {
-                $this->mail->SMTPKeepAlive = true;
+            if (is_array($host)) {
+                $host = implode(';', $host);
             }
 
+            return $host;
+        }
+
+        /**
+         * @param string $template
+         * @param array $context
+         * @param \Closure $callback
+         *
+         * @return \Core\Mailer\Mailer
+         * @throws \Exception
+         */
+        public function send(string $template, array $context, Closure $callback): Mailer
+        {
             try {
+                $message = new Message($this->mail);
+                $message->body(App::getInstance()->resolve('view')->fetch("@mail.{$template}", $context));
+
+                call_user_func_array($callback->bindTo($this->mail), [
+                    $message,
+                    $context,
+                ]);
+
+                // Send mailer
                 if (!$this->mail->send()) {
-                    throw new Exception($this->mail->ErrorInfo, E_USER_ERROR);
+                    throw new Exception(
+                        $this->mail->ErrorInfo, E_USER_ERROR
+                    );
                 }
 
-                // Limpa as propriedade do email
-                $this->mail->clearAddresses();
-                $this->mail->clearAllRecipients();
-                $this->mail->clearAttachments();
-                $this->mail->clearBCCs();
-                $this->mail->clearCCs();
-                $this->mail->clearCustomHeaders();
-                $this->mail->clearReplyTos();
-                $this->error = false;
+                // Clear properties
+                $this->clearAll();
 
                 return $this;
             } catch (Exception $e) {
-                $this->error = $e->getMessage();
-
                 throw $e;
             }
         }
 
         /**
-         * Verifica se existe erros
-         *
-         * @return bool|string
+         * @inheritDoc
          */
-        public function failed()
+        public function clearAll(): void
         {
-            return $this->error;
+            $this->mail->clearAddresses();
+            $this->mail->clearAllRecipients();
+            $this->mail->clearAttachments();
+            $this->mail->clearBCCs();
+            $this->mail->clearCCs();
+            $this->mail->clearCustomHeaders();
+            $this->mail->clearReplyTos();
         }
     }
 }

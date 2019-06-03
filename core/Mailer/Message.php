@@ -10,13 +10,14 @@
 
 namespace Core\Mailer {
 
+    use Exception;
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
      * Class Message
      *
      * @package Core\Mailer
-     * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Message
     {
@@ -36,30 +37,30 @@ namespace Core\Mailer {
         }
 
         /**
-         * Adicionar quem está enviando o email
-         *
          * @param string $address
          * @param string $name
          *
-         * @return $this
-         * @throws \PHPMailer\PHPMailer\Exception
+         * @return \Core\Mailer\Message
+         * @throws \Exception
          */
-        public function from($address, $name = '')
+        public function from(string $address, ?string $name = ''): Message
         {
-            $this->mail->setFrom($address, $name);
+            try {
+                $this->mail->setFrom($address, $name);
+            } catch (Exception $e) {
+                throw $e;
+            }
 
             return $this;
         }
 
         /**
-         * Adicionar a quem vai a resposta se for respondido o email
-         *
          * @param string $address
          * @param string $name
          *
-         * @return $this
+         * @return \Core\Mailer\Message
          */
-        public function reply($address, $name = '')
+        public function reply(string $address, ?string $name = ''): Message
         {
             $this->mail->addReplyTo($address, $name);
 
@@ -67,14 +68,38 @@ namespace Core\Mailer {
         }
 
         /**
-         * Adiciona para quem vai enviar o email.
-         *
          * @param string $address
          * @param string $name
          *
-         * @return $this
+         * @return \Core\Mailer\Message
          */
-        public function to($address, $name = '')
+        public function addCC(string $address, ?string $name = ''): Message
+        {
+            $this->mail->addCC($address, $name);
+
+            return $this;
+        }
+
+        /**
+         * @param string $address
+         * @param string $name
+         *
+         * @return \Core\Mailer\Message
+         */
+        public function addBCC(string $address, ?string $name = ''): Message
+        {
+            $this->mail->addBCC($address, $name);
+
+            return $this;
+        }
+
+        /**
+         * @param string $address
+         * @param string $name
+         *
+         * @return \Core\Mailer\Message
+         */
+        public function to(string $address, ?string $name = ''): Message
         {
             $this->mail->addAddress($address, $name);
 
@@ -82,13 +107,11 @@ namespace Core\Mailer {
         }
 
         /**
-         * Adiciona o titulo do email
-         *
          * @param string $subject
          *
-         * @return $this
+         * @return \Core\Mailer\Message
          */
-        public function subject($subject)
+        public function subject(string $subject): Message
         {
             $this->mail->Subject = $subject;
 
@@ -96,30 +119,54 @@ namespace Core\Mailer {
         }
 
         /**
-         * Se existir arquivo, adiciona o arquivo.
-         * os path dos arquivos devem ser passado como array ou o path direto
-         *
          * @param string $path
          * @param string $name
+         * @param string $encoding
+         * @param string $type
+         * @param string $disposition
          *
-         * @return $this
-         * @throws \PHPMailer\PHPMailer\Exception
+         * @return \Core\Mailer\Message
+         * @throws \Exception
          */
-        public function addFile($path, $name = '')
+        public function addFile(
+            string $path,
+            ?string $name = '',
+            ?string $encoding = PHPMailer::ENCODING_BASE64,
+            ?string $type = '',
+            ?string $disposition = 'attachment'
+        ): Message
         {
-            $this->mail->addAttachment($path, $name);
+            try {
+                $this->mail->addAttachment($path, $name, $encoding, $type, $disposition);
+            } catch (Exception $e) {
+                throw $e;
+            }
 
             return $this;
         }
 
         /**
-         * Corpo da mensagem
+         * @param string $message
          *
-         * @param $body
+         * @return \Core\Mailer\Message
          */
-        public function body($body)
+        public function body(string $message): Message
         {
-            $this->mail->Body = $body;
+            $this->mail->Body = $message;
+
+            return $this;
+        }
+
+        /**
+         * @param string $message
+         *
+         * @return \Core\Mailer\Message
+         */
+        public function altBody(string $message): Message
+        {
+            $this->mail->AltBody = $message;
+
+            return $this;
         }
     }
 }
