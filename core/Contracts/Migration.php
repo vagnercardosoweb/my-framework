@@ -56,19 +56,19 @@ namespace Core\Contracts {
         }
 
         /**
-         * @param string|null $tableName
+         * @param string|null $table
          * @param array $options
          *
          * @return \Phinx\Db\Table
          * @throws \Exception
          */
-        public function table($tableName = null, $options = [])
+        public function table($table = null, $options = [])
         {
             // Variávies
-            $tableName = (!empty($tableName) ? $tableName : $this->table);
+            $table = $table ?? $this->table;
 
             // Verifica a tabela
-            if (empty($tableName)) {
+            if (empty($table)) {
                 throw new \Exception(
                     sprintf("Table not defined in %s.", get_class($this)),
                     E_ERROR
@@ -76,7 +76,7 @@ namespace Core\Contracts {
             }
 
             // Retorna o método pai
-            return parent::table($tableName, array_merge([
+            return parent::table($table, array_merge([
                 'id' => $this->primaryKey,
                 'engine' => $this->engine,
                 'collation' => $this->collation,
