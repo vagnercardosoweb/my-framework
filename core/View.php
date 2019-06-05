@@ -10,6 +10,7 @@
 
 namespace Core {
 
+    use Psr\Http\Message\ResponseInterface;
     use Slim\Http\StatusCode;
 
     /**
@@ -64,15 +65,15 @@ namespace Core {
         }
 
         /**
-         * @param \Slim\Http\Response $response
+         * @param \Psr\Http\Message\ResponseInterface $response
          * @param string $template
          * @param array $context
          *
          * @param int $statusCode
          *
-         * @return \Slim\Http\Response
+         * @return \Psr\Http\Message\ResponseInterface
          */
-        public function render(\Slim\Http\Response $response, string $template, array $context = [], int $statusCode = StatusCode::HTTP_OK)
+        public function render(ResponseInterface $response, string $template, array $context = [], int $statusCode = StatusCode::HTTP_OK): ResponseInterface
         {
             if ($statusCode) {
                 $response = $response->withStatus($statusCode);
