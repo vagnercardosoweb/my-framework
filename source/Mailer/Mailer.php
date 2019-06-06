@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -16,7 +16,7 @@ namespace Core\Mailer {
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
-     * Class Mailer.
+     * Class Mailer
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -28,8 +28,6 @@ namespace Core\Mailer {
         protected $mail;
 
         /**
-         * Mailer constructor.
-         *
          * @param array $options
          */
         public function __construct(array $options)
@@ -43,9 +41,9 @@ namespace Core\Mailer {
          * @param array    $context
          * @param \Closure $callback
          *
-         * @return \Core\Mailer\Mailer
-         *
          * @throws \Exception
+         *
+         * @return \Core\Mailer\Mailer
          */
         public function send(string $template, array $context, Closure $callback): Mailer
         {
@@ -74,7 +72,10 @@ namespace Core\Mailer {
             }
         }
 
-        public function clearAll(): void
+        /**
+         * {@inheritdoc}
+         */
+        protected function clearAll(): void
         {
             $this->mail->clearAddresses();
             $this->mail->clearAllRecipients();
@@ -108,7 +109,7 @@ namespace Core\Mailer {
          */
         protected function configureDefaultMailer(array $options): void
         {
-            // PHPMailer instance
+            // PHPMailer
             $this->mail = new PHPMailer($options['exception'] ?? true);
 
             // Settings
