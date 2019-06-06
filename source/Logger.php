@@ -15,7 +15,7 @@ namespace Core {
     use Monolog\Logger as Monolog;
 
     /**
-     * Class Logger.
+     * Class Logger
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -75,10 +75,10 @@ namespace Core {
          *
          * @return \Core\Logger
          */
-        public function filename($filename)
+        public function filename($filename): Logger
         {
             $new = clone $this;
-            $new->filename = (string) $filename;
+            $new->filename = (string)$filename;
             $new->initProcessor();
             $new->initHandler();
 
@@ -88,7 +88,7 @@ namespace Core {
         /**
          * {@inheritdoc}
          */
-        protected function initProcessor()
+        protected function initProcessor(): void
         {
             $this->pushProcessor(function ($record) {
                 $record['extra']['ip'] = $ip = Helper::getIpAddress();
@@ -102,7 +102,7 @@ namespace Core {
         /**
          * {@inheritdoc}
          */
-        protected function initHandler()
+        protected function initHandler(): void
         {
             try {
                 // StreamHandler

@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -12,17 +12,20 @@ namespace App\Providers {
     use Core\Logger;
 
     /**
-     * Class LoggerProvider.
+     * Class LoggerProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class LoggerProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
             $this->container['logger'] = function () {
                 return new Logger(
-                    'VCWEBNETWORKS', APP_FOLDER.'/storage/logs'
+                    'VCWebNetworks', APP_FOLDER . '/storage/logs'
                 );
             };
         }
