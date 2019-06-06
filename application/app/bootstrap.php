@@ -1,12 +1,13 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
+
 use Core\App;
 use Core\Loader;
 
@@ -30,10 +31,10 @@ ob_start(function ($buffer) {
 /**
  * Autoload.
  */
-$authload = APP_FOLDER.'/vendor/autoload.php';
+$authload = APP_FOLDER . '/vendor/autoload.php';
 
 if (!file_exists($authload)) {
-    die('Run command in terminal: <br>'.
+    die('Run command in terminal: <br>' .
         '<code style="background: #000; color: #fff;">composer install</code>');
 }
 

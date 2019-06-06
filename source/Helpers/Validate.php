@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace App\Core\Helpers {
     /**
-     * Class Validate.
+     * Class Validate
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -23,7 +23,7 @@ namespace App\Core\Helpers {
          */
         public static function mail(string $mail): bool
         {
-            $mail = filter_var((string) $mail, FILTER_SANITIZE_EMAIL);
+            $mail = filter_var((string)$mail, FILTER_SANITIZE_EMAIL);
             $regex = '/[a-z0-9_\.\-]+@[a-z0-9_\.\-]*[a-z0-9_\.\-]+\.[a-z]{2,4}$/';
 
             if (filter_var($mail, FILTER_VALIDATE_EMAIL) && preg_match($regex, $mail)) {

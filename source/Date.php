@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -12,7 +12,7 @@ namespace App\Core {
     use DateTimeZone;
 
     /**
-     * Class Date.
+     * Class Date
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -50,7 +50,7 @@ namespace App\Core {
             try {
                 $date = new self('now', $timezone);
 
-                return $date->setTimestamp((int) $timestamp);
+                return $date->setTimestamp((int)$timestamp);
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException(
                     $e->getMessage(), $e->getCode(), $e->getPrevious()

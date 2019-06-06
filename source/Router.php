@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace Core {
     /**
-     * Class Router.
+     * Class Router
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -58,7 +58,7 @@ namespace Core {
                 ->getPath()
             ;
 
-            foreach ((array) $router as $route) {
+            foreach ((array)$router as $route) {
                 if (false !== mb_strpos($current, $route)) {
                     return true;
                 }
@@ -89,11 +89,11 @@ namespace Core {
                 $hash = "#{$hash}";
             }
 
-            return $baseUrl.App::getInstance()
+            return $baseUrl . App::getInstance()
                 ->resolve('router')
                 ->pathFor(
                     $name, $data, $queryParams
-                ).$hash;
+                ) . $hash;
         }
     }
 }

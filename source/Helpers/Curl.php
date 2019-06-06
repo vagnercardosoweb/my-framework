@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -12,7 +12,7 @@ namespace Core\Helpers {
     use Exception;
 
     /**
-     * Class \Core\Helpers\Curl.
+     * Class Curl
      *
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -32,9 +32,9 @@ namespace Core\Helpers {
          * @param string $endPoint
          * @param array  $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function get(string $endPoint, $params = [])
         {
@@ -46,9 +46,9 @@ namespace Core\Helpers {
          * @param string       $endPoint
          * @param string|array $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function create(string $method, string $endPoint, $params = [])
         {
@@ -133,9 +133,9 @@ namespace Core\Helpers {
          * @param string       $endPoint
          * @param array|string $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function post(string $endPoint, $params = [])
         {
@@ -146,9 +146,9 @@ namespace Core\Helpers {
          * @param string $endPoint
          * @param array  $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function put(string $endPoint, $params = [])
         {
@@ -159,9 +159,9 @@ namespace Core\Helpers {
          * @param string $endPoint
          * @param array  $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function delete(string $endPoint, $params = [])
         {
@@ -173,9 +173,9 @@ namespace Core\Helpers {
          * @param string       $endPoint
          * @param array|string $params
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         protected function createRequest(string $method, string $endPoint, $params)
         {

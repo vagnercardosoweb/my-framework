@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -13,7 +13,7 @@ namespace Core {
     use Slim\Http\StatusCode;
 
     /**
-     * Class View.
+     * Class View
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -87,6 +87,7 @@ namespace Core {
 
         /**
          * @param \Twig\Extension\ExtensionInterface
+         * @param \Twig\Extension\ExtensionInterface $extension
          *
          * @return $this
          */
@@ -155,9 +156,9 @@ namespace Core {
         /**
          * @param array $paths
          *
-         * @return \Twig\Loader\FilesystemLoader
-         *
          * @throws \Twig\Error\LoaderError
+         *
+         * @return \Twig\Loader\FilesystemLoader
          */
         private function createLoader(array $paths)
         {

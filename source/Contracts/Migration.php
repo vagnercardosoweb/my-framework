@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -68,9 +68,9 @@ namespace Core\Contracts {
          * @param string|null $table
          * @param array       $options
          *
-         * @return \Phinx\Db\Table
-         *
          * @throws \Exception
+         *
+         * @return \Phinx\Db\Table
          */
         public function table($table = null, $options = [])
         {

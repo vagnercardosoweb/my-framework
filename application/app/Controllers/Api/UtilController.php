@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -15,7 +15,7 @@ namespace App\Controllers\Api {
     use Core\Helpers\Str;
 
     /**
-     * Class UtilController.
+     * Class UtilController
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -25,9 +25,9 @@ namespace App\Controllers\Api {
          * @param string $name
          * @param mixed  $arguments
          *
-         * @return \Slim\Http\Response
-         *
          * @throws \Exception
+         *
+         * @return \Slim\Http\Response
          */
         public function __call($name, $arguments)
         {
@@ -69,9 +69,9 @@ namespace App\Controllers\Api {
          *
          * @param array $data
          *
-         * @return \Slim\Http\Response
-         *
          * @throws \Exception
+         *
+         * @return \Slim\Http\Response
          */
         protected function zipcode(array $data)
         {
@@ -113,8 +113,8 @@ namespace App\Controllers\Api {
 
                 if ('OK' === $map->status && !empty($map->results[0])) {
                     $location = $map->results[0]->geometry->location;
-                    $cep->latitude = (string) $location->lat;
-                    $cep->longitude = (string) $location->lng;
+                    $cep->latitude = (string)$location->lat;
+                    $cep->longitude = (string)$location->lng;
                 }
 
                 return json($cep);
@@ -128,9 +128,9 @@ namespace App\Controllers\Api {
          *
          * @param array $data
          *
-         * @return \Slim\Http\Response
-         *
          * @throws \Exception
+         *
+         * @return \Slim\Http\Response
          */
         protected function modalDetail(array $data)
         {
@@ -142,7 +142,7 @@ namespace App\Controllers\Api {
                 }
 
                 if (!empty($data['model']) && (!empty($data['id']) && $data['id'] > 0)) {
-                    $model = '\\App\\Models\\'.Str::studly($data['model']);
+                    $model = '\\App\\Models\\' . Str::studly($data['model']);
 
                     if (!$data['row'] = (new $model())->reset()->fetchById($data['id'])) {
                         throw new \Exception('Registro não encontrado.', E_USER_ERROR);

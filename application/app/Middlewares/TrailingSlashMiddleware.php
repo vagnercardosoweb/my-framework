@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -13,7 +13,7 @@ namespace App\Middlewares {
     use Slim\Http\Response;
 
     /**
-     * Class TrailingSlashMiddleware.
+     * Class TrailingSlashMiddleware
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -35,7 +35,7 @@ namespace App\Middlewares {
                 $uri = $uri->withPath(substr($path, 0, -1));
 
                 if ('GET' == $request->getMethod()) {
-                    return $response->withRedirect((string) $uri, 301);
+                    return $response->withRedirect((string)$uri, 301);
                 }
 
                 return $next($request->withUri($uri), $response);

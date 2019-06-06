@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -16,7 +16,7 @@ namespace Core {
     use Slim\Http\Response;
 
     /**
-     * Class App.
+     * Class App
      *
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -77,7 +77,7 @@ namespace Core {
         {
             // Variavéis
             $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
-            $pattern = (string) $pattern;
+            $pattern = (string)$pattern;
 
             // Verifica se o callable e uma closure
             if ($callable instanceof Closure) {
@@ -86,7 +86,7 @@ namespace Core {
                 $route = $this->map($methods, $pattern, function (Request $request, Response $response, array $params) use ($callable) {
                     // Separa o namespace e método
                     list($namespace, $originalMethod) = (explode('@', $callable) + [1 => null]);
-                    $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
+                    $method = mb_strtolower($request->getMethod()) . ucfirst($originalMethod);
 
                     // Valida se existe o `Controller` na string
                     if (!strripos($namespace, 'Controller')) {
@@ -111,7 +111,7 @@ namespace Core {
                     }
 
                     // Inicia o controller
-                    $namespace = 'App\\Controllers\\'.str_ireplace('/', '\\', $namespace);
+                    $namespace = 'App\\Controllers\\' . str_ireplace('/', '\\', $namespace);
                     $controller = new $namespace($request, $response, $this);
 
                     // Verifica se existe o método

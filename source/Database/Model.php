@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -13,7 +13,7 @@ namespace Core\Database {
     use Core\Helpers\Obj;
 
     /**
-     * Class Model.
+     * Class Model
      *
      * @property \Slim\Collection settings
      * @property \Slim\Http\Environment environment
@@ -182,9 +182,9 @@ namespace Core\Database {
         }
 
         /**
-         * @return int
-         *
          * @throws \Exception
+         *
+         * @return int
          */
         public function rowCount()
         {
@@ -194,13 +194,13 @@ namespace Core\Database {
         /**
          * @param string $column
          *
-         * @return int
-         *
          * @throws \Exception
+         *
+         * @return int
          */
         public function count($column = '1')
         {
-            return (int) $this->select("COUNT({$column}) AS count")
+            return (int)$this->select("COUNT({$column}) AS count")
                 ->order('count DESC')->limit(1)
                 ->execute()
                 ->fetch(\PDO::FETCH_OBJ)
@@ -217,7 +217,7 @@ namespace Core\Database {
         {
             // Limit
             if (is_numeric($limit)) {
-                $this->limit = (int) $limit;
+                $this->limit = (int)$limit;
 
                 // Offset
                 if (is_numeric($offset)) {
@@ -235,7 +235,7 @@ namespace Core\Database {
          */
         public function offset($offset)
         {
-            $this->offset = (int) $offset;
+            $this->offset = (int)$offset;
 
             return $this;
         }
@@ -276,7 +276,7 @@ namespace Core\Database {
         public function table($table = null)
         {
             if (!empty($table)) {
-                $this->table = (string) $table;
+                $this->table = (string)$table;
 
                 return $this;
             }
@@ -383,9 +383,9 @@ namespace Core\Database {
         }
 
         /**
-         * @return array|$this
-         *
          * @throws \Exception
+         *
+         * @return array|$this
          */
         public function save()
         {
@@ -404,7 +404,7 @@ namespace Core\Database {
 
                 return $this->db->update(
                     $this->table, $this->data,
-                    'WHERE '.$this->normalizeProperty($where),
+                    'WHERE ' . $this->normalizeProperty($where),
                     $bindings
                 );
             }
@@ -471,9 +471,9 @@ namespace Core\Database {
          * @param int|array $id
          * @param int       $fetchStyle
          *
-         * @return bool|array|$this
-         *
          * @throws \Exception
+         *
+         * @return bool|array|$this
          */
         public function fetchById($id, $fetchStyle = null)
         {
@@ -517,9 +517,9 @@ namespace Core\Database {
          * @param int   $fetchStyle
          * @param mixed $fetchArgument
          *
-         * @return array[$this]
-         *
          * @throws \Exception
+         *
+         * @return array[$this]
          */
         public function fetchAll($fetchStyle = null, $fetchArgument = null)
         {
@@ -554,9 +554,9 @@ namespace Core\Database {
         /**
          * @param int $fetchStyle
          *
-         * @return array|$this
-         *
          * @throws \Exception
+         *
+         * @return array|$this
          */
         public function fetch($fetchStyle = null)
         {
@@ -584,9 +584,9 @@ namespace Core\Database {
         }
 
         /**
-         * @return array|bool|$this
-         *
          * @throws \Exception
+         *
+         * @return array|bool|$this
          */
         public function delete()
         {
@@ -650,9 +650,9 @@ namespace Core\Database {
         }
 
         /**
-         * @return \Core\Database\Statement
-         *
          * @throws \Exception
+         *
+         * @return \Core\Database\Statement
          */
         protected function execute()
         {
@@ -738,7 +738,7 @@ namespace Core\Database {
             foreach ($chars as $char) {
                 $len = mb_strlen($char);
 
-                if (mb_substr($string, 0, $len) === (string) $char) {
+                if (mb_substr($string, 0, $len) === (string)$char) {
                     $string = trim(mb_substr($string, $len));
                 }
             }
@@ -776,9 +776,9 @@ namespace Core\Database {
                 $this->{$property} = [];
             }
 
-            foreach ((array) $conditions as $condition) {
+            foreach ((array)$conditions as $condition) {
                 if (!empty($condition) && !array_search($condition, $this->{$property})) {
-                    $this->{$property}[] = trim((string) $condition);
+                    $this->{$property}[] = trim((string)$condition);
                 }
             }
         }

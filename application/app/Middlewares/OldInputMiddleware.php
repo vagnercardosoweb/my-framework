@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -13,7 +13,7 @@ namespace App\Middlewares {
     use Slim\Http\Response;
 
     /**
-     * Class OldInputMiddleware.
+     * Class OldInputMiddleware
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */

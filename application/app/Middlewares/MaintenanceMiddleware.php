@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -13,7 +13,7 @@ namespace App\Middlewares {
     use Slim\Http\Response;
 
     /**
-     * Class MaintenanceMiddleware.
+     * Class MaintenanceMiddleware
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -24,9 +24,9 @@ namespace App\Middlewares {
          * @param \Slim\Http\Response $response PSR7 response
          * @param callable            $next     Next middleware
          *
-         * @return \Slim\Http\Response
-         *
          * @throws \Exception
+         *
+         * @return \Slim\Http\Response
          */
         public function __invoke(Request $request, Response $response, callable $next)
         {

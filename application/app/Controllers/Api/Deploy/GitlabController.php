@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -49,7 +49,7 @@ namespace App\Controllers\Api\Deploy {
                 chdir(ROOT);
 
                 // Verifica pasta .git
-                if (!file_exists(ROOT.'/.git')) {
+                if (!file_exists(ROOT . '/.git')) {
                     throw new \Exception('Git not initialize.', E_USER_ERROR);
                 }
 

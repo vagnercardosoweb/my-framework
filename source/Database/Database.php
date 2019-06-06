@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -20,7 +20,7 @@ namespace Core\Database {
     use RuntimeException;
 
     /**
-     * Class Database.
+     * Class Database
      *
      * @method Statement getPdo()
      * @method Statement fetch($fetchStyle = null, $cursorOrientation = 0, $cursorOffset = 0)
@@ -121,9 +121,9 @@ namespace Core\Database {
         /**
          * @param string $driver mysql|pgsql|dblib|sqlsrv
          *
-         * @return $this
-         *
          * @throws \Exception
+         *
+         * @return $this
          */
         public function driver($driver)
         {
@@ -139,9 +139,9 @@ namespace Core\Database {
          *
          * @param string $driver
          *
-         * @return $this
-         *
          * @throws \Exception
+         *
+         * @return $this
          */
         public static function getInstance($driver = null)
         {
@@ -157,9 +157,9 @@ namespace Core\Database {
         /**
          * @param \Closure $callback
          *
-         * @return \Closure|mixed
-         *
          * @throws \Exception
+         *
+         * @return \Closure|mixed
          */
         public function transaction(Closure $callback)
         {
@@ -180,14 +180,14 @@ namespace Core\Database {
          * @param string       $table
          * @param array|object $data
          *
-         * @return Statement
-         *
          * @throws \Exception
+         *
+         * @return Statement
          */
         public function create($table, $data)
         {
             // Variávies
-            $table = (string) $table;
+            $table = (string)$table;
             $data = $this->toData($data);
             $values = [];
 
@@ -198,17 +198,17 @@ namespace Core\Database {
             if (!empty($data[0])) {
                 foreach ($data as $i => $item) {
                     $data = ($this->emitEvent("{$table}:creating", $item) ?: $item);
-                    $values[] = ':'.implode("_{$i}, :", array_keys($data))."_{$i}";
+                    $values[] = ':' . implode("_{$i}, :", array_keys($data)) . "_{$i}";
 
                     foreach ($data as $k => $v) {
                         $this->setBindings(["{$k}_{$i}" => $v]);
                     }
                 }
 
-                $values = '('.implode('), (', $values).')';
+                $values = '(' . implode('), (', $values) . ')';
             } else {
                 $data = ($this->emitEvent("{$table}:creating", $data) ?: $data);
-                $values = '(:'.implode(', :', array_keys($data)).')';
+                $values = '(:' . implode(', :', array_keys($data)) . ')';
                 $this->setBindings($data);
             }
 
@@ -232,7 +232,7 @@ namespace Core\Database {
         public function toData($data, $type = 'array')
         {
             // Variávies
-            $type = (string) ($type ?: 'array');
+            $type = (string)($type ?: 'array');
 
             switch ($type) {
                 case 'array':
@@ -256,9 +256,9 @@ namespace Core\Database {
          * @param string|array $bindings
          * @param array        $driverOptions
          *
-         * @return Statement
-         *
          * @throws \Exception
+         *
+         * @return Statement
          */
         public function query($statement, $bindings = null, $driverOptions = [])
         {
@@ -287,16 +287,16 @@ namespace Core\Database {
          * @param string       $condition
          * @param string|array $bindings
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function update($table, $data, $condition, $bindings = null)
         {
             // Variávies
-            $table = (string) $table;
+            $table = (string)$table;
             $data = $this->toData($data);
-            $condition = (string) $condition;
+            $condition = (string)$condition;
             $set = [];
 
             // Verifica registro
@@ -347,9 +347,9 @@ namespace Core\Database {
          * @param string       $condition
          * @param string|array $bindings
          *
-         * @return Statement
-         *
          * @throws \Exception
+         *
+         * @return Statement
          */
         public function read($table, $condition = null, $bindings = null)
         {
@@ -381,15 +381,15 @@ namespace Core\Database {
          * @param string       $condition
          * @param string|array $bindings
          *
-         * @return mixed
-         *
          * @throws \Exception
+         *
+         * @return mixed
          */
         public function delete($table, $condition, $bindings = null)
         {
             // Variávies
-            $table = (string) $table;
-            $condition = (string) $condition;
+            $table = (string)$table;
+            $condition = (string)$condition;
 
             // Verifica registro
             $deleted = $this->read($table, $condition, $bindings)->fetch();
@@ -458,14 +458,14 @@ namespace Core\Database {
         protected function setDefaultAttributesAndCommands(array $config)
         {
             if (!empty($config['attributes'])) {
-                foreach ((array) $config['attributes'] as $key => $value) {
+                foreach ((array)$config['attributes'] as $key => $value) {
                     $this->setAttribute($key, $value);
                 }
             }
 
             // Comandos sql na inicialização
             if (!empty($config['commands'])) {
-                foreach ((array) $config['commands'] as $command) {
+                foreach ((array)$config['commands'] as $command) {
                     $this->exec($command);
                 }
             }
@@ -549,7 +549,7 @@ namespace Core\Database {
                 array_shift($arguments);
 
                 return $event->emit(
-                    (string) $name, ...$arguments
+                    (string)$name, ...$arguments
                 );
             }
 
@@ -594,7 +594,7 @@ namespace Core\Database {
             if (!empty($this->bindings) && is_array($this->bindings)) {
                 foreach ($this->bindings as $key => $value) {
                     if (is_string($key) && in_array($key, ['limit', 'offset', 'l', 'o'])) {
-                        $value = (int) $value;
+                        $value = (int)$value;
                     }
 
                     $value = ((empty($value) && '0' != $value)
@@ -602,7 +602,7 @@ namespace Core\Database {
                         : filter_var($value, FILTER_DEFAULT));
 
                     $this->statement->bindValue(
-                        (is_string($key) ? ":{$key}" : ((int) $key + 1)),
+                        (is_string($key) ? ":{$key}" : ((int)$key + 1)),
                         $value,
                         (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR)
                     );

@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace Core\Helpers {
     /**
-     * Class Str.
+     * Class Str
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -33,7 +33,7 @@ namespace Core\Helpers {
                     $string, 0, strrpos(
                         self::substr($string, 0, $limit), ' '
                     )
-                ).$end;
+                ) . $end;
         }
 
         /**

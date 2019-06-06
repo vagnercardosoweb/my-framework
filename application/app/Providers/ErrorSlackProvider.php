@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -14,7 +14,7 @@ namespace App\Providers {
     use Core\Helpers\Helper;
 
     /**
-     * Class ErrorSlackProvider.
+     * Class ErrorSlackProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */

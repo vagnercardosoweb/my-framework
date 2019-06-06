@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace Core\Helpers {
     /**
-     * Class Upload.
+     * Class Upload
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -27,7 +27,7 @@ namespace Core\Helpers {
                     $totalFiles = count($file['name']);
                     $fileKeys = array_keys($file);
 
-                    for ($i = 0; $i < $totalFiles; ++$i) {
+                    for ($i = 0; $i < $totalFiles; $i++) {
                         foreach ($fileKeys as $fileKey) {
                             $newFiles[$key][$i][$fileKey] = $file[$fileKey][$i];
                         }

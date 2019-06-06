@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -21,7 +21,7 @@ return [
         'charset' => 'UTF-8',
         'strict_variables' => false,
         'autoescape' => 'html',
-        'cache' => ('production' == env('APP_ENV') ? APP_FOLDER.'/storage/cache' : false),
+        'cache' => ('production' == env('APP_ENV') ? APP_FOLDER . '/storage/cache' : false),
         'auto_reload' => true,
         'optimizations' => -1,
     ],
@@ -36,9 +36,9 @@ return [
      */
 
     'templates' => [
-        'web' => RESOURCE_FOLDER.'/views/web',
-        'error' => RESOURCE_FOLDER.'/views/error',
-        'mail' => RESOURCE_FOLDER.'/views/mail',
+        'web' => RESOURCE_FOLDER . '/views/web',
+        'error' => RESOURCE_FOLDER . '/views/error',
+        'mail' => RESOURCE_FOLDER . '/views/mail',
     ],
 
     /*

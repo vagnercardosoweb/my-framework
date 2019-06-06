@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace Core\Helpers {
     /**
-     * Class Paginator.
+     * Class Paginator
      *
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -61,18 +61,18 @@ namespace Core\Helpers {
         public function __construct($total, $link, $limit = 10, $range = 4, $pageString = 'page')
         {
             // Atributos
-            $this->total = (int) $total;
-            $this->link = (string) $link;
-            $this->limit = (int) ($limit ? $limit : 10);
-            $this->range = (int) ($range ? $range : 4);
+            $this->total = (int)$total;
+            $this->link = (string)$link;
+            $this->limit = (int)($limit ? $limit : 10);
+            $this->range = (int)($range ? $range : 4);
 
             // Calcula total de páginas
-            $this->pages = max((int) ceil($this->total / $this->limit), 1);
+            $this->pages = max((int)ceil($this->total / $this->limit), 1);
 
             // Filter page
             $currentPage = filter_input(INPUT_GET, $pageString, FILTER_DEFAULT);
             $currentPage = ($currentPage > PHP_INT_MAX) ? $this->pages : $currentPage;
-            $this->currentPage = (int) (isset($currentPage) ? $currentPage : 1);
+            $this->currentPage = (int)(isset($currentPage) ? $currentPage : 1);
 
             // Calcula offset
             $this->offset = ($this->currentPage * $this->limit) - $this->limit;
@@ -113,8 +113,8 @@ namespace Core\Helpers {
                     break;
 
                 default:
-                    if (method_exists($this, 'get'.ucfirst($method))) {
-                        return $this->{'get'.ucfirst($method)}(...$arguments);
+                    if (method_exists($this, 'get' . ucfirst($method))) {
+                        return $this->{'get' . ucfirst($method)}(...$arguments);
                     }
 
                     throw new \BadMethodCallException(
@@ -199,7 +199,7 @@ namespace Core\Helpers {
         public function getPrevPage()
         {
             if ($this->currentPage > 1) {
-                $prevPage = (int) ($this->currentPage - 1);
+                $prevPage = (int)($this->currentPage - 1);
 
                 return "{$this->link}{$prevPage}";
             }
@@ -213,7 +213,7 @@ namespace Core\Helpers {
         public function getNextPage()
         {
             if ($this->pages > $this->currentPage) {
-                $nextPage = (int) ($this->currentPage + 1);
+                $nextPage = (int)($this->currentPage + 1);
 
                 return "{$this->link}{$nextPage}";
             }
@@ -226,7 +226,7 @@ namespace Core\Helpers {
          */
         public function getCurrentPage()
         {
-            return (int) $this->currentPage;
+            return (int)$this->currentPage;
         }
 
         /**
@@ -237,7 +237,7 @@ namespace Core\Helpers {
             $first = ($this->currentPage - 1) * $this->limit + 1;
 
             return $first <= $this->total
-                ? (int) $first
+                ? (int)$first
                 : false;
         }
 
@@ -253,8 +253,8 @@ namespace Core\Helpers {
             $last = $first + $this->limit - 1;
 
             return $last > $this->total
-                ? (int) $this->total
-                : (int) $last;
+                ? (int)$this->total
+                : (int)$last;
         }
 
         /**
@@ -269,7 +269,7 @@ namespace Core\Helpers {
             }
 
             if ($this->getPages() <= $this->getRange()) {
-                for ($i = 1; $i <= $this->getPages(); ++$i) {
+                for ($i = 1; $i <= $this->getPages(); $i++) {
                     $items[] = $this->createItem($i, $this->getCurrentPage() == $i);
                 }
             } else {
@@ -282,7 +282,7 @@ namespace Core\Helpers {
                     $items[] = $this->createItem();
                 }
 
-                for ($i = $startPage; $i <= $endPage; ++$i) {
+                for ($i = $startPage; $i <= $endPage; $i++) {
                     $items[] = $this->createItem($i, $this->getCurrentPage() == $i);
                 }
 

@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -11,7 +11,7 @@ use App\Models\User;
 use Phinx\Seed\AbstractSeed;
 
 /**
- * Class UsersSeeder.
+ * Class UsersSeeder
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -29,7 +29,7 @@ class UsersSeeder extends AbstractSeed
             }
 
             // Create users
-            for ($i = 1; $i <= 10; ++$i) {
+            for ($i = 1; $i <= 10; $i++) {
                 $user = new User();
                 $user->data([
                     'name' => "User {$i}",

@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -37,11 +37,11 @@ namespace App\Middlewares {
                     $scaped = preg_quote("={$value}", '/');
 
                     file_put_contents(
-                        APP_FOLDER.'/.env',
+                        APP_FOLDER . '/.env',
                         preg_replace(
                             "/^{$key}{$scaped}/m",
                             "{$key}=vcw_{$random}",
-                            file_get_contents(APP_FOLDER.'/.env')
+                            file_get_contents(APP_FOLDER . '/.env')
                         )
                     );
                 }

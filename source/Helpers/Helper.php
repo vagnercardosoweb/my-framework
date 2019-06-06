@@ -1,7 +1,7 @@
 <?php
 
-/**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -10,7 +10,7 @@
 
 namespace Core\Helpers {
     /**
-     * Class Helper.
+     * Class Helper
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -177,7 +177,7 @@ namespace Core\Helpers {
                 if (is_array($value)) {
                     $build[] = self::httpBuildQuery($value, $key);
                 } else {
-                    $build[] = $key.'='.urlencode($value);
+                    $build[] = $key . '=' . urlencode($value);
                 }
             }
 
@@ -208,7 +208,7 @@ namespace Core\Helpers {
 
             return number_format(
                     round($bytes, $precision), 2, ',', ''
-                ).' '.$units[$base];
+                ) . ' ' . $units[$base];
         }
 
         /**
