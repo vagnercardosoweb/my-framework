@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -14,12 +14,15 @@ namespace App\Providers {
     use Core\Password\Bcrypt;
 
     /**
-     * Class PasswordProvider.
+     * Class PasswordProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class PasswordProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
             $this->container['password'] = function () {

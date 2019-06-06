@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -12,7 +12,7 @@ namespace Core\Password {
     use RuntimeException;
 
     /**
-     * Class Argon.
+     * Class Argon
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */

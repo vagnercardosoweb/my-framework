@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -10,7 +10,7 @@
 
 namespace Core\Password {
     /**
-     * Class Argon2Id.
+     * Class Argon2Id
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
