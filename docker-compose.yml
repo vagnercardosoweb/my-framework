@@ -8,16 +8,20 @@ services:
     networks:
       - mysql-network
       # - pgsql-network
+    depends_on:
+      - mysql
+      # - pgsql
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - ".:/var/www"
-      - "./docker/000-default.conf:/etc/apache2/sites-available/000-default.conf"
-      - "./docker/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf"
+      - "./docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf"
+      - "./docker/apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf"
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
       - DOCUMENT_ROOT=/var/www/public_html
+      - APACHE_LOG_DIR=/var/www/docker/apache/logs
 
   mysql:
     image: mysql:5.7
@@ -38,6 +42,8 @@ services:
     image: phpmyadmin/phpmyadmin
     networks:
       - mysql-network
+    depends_on:
+      - mysql
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
