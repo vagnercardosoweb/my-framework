@@ -9,6 +9,7 @@
  */
 
 namespace App\Providers {
+    use Core\App;
     use Core\Helpers\Curl;
     use Core\Helpers\Helper;
 
@@ -24,26 +25,38 @@ namespace App\Providers {
          */
         public function register()
         {
-            if (!preg_match('/localhost|.dev|.local/i', $_SERVER['HTTP_HOST']) && !Helper::isPhpCli() && App::getInstance()->resolve('event')) {
-                $this->event->on('event.error.handler', function ($errors) {
-                    if (!empty($errors['error']) && !empty(env('SLACK_ERROR_URL', ''))) {
-                        unset($errors['error']['trace']);
-
-                        // Password
-                        $id = hash_hmac('sha1', json_encode($errors['error']), 'SLACKNOTIFICATION');
-
-                        // Adiciona um novo evento para gerar o id.
-                        $this->event->on('event.error.id', function () use ($id) {
-                            return $id;
-                        });
-
-                        // Envia a notificação
-                        if ($this->checkFilemtime($id)) {
-                            $this->sendNotification(array_merge(['id' => $id], $errors['error']));
-                        }
-                    }
-                });
+            if (
+                !preg_match('/localhost|.dev|.local/i', $_SERVER['HTTP_HOST']) &&
+                !Helper::isPhpCli() &&
+                App::getInstance()->resolve('event')
+            ) {
+                $this->dispatch();
             }
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        protected function dispatch(): void
+        {
+            $this->event->on('eventErrorHandler', function (array $errors) {
+                if (!empty($errors['error']) && !empty(env('SLACK_ERROR_URL', ''))) {
+                    unset($errors['error']['trace']);
+
+                    // Password
+                    $id = hash_hmac('sha1', json_encode($errors['error']), 'slackNotification');
+
+                    // Adiciona um novo evento para gerar o id.
+                    $this->event->on('eventErrorHandlerId', function () use ($id) {
+                        return $id;
+                    });
+
+                    // Envia a notificação
+                    if ($this->timeFile($id)) {
+                        $this->notification(array_merge(['id' => $id], $errors['error']));
+                    }
+                }
+            });
         }
 
         /**
@@ -51,7 +64,7 @@ namespace App\Providers {
          *
          * @return bool
          */
-        protected function checkFilemtime($id)
+        protected function timeFile(string $id): bool
         {
             // Time do arquivo
             $filename = $this->createFile($id);
@@ -73,10 +86,10 @@ namespace App\Providers {
          *
          * @return string
          */
-        protected function createFile($id)
+        protected function createFile(string $id): string
         {
             // Variáveis
-            $path = APP_FOLDER.'/storage/cache/slack';
+            $path = APP_FOLDER . '/storage/cache/slack';
             $filename = "{$path}/{$id}";
 
             // Cria a pasta caso não exista
@@ -98,10 +111,10 @@ namespace App\Providers {
         /**
          * @param array $error
          */
-        protected function sendNotification($error)
+        protected function notification(array $error): void
         {
             // Deixa prosseguir a aplicação
-            if (!Helper::isPhpCli() && env('APP_SESSION', true)) {
+            if ('true' == env('APP_SESSION', true)) {
                 session_write_close();
             }
 
@@ -111,7 +124,7 @@ namespace App\Providers {
             $text = [];
             $text[] = "*ip:* {$ip}";
             $text[] = "*hostname:* {$hostname}";
-            $text[] = '*date:* '.date('d/m/Y H:i:s', time());
+            $text[] = '*date:* ' . date('d/m/Y H:i:s', time());
 
             // Monta payload do erro
             foreach ($error as $key => $value) {

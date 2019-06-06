@@ -89,7 +89,10 @@ namespace App\Controller {
             return $this->view->render($this->response, $template, $context, $status);
         }
 
-        protected function boot()
+        /**
+         * @return void
+         */
+        protected function boot(): void
         {
         }
     }

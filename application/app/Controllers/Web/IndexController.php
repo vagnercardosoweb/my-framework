@@ -12,14 +12,14 @@ namespace App\Controllers\Web {
     use App\Controller\Controller;
 
     /**
-     * Class IndexController.
+     * Class IndexController
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class IndexController extends Controller
     {
         /**
-         * [GET] /.
+         * [GET] /
          *
          * @return \Slim\Http\Response
          */

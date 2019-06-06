@@ -16,21 +16,27 @@ namespace App\Providers {
     use Slim\Http\Response;
 
     /**
-     * Class ErrorProvider.
+     * Class ErrorProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class ErrorProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
+            /**
+             * @return \Closure
+             */
             $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
-                /*
-                 * @param \Slim\Http\Request $request
+                /**
+                 * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
-                 * @param \Exception $exception
+                 * @param \Exception          $exception
                  *
-                 * @return mixed
+                 * @return \Psr\Http\Message\ResponseInterface
                  */
                 return function (Request $request, Response $response, $exception) {
                     /** @var \Slim\Route $route */
@@ -43,13 +49,13 @@ namespace App\Providers {
                             'file' => str_replace([PUBLIC_FOLDER, APP_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
                             'line' => $exception->getLine(),
                             'message' => $exception->getMessage(),
-                            'route' => (is_object($route) ? '('.implode(', ', $route->getMethods()).') ' : null).$request->getUri(),
+                            'route' => (is_object($route) ? '(' . implode(', ', $route->getMethods()) . ') ' : null) . $request->getUri(),
                             'trace' => explode("\n", $exception->getTraceAsString()),
                         ],
                     ];
 
                     if (App::getInstance()->resolve('event')) {
-                        $this->event->emit('event.error.handler', $errors);
+                        $this->event->emit('eventErrorHandler', $errors);
                     }
 
                     if (Helper::isPhpCli() || ($request->isXhr() || Router::hasCurrent('/api/'))) {
@@ -57,17 +63,23 @@ namespace App\Providers {
                     }
 
                     return $this->view->render(
-                        $response, '@error.500', $errors, 500
+                        $response,
+                        '@error.500',
+                        $errors,
+                        500
                     );
                 };
             };
 
+            /**
+             * @return \Closure
+             */
             $this->container['notFoundHandler'] = function () {
-                /*
-                 * @param \Slim\Http\Request $request
+                /**
+                 * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
                  *
-                 * @return mixed
+                 * @return \Psr\Http\Message\ResponseInterface
                  */
                 return function (Request $request, Response $response) {
                     $uri = urldecode($request->getUri());
@@ -82,18 +94,24 @@ namespace App\Providers {
                     }
 
                     return $this->view->render(
-                        $response, '@error.404', ['url' => $uri], 404
+                        $response,
+                        '@error.404',
+                        ['url' => $uri],
+                        404
                     );
                 };
             };
 
+            /**
+             * @return \Closure
+             */
             $this->container['notAllowedHandler'] = function () {
-                /*
-                 * @param \Slim\Http\Request $request
+                /**
+                 * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
-                 * @param string[] $methods
+                 * @param string[]            $methods
                  *
-                 * @return mixed
+                 * @return \Psr\Http\Message\ResponseInterface
                  */
                 return function (Request $request, Response $response, $methods) {
                     $uri = urldecode($request->getUri());

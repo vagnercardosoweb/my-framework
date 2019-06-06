@@ -17,8 +17,8 @@
         
         {% if debug %}
           {% if has_container('event') %}
-            {% if event_has('event.error.id') %}
-              <h1 style="text-align: center; color: red; font-weight: bold;">{{ event_emit('event.error.id') }}</h1>
+            {% if event_has('eventErrorHandlerId') %}
+              <h1 style="text-align: center; color: red; font-weight: bold;">{{ event_emit('eventErrorHandlerId') }}</h1>
             {% endif %}
           {% endif %}
           
