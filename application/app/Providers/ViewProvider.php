@@ -19,15 +19,22 @@ namespace App\Providers {
      */
     class ViewProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
             $this->container['view'] = function () {
                 return new View(
-                    config('view.templates'), config('view.options')
+                    config('view.templates'),
+                    config('view.options')
                 );
             };
         }
 
+        /**
+         * {@inheritdoc}
+         */
         public function boot()
         {
             $this->view->addExtension(new DebugExtension());
