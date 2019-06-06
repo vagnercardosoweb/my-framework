@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -10,7 +10,7 @@
 
 namespace Core {
     /**
-     * Class Jwt.
+     * Class Jwt
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -35,7 +35,7 @@ namespace Core {
          */
         public function __construct(string $key)
         {
-            $this->key = (string) $key;
+            $this->key = (string)$key;
 
             if (empty($this->key)) {
                 throw new \InvalidArgumentException(
@@ -66,9 +66,9 @@ namespace Core {
         /**
          * @param string $token
          *
-         * @return array
-         *
          * @throws \Exception
+         *
+         * @return array
          */
         public function decode(string $token): array
         {

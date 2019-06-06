@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -12,17 +12,22 @@ namespace App\Providers {
     use Core\Jwt;
 
     /**
-     * Class JwtProvider.
+     * Class JwtProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class JwtProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
             $this->container['jwt'] = function () {
                 return new Jwt(
-                    (env('APP_KEY') ?? md5(md5('VCWEBNETWORKS')))
+                    (env('APP_KEY', null) ?: md5(md5(
+                        sprintf('vcw-%s', $_SERVER['HTTP_HOST'] ?? 'VCWebNetworks'))
+                    ))
                 );
             };
         }
