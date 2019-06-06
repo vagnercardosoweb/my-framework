@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -10,7 +10,7 @@
 
 namespace Core {
     /**
-     * Class Encryption.
+     * Class Encryption
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -46,9 +46,9 @@ namespace Core {
          * @param mixed $value
          * @param bool  $serialize
          *
-         * @return string|bool
+         * @return string|null
          */
-        public function encrypt($value, bool $serialize = true)
+        public function encrypt($value, bool $serialize = true): ?string
         {
             $ivlenght = openssl_cipher_iv_length($this->cipher);
             $iv = random_bytes($ivlenght);
@@ -59,14 +59,14 @@ namespace Core {
             );
 
             if (false === $value) {
-                return false;
+                return null;
             }
 
             $mac = $this->hash($iv = base64_encode($iv), $value);
             $json = json_encode(compact('iv', 'value', 'mac'));
 
             if (JSON_ERROR_NONE !== json_last_error()) {
-                return false;
+                return null;
             }
 
             return base64_encode($json);
@@ -76,7 +76,7 @@ namespace Core {
          * @param string $payload
          * @param bool   $unserialize
          *
-         * @return string|bool
+         * @return mixed
          */
         public function decrypt(string $payload, bool $unserialize = true)
         {
@@ -87,7 +87,7 @@ namespace Core {
             );
 
             if (false === $decrypted) {
-                return false;
+                return null;
             }
 
             return $unserialize
@@ -103,24 +103,24 @@ namespace Core {
          */
         protected function hash(string $iv, string $value): string
         {
-            return hash_hmac('sha256', $iv.$value, $this->key);
+            return hash_hmac('sha256', $iv . $value, $this->key);
         }
 
         /**
          * @param string $payload
          *
-         * @return array|bool
+         * @return array|null
          */
-        protected function getJsonPayload(string $payload)
+        protected function getJsonPayload(string $payload): ?array
         {
             $payload = json_decode(base64_decode($payload), true);
 
             if (!$this->validPayload($payload)) {
-                return false;
+                return null;
             }
 
             if (!$this->validMac($payload)) {
-                return false;
+                return null;
             }
 
             return $payload;
@@ -131,7 +131,7 @@ namespace Core {
          *
          * @return bool
          */
-        protected function validPayload(array $payload)
+        protected function validPayload(array $payload): bool
         {
             return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
                 strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
@@ -142,7 +142,7 @@ namespace Core {
          *
          * @return bool
          */
-        protected function validMac(array $payload)
+        protected function validMac(array $payload): bool
         {
             $bytes = random_bytes(16);
             $calculated = $this->calculateMac($payload, $bytes);
@@ -159,7 +159,7 @@ namespace Core {
          *
          * @return string
          */
-        protected function calculateMac(array $payload, $bytes)
+        protected function calculateMac(array $payload, $bytes): string
         {
             return hash_hmac(
                 'sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true

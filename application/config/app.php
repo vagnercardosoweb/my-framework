@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -32,13 +32,13 @@ return [
          * Versão do framework
          */
 
-        'framework' => 'v1.0.0',
+        'framework' => 'v0.1.0',
 
         /*
          * Versão do skeleton
          */
 
-        'skeleton' => 'v1.0.0',
+        'skeleton' => 'v0.1.0',
     ],
 
     /*
