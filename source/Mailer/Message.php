@@ -13,7 +13,7 @@ namespace Core\Mailer {
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
-     * Class Message.
+     * Class Message
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -25,8 +25,6 @@ namespace Core\Mailer {
         protected $mail;
 
         /**
-         * Message constructor.
-         *
          * @param PHPMailer $mail
          */
         public function __construct(PHPMailer $mail)
@@ -38,9 +36,9 @@ namespace Core\Mailer {
          * @param string $address
          * @param string $name
          *
-         * @return \Core\Mailer\Message
-         *
          * @throws \Exception
+         *
+         * @return \Core\Mailer\Message
          */
         public function from(string $address, ?string $name = ''): Message
         {
@@ -124,9 +122,9 @@ namespace Core\Mailer {
          * @param string $type
          * @param string $disposition
          *
-         * @return \Core\Mailer\Message
-         *
          * @throws \Exception
+         *
+         * @return \Core\Mailer\Message
          */
         public function addFile(
             string $path,
