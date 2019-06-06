@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,22 +9,20 @@
  */
 
 namespace App\Middlewares {
-
     use Slim\Http\Request;
     use Slim\Http\Response;
 
     /**
-     * Class TrailingSlashMiddleware
+     * Class TrailingSlashMiddleware.
      *
-     * @package App\Middlewares
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class TrailingSlashMiddleware extends Middleware
     {
         /**
-         * @param \Slim\Http\Request $request PSR7 request
+         * @param \Slim\Http\Request  $request  PSR7 request
          * @param \Slim\Http\Response $response PSR7 response
-         * @param callable $next Next middleware
+         * @param callable            $next     Next middleware
          *
          * @return \Slim\Http\Response
          */
@@ -33,21 +31,17 @@ namespace App\Middlewares {
             $uri = $request->getUri();
             $path = $uri->getPath();
 
-            if ($path != '/' && substr($path, -1) == '/') {
+            if ('/' != $path && '/' == substr($path, -1)) {
                 $uri = $uri->withPath(substr($path, 0, -1));
 
-                if ($request->getMethod() == 'GET') {
+                if ('GET' == $request->getMethod()) {
                     return $response->withRedirect((string) $uri, 301);
-                } else {
-                    $response = $next($request->withUri($uri), $response);
-
-                    return $response;
                 }
+
+                return $next($request->withUri($uri), $response);
             }
 
-            $response = $next($request, $response);
-
-            return $response;
+            return $next($request, $response);
         }
     }
 }

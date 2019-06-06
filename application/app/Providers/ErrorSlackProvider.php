@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,18 @@
  */
 
 namespace App\Providers {
-
     use Core\Helpers\Curl;
     use Core\Helpers\Helper;
 
     /**
-     * Class ErrorSlackProvider
+     * Class ErrorSlackProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class ErrorSlackProvider extends Provider
     {
         /**
-         * @inheritDoc
+         * {@inheritdoc}
          */
         public function register()
         {
@@ -113,7 +111,7 @@ namespace App\Providers {
             $text = [];
             $text[] = "*ip:* {$ip}";
             $text[] = "*hostname:* {$hostname}";
-            $text[] = "*date:* ".date('d/m/Y H:i:s', time());
+            $text[] = '*date:* '.date('d/m/Y H:i:s', time());
 
             // Monta payload do erro
             foreach ($error as $key => $value) {
@@ -132,8 +130,8 @@ namespace App\Providers {
             try {
                 (new Curl())->post(env('SLACK_ERROR_URL'), json_encode([
                     'text' => $text,
-                    "username" => config('client.name'),
-                    "mrkdwn" => true,
+                    'username' => config('client.name'),
+                    'mrkdwn' => true,
                 ]));
             } catch (\Exception $e) {
                 $this->logger->filename('slack')->error(

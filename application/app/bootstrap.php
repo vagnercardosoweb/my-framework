@@ -1,17 +1,16 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use Core\App;
 use Core\Loader;
 
-/**
+/*
  * Minifier o html, js, css etc...
  */
 
@@ -29,9 +28,8 @@ ob_start(function ($buffer) {
 });
 
 /**
- * Autoload
+ * Autoload.
  */
-
 $authload = APP_FOLDER.'/vendor/autoload.php';
 
 if (!file_exists($authload)) {
@@ -42,16 +40,15 @@ if (!file_exists($authload)) {
 require_once "{$authload}";
 
 /**
- * Carrega a aplicação
+ * Carrega a aplicação.
  */
-
 $app = App::getInstance();
 Loader::providers($app);
 Loader::middlewares($app);
 Loader::routes($app);
 $app->run();
 
-/**
+/*
  * Buffer de saída
  */
 

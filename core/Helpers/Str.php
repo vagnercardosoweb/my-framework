@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,18 +9,16 @@
  */
 
 namespace Core\Helpers {
-
     /**
-     * Class Str
+     * Class Str.
      *
-     * @package Core\Helpers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Str extends \Illuminate\Support\Str
     {
         /**
          * @param string $string
-         * @param int $limit
+         * @param int    $limit
          * @param string $end
          *
          * @return string

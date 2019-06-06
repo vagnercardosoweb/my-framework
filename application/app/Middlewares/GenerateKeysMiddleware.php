@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,23 +9,21 @@
  */
 
 namespace App\Middlewares {
-
     use Core\Helpers\Str;
     use Slim\Http\Request;
     use Slim\Http\Response;
 
     /**
-     * Class GenerateKeysMiddleware
+     * Class GenerateKeysMiddleware.
      *
-     * @package App\Middlewares
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class GenerateKeysMiddleware extends Middleware
     {
         /**
-         * @param \Slim\Http\Request $request PSR7 request
+         * @param \Slim\Http\Request  $request  PSR7 request
          * @param \Slim\Http\Response $response PSR7 response
-         * @param callable $next Next middleware
+         * @param callable            $next     Next middleware
          *
          * @return \Slim\Http\Response
          */
@@ -49,9 +47,7 @@ namespace App\Middlewares {
                 }
             }
 
-            $response = $next($request, $response);
-
-            return $response;
+            return $next($request, $response);
         }
     }
 }

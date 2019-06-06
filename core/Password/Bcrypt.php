@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,18 +9,16 @@
  */
 
 namespace Core\Password {
-
     /**
-     * Class Bcrypt
+     * Class Bcrypt.
      *
-     * @package Core\Password
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Bcrypt extends Password
     {
         /**
          * @param string $password
-         * @param array $options
+         * @param array  $options
          *
          * @return string
          */
@@ -30,9 +28,9 @@ namespace Core\Password {
                 'cost' => $options['cost'] ?? PASSWORD_BCRYPT_DEFAULT_COST,
             ]);
 
-            if ($hash === false) {
+            if (false === $hash) {
                 throw new \RuntimeException(
-                    "Bcrypt password not supported."
+                    'Bcrypt password not supported.'
                 );
             }
 
@@ -41,7 +39,7 @@ namespace Core\Password {
 
         /**
          * @param string $hash
-         * @param array $options
+         * @param array  $options
          *
          * @return bool
          */

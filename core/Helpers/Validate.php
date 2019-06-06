@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace App\Core\Helpers {
-
     /**
-     * Class Validate
+     * Class Validate.
      *
-     * @package App\Core\Helpers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Validate
@@ -44,7 +42,7 @@ namespace App\Core\Helpers {
         {
             $cpf = preg_replace('/[^0-9]/', '', $cpf);
 
-            if (strlen($cpf) != 11) {
+            if (11 != strlen($cpf)) {
                 return false;
             }
 
@@ -68,9 +66,9 @@ namespace App\Core\Helpers {
 
             if ($sumA != $cpf[9] || $sumB != $cpf[10]) {
                 return false;
-            } else {
-                return true;
             }
+
+            return true;
         }
 
         /**
@@ -82,7 +80,7 @@ namespace App\Core\Helpers {
         {
             $cnpj = preg_replace('/[^0-9]/', '', $cnpj);
 
-            if (strlen($cnpj) != 14) {
+            if (14 != strlen($cnpj)) {
                 return false;
             }
 
@@ -90,7 +88,7 @@ namespace App\Core\Helpers {
             $digitB = 0;
 
             for ($i = 0, $c = 5; $i <= 11; $i++, $c--) {
-                $c = ($c == 1 ? 9 : $c);
+                $c = (1 == $c ? 9 : $c);
                 $digitA += $cnpj[$i] * $c;
             }
 
@@ -99,20 +97,21 @@ namespace App\Core\Helpers {
                     return false;
                 }
 
-                $c = ($c == 1 ? 9 : $c);
+                $c = (1 == $c ? 9 : $c);
                 $digitB += $cnpj[$i] * $c;
             }
 
             $sumA = (($digitA % 11) < 2) ? 0 : 11 - ($digitA % 11);
             $sumB = (($digitB % 11) < 2) ? 0 : 11 - ($digitB % 11);
 
-            if (strlen($cnpj) != 14) {
+            if (14 != strlen($cnpj)) {
                 return false;
-            } else if ($sumA != $cnpj[12] || $sumB != $cnpj[13]) {
-                return false;
-            } else {
-                return true;
             }
+            if ($sumA != $cnpj[12] || $sumB != $cnpj[13]) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

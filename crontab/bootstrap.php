@@ -1,18 +1,17 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use Core\App;
 use Core\Loader;
 
 try {
-    /**
+    /*
      * Constantes
      */
 
@@ -20,21 +19,19 @@ try {
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
     define('APP_FOLDER', __DIR__.'/../application');
     define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
-    define('BASE_URL', "http://localhost");
+    define('BASE_URL', 'http://localhost');
 
     /**
-     * Autoload
+     * Autoload.
      */
-
     require_once APP_FOLDER.'/vendor/autoload.php';
 
     /**
-     * Carrega a aplicação
+     * Carrega a aplicação.
      */
-
     $app = App::getInstance();
 
-    /**
+    /*
      * Carrega os serviços
      */
 

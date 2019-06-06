@@ -1,17 +1,16 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use Core\Contracts\Migration;
 
 /**
- * Class CreateUsers
+ * Class CreateUsers.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -28,7 +27,6 @@ class CreateUsers extends Migration
     protected $primaryKey = 'id';
 
     /**
-     * @return void
      * @throws \Exception
      *
      * @see http://docs.phinx.org/en/latest/migrations.html
@@ -45,11 +43,11 @@ class CreateUsers extends Migration
                 'default' => 'online',
             ])
             ->addIndex('email', ['unique' => true])
-            ->save();
+            ->save()
+        ;
     }
 
     /**
-     * @return void
      * @throws \Exception
      */
     public function down()

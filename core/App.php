@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,7 +9,6 @@
  */
 
 namespace Core {
-
     use BadMethodCallException;
     use Closure;
     use Core\Helpers\Helper;
@@ -17,9 +16,8 @@ namespace Core {
     use Slim\Http\Response;
 
     /**
-     * Class App
+     * Class App.
      *
-     * @package Core
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class App extends \Slim\App
@@ -30,7 +28,7 @@ namespace Core {
         private static $instance;
 
         /**
-         * App constructor
+         * App constructor.
          */
         public function __construct()
         {
@@ -44,7 +42,7 @@ namespace Core {
                     'responseChunkSize' => 4096,
                     'outputBuffering' => 'append',
                     'determineRouteBeforeAppMiddleware' => true,
-                    'displayErrorDetails' => (env('APP_ENV', 'development') == 'development'),
+                    'displayErrorDetails' => ('development' == env('APP_ENV', 'development')),
                     'addContentLengthHeader' => true,
                     'routerCacheFile' => false,
                 ], config('app.slim', [])),
@@ -67,10 +65,10 @@ namespace Core {
         }
 
         /**
-         * @param string|array $methods
-         * @param string $pattern
-         * @param string|\Closure $callable
-         * @param string $name
+         * @param string|array          $methods
+         * @param string                $pattern
+         * @param string|\Closure       $callable
+         * @param string                $name
          * @param string|array|\Closure $middlewares
          *
          * @return \Slim\Interfaces\RouteInterface
@@ -95,17 +93,17 @@ namespace Core {
                         $namespace = "{$namespace}Controller";
                     }
 
-                    /**
+                    /*
                      * Percorre os grupos procurando
                      * por NAMESPACES para auto completar
-                     *
-                     * @var \Slim\Route $route
                      */
+
+                    /** @var \Slim\Route $route */
                     if ($route = $request->getAttribute('route')) {
                         foreach (array_reverse($route->getGroups()) as $group) {
                             if (property_exists($group, 'namespaces')) {
                                 foreach ($group->namespaces as $n) {
-                                    $n = (($n[strlen($n) - 1] !== '/') ? "{$n}/" : $n);
+                                    $n = (('/' !== $n[strlen($n) - 1]) ? "{$n}/" : $n);
                                     $namespace = "{$n}{$namespace}";
                                 }
                             }
@@ -113,7 +111,7 @@ namespace Core {
                     }
 
                     // Inicia o controller
-                    $namespace = "App\\Controllers\\".str_ireplace('/', '\\', $namespace);
+                    $namespace = 'App\\Controllers\\'.str_ireplace('/', '\\', $namespace);
                     $controller = new $namespace($request, $response, $this);
 
                     // Verifica se existe o método
@@ -123,7 +121,7 @@ namespace Core {
 
                         if (!method_exists($controller, $method)) {
                             throw new BadMethodCallException(
-                                sprintf("Call to undefined method %s::%s()", get_class($controller), $method), E_ERROR
+                                sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR
                             );
                         }
                     }
@@ -165,7 +163,7 @@ namespace Core {
         }
 
         /**
-         * @param string|array $pattern
+         * @param string|array      $pattern
          * @param callable|\Closure $callable
          *
          * @return \Slim\Interfaces\RouteGroupInterface
@@ -200,7 +198,7 @@ namespace Core {
 
         /**
          * @param string $name
-         * @param mixed $params
+         * @param mixed  $params
          *
          * @return mixed
          */

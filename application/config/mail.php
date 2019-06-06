@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,8 +9,7 @@
  */
 
 return [
-
-    /**
+    /*
      * 0 = Off ( Em produção manter em off )
      * 1 = Mensagem cliente
      * 2 = Mensagem do servidor e cliente
@@ -18,7 +17,7 @@ return [
 
     'debug' => env('MAIL_DEBUG', 0),
 
-    /**
+    /*
      * Charset
      *
      * Codigicação das palavras
@@ -26,7 +25,7 @@ return [
 
     'charset' => env('MAIL_CHARSET', 'utf-8'),
 
-    /**
+    /*
      * Host
      *
      * Servidor que irá envia o e-mail
@@ -34,7 +33,7 @@ return [
 
     'host' => env('MAIL_HOST', null),
 
-    /**
+    /*
      * Port
      *
      * Porta do servidor
@@ -42,7 +41,7 @@ return [
 
     'port' => env('MAIL_PORT', 587),
 
-    /**
+    /*
      * Username
      *
      * Usuário do servidor
@@ -50,7 +49,7 @@ return [
 
     'username' => env('MAIL_USER', null),
 
-    /**
+    /*
      * Password
      *
      * Senha do usuário do servidor
@@ -58,7 +57,7 @@ return [
 
     'password' => env('MAIL_PASS', null),
 
-    /**
+    /*
      * Auth
      *
      * Define se os e-mail serão autenticado
@@ -66,7 +65,7 @@ return [
 
     'auth' => env('MAIL_AUTH', true),
 
-    /**
+    /*
      * Secure
      *
      * Define o nível de segurança
@@ -76,7 +75,7 @@ return [
 
     'secure' => env('MAIL_SECURE', 'tls'),
 
-    /**
+    /*
      * From
      *
      * Remetente que irá envia os e-mails
@@ -86,5 +85,4 @@ return [
         'name' => env('MAIL_FROM_NAME', ''),
         'mail' => env('MAIL_FROM_MAIL', ''),
     ],
-
 ];

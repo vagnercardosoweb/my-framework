@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,18 @@
  */
 
 namespace App\Middlewares {
-
     use Core\App;
     use Slim\Http\Request;
     use Slim\Http\Response;
 
     /**
-     * Class Middleware
+     * Class Middleware.
      *
      * @property \Slim\Collection settings
      * @property \Slim\Http\Environment environment
      * @property \Slim\Http\Request request
      * @property \Slim\Http\Response response
      * @property \Slim\Router router
-     *
      * @property \Core\View view
      * @property \Core\Session\Session session
      * @property \Core\Session\Flash flash
@@ -32,10 +30,8 @@ namespace App\Middlewares {
      * @property \Core\Jwt jwt
      * @property \Core\Logger logger
      * @property \Core\Event event
-     *
      * @property \Core\Database\Database db
      *
-     * @package App\Middlewares
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     abstract class Middleware
@@ -60,9 +56,9 @@ namespace App\Middlewares {
         }
 
         /**
-         * @param \Slim\Http\Request $request PSR7 request
+         * @param \Slim\Http\Request  $request  PSR7 request
          * @param \Slim\Http\Response $response PSR7 response
-         * @param callable $next Next middleware
+         * @param callable            $next     Next middleware
          *
          * @return \Slim\Http\Response
          */

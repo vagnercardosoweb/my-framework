@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,18 @@
  */
 
 namespace App\Controllers\Api\Deploy {
-
     use App\Controller\Controller;
     use Slim\Http\StatusCode;
 
     /**
-     * Class GitlabController
+     * Class GitlabController.
      *
-     * @package App\Controllers\Api\Deploy
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class GitlabController extends Controller
     {
         /**
-         * [POST] /api/deploy/gitlab
+         * [POST] /api/deploy/gitlab.
          *
          * @return \Slim\Http\Response
          */
@@ -34,14 +32,14 @@ namespace App\Controllers\Api\Deploy {
                 $event = $this->request->getHeaderLine('X-Gitlab-Event');
 
                 if (empty($token) || $token !== env('DEPLOY_KEY')) {
-                    throw new \Exception("Token inválid.", E_USER_ERROR);
+                    throw new \Exception('Token inválid.', E_USER_ERROR);
                 }
 
                 // Body
                 $body = json_decode(file_get_contents('php://input'), true);
 
                 if (empty($body['ref'])) {
-                    throw new \InvalidArgumentException("Body ref empty.", E_USER_ERROR);
+                    throw new \InvalidArgumentException('Body ref empty.', E_USER_ERROR);
                 }
 
                 // Trata branch
@@ -52,7 +50,7 @@ namespace App\Controllers\Api\Deploy {
 
                 // Verifica pasta .git
                 if (!file_exists(ROOT.'/.git')) {
-                    throw new \Exception("Git not initialize.", E_USER_ERROR);
+                    throw new \Exception('Git not initialize.', E_USER_ERROR);
                 }
 
                 switch ($branch) {
@@ -60,7 +58,7 @@ namespace App\Controllers\Api\Deploy {
                         `git fetch origin && git reset --hard origin/master 2>&1`;
                         break;
                     default:
-                        throw new \Exception("Branch undefined.", E_USER_ERROR);
+                        throw new \Exception('Branch undefined.', E_USER_ERROR);
                 }
 
                 return json([

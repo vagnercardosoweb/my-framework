@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,7 +9,6 @@
  */
 
 namespace App\Providers {
-
     use Core\App;
     use Core\Helpers\Helper;
     use Core\Router;
@@ -17,20 +16,16 @@ namespace App\Providers {
     use Slim\Http\Response;
 
     /**
-     * Class ErrorProvider
+     * Class ErrorProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class ErrorProvider extends Provider
     {
-        /**
-         * @return void
-         */
         public function register()
         {
             $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request $request
                  * @param \Slim\Http\Response $response
                  * @param \Exception $exception
@@ -48,7 +43,7 @@ namespace App\Providers {
                             'file' => str_replace([PUBLIC_FOLDER, APP_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
                             'line' => $exception->getLine(),
                             'message' => $exception->getMessage(),
-                            'route' => (is_object($route) ? "(".implode(", ", $route->getMethods()).") " : null).$request->getUri(),
+                            'route' => (is_object($route) ? '('.implode(', ', $route->getMethods()).') ' : null).$request->getUri(),
                             'trace' => explode("\n", $exception->getTraceAsString()),
                         ],
                     ];
@@ -68,7 +63,7 @@ namespace App\Providers {
             };
 
             $this->container['notFoundHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request $request
                  * @param \Slim\Http\Response $response
                  *
@@ -93,7 +88,7 @@ namespace App\Providers {
             };
 
             $this->container['notAllowedHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request $request
                  * @param \Slim\Http\Response $response
                  * @param string[] $methods

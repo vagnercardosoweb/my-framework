@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core {
-
     /**
-     * Class Encryption
+     * Class Encryption.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Encryption
@@ -46,7 +44,7 @@ namespace Core {
 
         /**
          * @param mixed $value
-         * @param bool $serialize
+         * @param bool  $serialize
          *
          * @return string|bool
          */
@@ -60,14 +58,14 @@ namespace Core {
                 $this->cipher, $this->key, 0, $iv
             );
 
-            if ($value === false) {
+            if (false === $value) {
                 return false;
             }
 
             $mac = $this->hash($iv = base64_encode($iv), $value);
             $json = json_encode(compact('iv', 'value', 'mac'));
 
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            if (JSON_ERROR_NONE !== json_last_error()) {
                 return false;
             }
 
@@ -75,19 +73,8 @@ namespace Core {
         }
 
         /**
-         * @param string $iv
-         * @param mixed $value
-         *
-         * @return string
-         */
-        protected function hash(string $iv, string $value): string
-        {
-            return hash_hmac('sha256', $iv.$value, $this->key);
-        }
-
-        /**
          * @param string $payload
-         * @param bool $unserialize
+         * @param bool   $unserialize
          *
          * @return string|bool
          */
@@ -99,13 +86,24 @@ namespace Core {
                 $payload['value'], $this->cipher, $this->key, 0, $iv
             );
 
-            if ($decrypted === false) {
+            if (false === $decrypted) {
                 return false;
             }
 
             return $unserialize
                 ? unserialize($decrypted)
                 : $decrypted;
+        }
+
+        /**
+         * @param string $iv
+         * @param mixed  $value
+         *
+         * @return string
+         */
+        protected function hash(string $iv, string $value): string
+        {
+            return hash_hmac('sha256', $iv.$value, $this->key);
         }
 
         /**
@@ -156,7 +154,7 @@ namespace Core {
         }
 
         /**
-         * @param array $payload
+         * @param array  $payload
          * @param string $bytes
          *
          * @return string

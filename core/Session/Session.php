@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,13 +9,11 @@
  */
 
 namespace Core\Session {
-
     use Core\Helpers\Arr;
 
     /**
-     * Class Session
+     * Class Session.
      *
-     * @package Core\Session
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Session
@@ -37,9 +35,6 @@ namespace Core\Session {
             $this->session = &$_SESSION;
         }
 
-        /**
-         * @inheritDoc
-         */
         public function start()
         {
             if (!session_id()) {
@@ -63,9 +58,7 @@ namespace Core\Session {
 
         /**
          * @param string $key
-         * @param mixed $value
-         *
-         * @return void
+         * @param mixed  $value
          */
         public function set($key, $value = null)
         {
@@ -90,7 +83,7 @@ namespace Core\Session {
 
         /**
          * @param string $key
-         * @param mixed $default
+         * @param mixed  $default
          *
          * @return mixed
          */
@@ -119,9 +112,6 @@ namespace Core\Session {
             Arr::forget($this->session, $key);
         }
 
-        /**
-         * @inheritDoc
-         */
         public function destroy()
         {
             $_SESSION = [];
@@ -133,26 +123,23 @@ namespace Core\Session {
                     session_name(),
                     '',
                     (time() - 42000),
-                    $params["path"],
-                    $params["domain"],
-                    $params["secure"],
-                    $params["httponly"]
+                    $params['path'],
+                    $params['domain'],
+                    $params['secure'],
+                    $params['httponly']
                 );
             }
 
-            if (session_status() == PHP_SESSION_ACTIVE) {
+            if (PHP_SESSION_ACTIVE == session_status()) {
                 session_destroy();
 
                 $this->regenerate();
             }
         }
 
-        /**
-         * @inheritDoc
-         */
         public function regenerate()
         {
-            if (session_status() == PHP_SESSION_ACTIVE) {
+            if (PHP_SESSION_ACTIVE == session_status()) {
                 session_regenerate_id(true);
             }
         }

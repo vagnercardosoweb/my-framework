@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,16 +9,14 @@
  */
 
 namespace Core {
-
     use Core\Helpers\Helper;
     use Monolog\Formatter\LineFormatter;
     use Monolog\Handler\StreamHandler;
     use Monolog\Logger as Monolog;
 
     /**
-     * Class Logger
+     * Class Logger.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Logger extends Monolog
@@ -47,35 +45,12 @@ namespace Core {
         }
 
         /**
-         * @inheritdoc
+         * {@inheritdoc}
          */
-        protected function initProcessor()
+        public function __clone()
         {
-            $this->pushProcessor(function ($record) {
-                $record['extra']['ip'] = $ip = Helper::getIpAddress();
-                $record['extra']['hostname'] = gethostbyaddr($ip);
-                $record['extra']['useragent'] = Helper::getUserAgent();
-
-                return $record;
-            });
-        }
-
-        /**
-         * @inheritdoc
-         */
-        protected function initHandler()
-        {
-            try {
-                // StreamHandler
-                $stream = new StreamHandler($this->getDirectory(), self::DEBUG);
-                $separate = str_repeat('=', 150);
-                $formatter = new LineFormatter(
-                    "{$separate}\n[%datetime%] %channel%.%level_name%: %message% \n%context% \n%extra%\n{$separate}\n\n"
-                );
-                $stream->setFormatter($formatter);
-                $this->pushHandler($stream);
-            } catch (\Exception $e) {
-            }
+            $this->processors = [];
+            $this->handlers = [];
         }
 
         /**
@@ -88,7 +63,7 @@ namespace Core {
             }
 
             return sprintf(
-                "%s/%s-%s.log",
+                '%s/%s-%s.log',
                 $this->directory,
                 $this->filename,
                 date('Ymd')
@@ -111,12 +86,35 @@ namespace Core {
         }
 
         /**
-         * @inheritdoc
+         * {@inheritdoc}
          */
-        public function __clone()
+        protected function initProcessor()
         {
-            $this->processors = [];
-            $this->handlers = [];
+            $this->pushProcessor(function ($record) {
+                $record['extra']['ip'] = $ip = Helper::getIpAddress();
+                $record['extra']['hostname'] = gethostbyaddr($ip);
+                $record['extra']['useragent'] = Helper::getUserAgent();
+
+                return $record;
+            });
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        protected function initHandler()
+        {
+            try {
+                // StreamHandler
+                $stream = new StreamHandler($this->getDirectory(), self::DEBUG);
+                $separate = str_repeat('=', 150);
+                $formatter = new LineFormatter(
+                    "{$separate}\n[%datetime%] %channel%.%level_name%: %message% \n%context% \n%extra%\n{$separate}\n\n"
+                );
+                $stream->setFormatter($formatter);
+                $this->pushHandler($stream);
+            } catch (\Exception $e) {
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,15 @@
  */
 
 namespace App\Providers {
-
     use Core\Jwt;
 
     /**
-     * Class JwtProvider
+     * Class JwtProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class JwtProvider extends Provider
     {
-        /**
-         * @return void
-         */
         public function register()
         {
             $this->container['jwt'] = function () {

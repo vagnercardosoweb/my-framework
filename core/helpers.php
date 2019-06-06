@@ -13,7 +13,7 @@ use Slim\Http\StatusCode;
 if (!function_exists('env')) {
     /**
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -59,14 +59,14 @@ if (!function_exists('env')) {
 if (!function_exists('asset')) {
     /**
      * @param string $file
-     * @param bool $baseUrl
-     * @param bool $version
+     * @param bool   $baseUrl
+     * @param bool   $version
      *
      * @return bool|string
      */
     function asset(string $file, bool $baseUrl = false, bool $version = false)
     {
-        $file = ((!empty($file[0]) && $file[0] !== '/') ? "/{$file}" : $file);
+        $file = ((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file);
         $path = PUBLIC_FOLDER."{$file}";
         $baseUrl = ($baseUrl ? BASE_URL : '');
 
@@ -95,7 +95,7 @@ if (!function_exists('asset_content')) {
         }
 
         foreach ($files as $file) {
-            $file = ((!empty($file[0]) && $file[0] !== '/') ? "/{$file}" : $file);
+            $file = ((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file);
             $filePath = PUBLIC_FOLDER."{$file}";
 
             if (file_exists($filePath)) {
@@ -112,7 +112,7 @@ if (!function_exists('asset_content')) {
 if (!function_exists('config')) {
     /**
      * @param string $name
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -146,8 +146,8 @@ if (!function_exists('config')) {
 if (!function_exists('json')) {
     /**
      * @param mixed $data
-     * @param int $status
-     * @param int $options
+     * @param int   $status
+     * @param int   $options
      *
      * @return \Slim\Http\Response
      */
@@ -160,8 +160,8 @@ if (!function_exists('json')) {
 if (!function_exists('redirect')) {
     /**
      * @param string $name
-     * @param array $data
-     * @param array $queryParams
+     * @param array  $data
+     * @param array  $queryParams
      *
      * @return \Slim\Http\Response
      */
@@ -182,7 +182,8 @@ if (!function_exists('redirect')) {
 
         return App::getInstance()
             ->resolve('response')
-            ->withRedirect($location, $status);
+            ->withRedirect($location, $status)
+        ;
     }
 }
 
@@ -239,10 +240,9 @@ if (!function_exists('empty_recursive')) {
         foreach ((array) $data as $key => $value) {
             if (is_array($value)) {
                 return empty_recursive($value);
-            } else {
-                if (empty($value) && $value != '0') {
-                    return true;
-                }
+            }
+            if (empty($value) && '0' != $value) {
+                return true;
             }
         }
 
@@ -270,9 +270,9 @@ if (!function_exists('filter_values')) {
             } else {
                 if (is_int($value)) {
                     $filter = FILTER_SANITIZE_NUMBER_INT;
-                } else if (is_float($value)) {
+                } elseif (is_float($value)) {
                     $filter = FILTER_SANITIZE_NUMBER_FLOAT;
-                } else if (is_string($value)) {
+                } elseif (is_string($value)) {
                     $filter = FILTER_SANITIZE_STRING;
                 } else {
                     $filter = FILTER_DEFAULT;

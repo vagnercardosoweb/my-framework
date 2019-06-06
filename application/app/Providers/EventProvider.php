@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,19 +9,17 @@
  */
 
 namespace App\Providers {
-
     use Core\Event;
 
     /**
-     * Class EventProvider
+     * Class EventProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class EventProvider extends Provider
     {
         /**
-         * @inheritDoc
+         * {@inheritdoc}
          */
         public function register()
         {
@@ -30,9 +28,6 @@ namespace App\Providers {
             };
         }
 
-        /**
-         * @return void
-         */
         public function boot()
         {
             $this->view->addFunction('event_emit', function (string $event) {

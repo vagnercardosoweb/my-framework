@@ -1,18 +1,17 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use Core\App;
 use Core\Loader;
 
 try {
-    /**
+    /*
      * Constantes
      */
 
@@ -20,21 +19,19 @@ try {
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
     define('APP_FOLDER', __DIR__);
     define('RESOURCE_FOLDER', __DIR__.'/resources');
-    define('BASE_URL', "http://localhost");
+    define('BASE_URL', 'http://localhost');
 
     /**
-     * Autoload
+     * Autoload.
      */
-
     require_once APP_FOLDER.'/vendor/autoload.php';
 
     /**
-     * Carrega a aplicação
+     * Carrega a aplicação.
      */
-
     $app = App::getInstance();
 
-    /**
+    /*
      * Carrega os serviços
      */
 
@@ -45,18 +42,18 @@ try {
         \App\Providers\JwtProvider::class,
     ]);
 
-    /**
+    /*
      * Configurações do phinx
      */
 
     return [
-        /**
+        /*
          * Class padrão para a migração
          */
 
         'migration_base_class' => \Core\Contracts\Migration::class,
 
-        /**
+        /*
          * Template para criação da migration
          */
 
@@ -64,7 +61,7 @@ try {
             'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
         ],
 
-        /**
+        /*
          * Caminhos relativos até a pasta que será salvo os arquivos
          * de migrations, seeds e bootstrapper
          */
@@ -74,7 +71,7 @@ try {
             'seeds' => __DIR__.'/storage/database/seeds',
         ],
 
-        /**
+        /*
          * Configurações que é usada no escopo do phinx
          */
 
@@ -82,7 +79,7 @@ try {
             'default_migration_table' => 'migrations',
             'default_database' => env('DB_DRIVER', 'mysql'),
 
-            /**
+            /*
              * MySQL
              */
 
@@ -99,7 +96,7 @@ try {
                 'table_suffix' => false,
             ],
 
-            /**
+            /*
              * PostgreSQL
              */
 
@@ -116,7 +113,7 @@ try {
                 'table_suffix' => false,
             ],
 
-            /**
+            /*
              * SQLServer
              */
 
@@ -134,7 +131,7 @@ try {
             ],
         ],
 
-        /**
+        /*
          * Ordem da versionamento
          *
          * creation:

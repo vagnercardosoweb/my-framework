@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core\Helpers {
-
     /**
-     * Class Paginator
+     * Class Paginator.
      *
-     * @package App\Helpers
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Paginator
@@ -54,9 +52,9 @@ namespace Core\Helpers {
         protected $currentPage;
 
         /**
-         * @param int $total
-         * @param int $limit
-         * @param int $range
+         * @param int    $total
+         * @param int    $limit
+         * @param int    $range
          * @param string $link
          * @param string $pageString
          */
@@ -80,7 +78,7 @@ namespace Core\Helpers {
             $this->offset = ($this->currentPage * $this->limit) - $this->limit;
 
             // Monta o link
-            if (strpos($this->link, '?') !== false) {
+            if (false !== strpos($this->link, '?')) {
                 $this->link = "{$this->link}&{$pageString}=";
             } else {
                 $this->link = "{$this->link}?{$pageString}=";
@@ -90,6 +88,38 @@ namespace Core\Helpers {
             if (($this->total > 0 && $this->offset > 0) && ($this->offset >= $this->total)) {
                 header("Location: {$this->link}{$this->pages}", true, 301);
                 exit;
+            }
+        }
+
+        /**
+         * @param string $method
+         * @param array  $arguments
+         *
+         * @return string
+         */
+        public function __call($method, $arguments)
+        {
+            switch ($method) {
+                case 'links':
+                    return $this->toHtml(...$arguments);
+                    break;
+
+                case 'prev':
+                    return $this->getPrevPage();
+                    break;
+
+                case 'next':
+                    return $this->getNextPage();
+                    break;
+
+                default:
+                    if (method_exists($this, 'get'.ucfirst($method))) {
+                        return $this->{'get'.ucfirst($method)}(...$arguments);
+                    }
+
+                    throw new \BadMethodCallException(
+                        sprintf('Call to undefined method %s::%s()', get_class(), $method), E_ERROR
+                    );
             }
         }
 
@@ -239,7 +269,7 @@ namespace Core\Helpers {
             }
 
             if ($this->getPages() <= $this->getRange()) {
-                for ($i = 1; $i <= $this->getPages(); $i++) {
+                for ($i = 1; $i <= $this->getPages(); ++$i) {
                     $items[] = $this->createItem($i, $this->getCurrentPage() == $i);
                 }
             } else {
@@ -248,11 +278,11 @@ namespace Core\Helpers {
                     : $this->getPages();
 
                 if ($startPage > 1) {
-                    $items[] = $this->createItem(1, $this->getCurrentPage() == 1);
+                    $items[] = $this->createItem(1, 1 == $this->getCurrentPage());
                     $items[] = $this->createItem();
                 }
 
-                for ($i = $startPage; $i <= $endPage; $i++) {
+                for ($i = $startPage; $i <= $endPage; ++$i) {
                     $items[] = $this->createItem($i, $this->getCurrentPage() == $i);
                 }
 
@@ -266,58 +296,11 @@ namespace Core\Helpers {
         }
 
         /**
-         * @param int $number
-         * @param bool $current
-         *
-         * @return array
-         */
-        protected function createItem($number = 0, $current = false)
-        {
-            return [
-                'number' => ($number > 0 ? $number : '...'),
-                'pattern' => ($number > 0 ? "{$this->getLink()}{$number}" : false),
-                'current' => $current,
-            ];
-        }
-
-        /**
          * @return string
          */
         public function getLink()
         {
             return $this->link;
-        }
-
-        /**
-         * @param string $method
-         * @param array $arguments
-         *
-         * @return string
-         */
-        public function __call($method, $arguments)
-        {
-            switch ($method) {
-                case 'links':
-                    return $this->toHtml(...$arguments);
-                    break;
-
-                case 'prev':
-                    return $this->getPrevPage();
-                    break;
-
-                case 'next':
-                    return $this->getNextPage();
-                    break;
-
-                default:
-                    if (method_exists($this, 'get'.ucfirst($method))) {
-                        return $this->{'get'.ucfirst($method)}(...$arguments);
-                    }
-
-                    throw new \BadMethodCallException(
-                        sprintf("Call to undefined method %s::%s()", get_class(), $method), E_ERROR
-                    );
-            }
         }
 
         /**
@@ -351,9 +334,24 @@ namespace Core\Helpers {
                 }
             }
 
-            $html .= "</ul>";
+            $html .= '</ul>';
 
             return $html;
+        }
+
+        /**
+         * @param int  $number
+         * @param bool $current
+         *
+         * @return array
+         */
+        protected function createItem($number = 0, $current = false)
+        {
+            return [
+                'number' => ($number > 0 ? $number : '...'),
+                'pattern' => ($number > 0 ? "{$this->getLink()}{$number}" : false),
+                'current' => $current,
+            ];
         }
     }
 }

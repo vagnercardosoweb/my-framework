@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,26 +9,21 @@
  */
 
 namespace App\Providers {
-
     use Core\Helpers\Helper;
     use Core\Session\Flash;
     use Core\Session\Session;
 
     /**
-     * Class SessionProvider
+     * Class SessionProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class SessionProvider extends Provider
     {
-        /**
-         * @return void
-         */
         public function register()
         {
             $this->container['session'] = function () {
-                if (!Helper::isPhpCli() && env('APP_SESSION', 'true') == true) {
+                if (!Helper::isPhpCli() && true == env('APP_SESSION', 'true')) {
                     return new Session();
                 }
 
@@ -44,12 +39,9 @@ namespace App\Providers {
             };
         }
 
-        /**
-         * @return void
-         */
         public function boot()
         {
-            if (!Helper::isPhpCli() && env('APP_SESSION', 'true') == 'true') {
+            if (!Helper::isPhpCli() && 'true' == env('APP_SESSION', 'true')) {
                 $this->view->addGlobal('session', $this->session->all());
                 $this->view->addGlobal('flash', $this->flash->all());
             }

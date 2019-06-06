@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,14 +9,12 @@
  */
 
 namespace Core\Contracts {
-
     use Core\App;
     use Phinx\Migration\AbstractMigration;
 
     /**
-     * Class Migration
+     * Class Migration.
      *
-     * @package App\Models
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     abstract class Migration extends AbstractMigration
@@ -47,7 +45,18 @@ namespace Core\Contracts {
         protected $primaryKeys = [];
 
         /**
-         * @return void
+         * @param string $name
+         *
+         * @return mixed
+         */
+        public function __get($name)
+        {
+            return App::getInstance()
+                ->resolve($name)
+            ;
+        }
+
+        /**
          * @throws \Exception
          */
         public function down()
@@ -57,9 +66,10 @@ namespace Core\Contracts {
 
         /**
          * @param string|null $table
-         * @param array $options
+         * @param array       $options
          *
          * @return \Phinx\Db\Table
+         *
          * @throws \Exception
          */
         public function table($table = null, $options = [])
@@ -70,7 +80,7 @@ namespace Core\Contracts {
             // Verifica a tabela
             if (empty($table)) {
                 throw new \Exception(
-                    sprintf("Table not defined in %s.", get_class($this)),
+                    sprintf('Table not defined in %s.', get_class($this)),
                     E_ERROR
                 );
             }
@@ -82,17 +92,6 @@ namespace Core\Contracts {
                 'collation' => $this->collation,
                 'primary_key' => $this->primaryKeys,
             ], $options));
-        }
-
-        /**
-         * @param string $name
-         *
-         * @return mixed
-         */
-        public function __get($name)
-        {
-            return App::getInstance()
-                ->resolve($name);
         }
     }
 }

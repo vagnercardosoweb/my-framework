@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core\Password {
-
     /**
-     * Class Argon2Id
+     * Class Argon2Id.
      *
-     * @package Core\Password
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Argon2Id extends Argon

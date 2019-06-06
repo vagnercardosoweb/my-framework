@@ -1,18 +1,16 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use Core\App;
 
 return [
-
-    /**
+    /*
      * Options
      *
      * Configura as opções padões do twig
@@ -23,12 +21,12 @@ return [
         'charset' => 'UTF-8',
         'strict_variables' => false,
         'autoescape' => 'html',
-        'cache' => (env('APP_ENV') == 'production' ? APP_FOLDER.'/storage/cache' : false),
+        'cache' => ('production' == env('APP_ENV') ? APP_FOLDER.'/storage/cache' : false),
         'auto_reload' => true,
         'optimizations' => -1,
     ],
 
-    /**
+    /*
      * Templates
      *
      * Define os templates no carregamento das views
@@ -43,15 +41,14 @@ return [
         'mail' => RESOURCE_FOLDER.'/views/mail',
     ],
 
-    /**
+    /*
      * Helpers & Functions
      *
      * Registra funções e filtros para usar na view
      */
 
     'registers' => [
-
-        /**
+        /*
          * Funções
          */
 
@@ -77,7 +74,7 @@ return [
             },
         ],
 
-        /**
+        /*
          * Filtros
          */
 
@@ -87,7 +84,5 @@ return [
             'get_day' => 'get_day',
             'get_month' => 'get_month',
         ],
-
     ],
-
 ];

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,18 @@
  */
 
 namespace Core\Password {
-
     use RuntimeException;
 
     /**
-     * Class Argon
+     * Class Argon.
      *
-     * @package Core\Password
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Argon extends Password
     {
         /**
          * @param string $value
-         * @param array $options
+         * @param array  $options
          *
          * @return string
          */
@@ -34,9 +32,9 @@ namespace Core\Password {
                 'threads' => $options['threads'] ?? PASSWORD_ARGON2_DEFAULT_THREADS,
             ]);
 
-            if ($hash === false) {
+            if (false === $hash) {
                 throw new RuntimeException(
-                    "Argon2i(d) password not supported."
+                    'Argon2i(d) password not supported.'
                 );
             }
 
@@ -45,7 +43,7 @@ namespace Core\Password {
 
         /**
          * @param string $hash
-         * @param array $options
+         * @param array  $options
          *
          * @return bool
          */

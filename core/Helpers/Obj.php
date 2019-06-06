@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core\Helpers {
-
     /**
-     * Class Obj
+     * Class Obj.
      *
-     * @package Core\Helpers
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Obj
@@ -45,7 +43,7 @@ namespace Core\Helpers {
         /**
          * @param object $object
          * @param string $name
-         * @param mixed $default
+         * @param mixed  $default
          *
          * @return mixed
          */

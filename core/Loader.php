@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,7 +9,6 @@
  */
 
 namespace Core {
-
     use Dotenv\Dotenv;
     use Dotenv\Environment\Adapter\EnvConstAdapter;
     use Dotenv\Environment\Adapter\PutenvAdapter;
@@ -17,16 +16,12 @@ namespace Core {
     use Dotenv\Environment\DotenvFactory;
 
     /**
-     * Class Loader
+     * Class Loader.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Loader
     {
-        /**
-         * @inheritDoc
-         */
         public static function dotEnvironment()
         {
             $pathEnv = APP_FOLDER.'/.env';
@@ -46,15 +41,11 @@ namespace Core {
             }
         }
 
-        /**
-         * @inheritDoc
-         */
         public static function defaultPhpConfig()
         {
             /**
-             * Configurações básicas
+             * Configurações básicas.
              */
-
             $charset = env('APP_CHARSET', 'UTF-8');
             $locale = env('APP_LOCALE', 'pt_BR');
 
@@ -63,22 +54,22 @@ namespace Core {
             date_default_timezone_set(env('APP_TIMEZONE', 'America/Sao_Paulo'));
             setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
 
-            /**
+            /*
              * Configurações de erros
              */
 
-            ini_set('log_errors', (env('INI_LOG_ERRORS', 'true') == 'true'));
+            ini_set('log_errors', ('true' == env('INI_LOG_ERRORS', 'true')));
             ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));
             ini_set('display_errors', env('INI_DISPLAY_ERRORS', 'On'));
             ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', 'On'));
 
-            if (env('APP_ENV', 'development') == 'development') {
+            if ('development' == env('APP_ENV', 'development')) {
                 error_reporting(E_ALL ^ E_DEPRECATED);
             } else {
                 error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
             }
 
-            if (env('APP_ERROR_HANDLER', 'true') == 'true') {
+            if ('true' == env('APP_ERROR_HANDLER', 'true')) {
                 set_error_handler(function ($level, $message, $file = '', $line = 0) {
                     if (error_reporting() & $level) {
                         throw new \ErrorException(
@@ -91,7 +82,7 @@ namespace Core {
 
         /**
          * @param \Core\App $app
-         * @param array $providers
+         * @param array     $providers
          */
         public static function providers(App $app, array $providers = [])
         {
@@ -114,7 +105,7 @@ namespace Core {
 
         /**
          * @param \Core\App $app
-         * @param array $middlewares
+         * @param array     $middlewares
          */
         public static function middlewares(App $app, array $middlewares = [])
         {
@@ -128,7 +119,7 @@ namespace Core {
         }
 
         /**
-         * @param \Core\App $app
+         * @param \Core\App   $app
          * @param string|null $folder
          */
         public static function routes(App $app, ?string $folder = '')
@@ -139,7 +130,7 @@ namespace Core {
 
             $file = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(
-                    $folder ?: APP_FOLDER."/routes", \FilesystemIterator::SKIP_DOTS
+                    $folder ?: APP_FOLDER.'/routes', \FilesystemIterator::SKIP_DOTS
                 )
             );
 

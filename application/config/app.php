@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,8 +9,7 @@
  */
 
 return [
-
-    /**
+    /*
      * Configurações do slim
      */
 
@@ -19,32 +18,30 @@ return [
         'responseChunkSize' => 4096,
         'outputBuffering' => 'append',
         'determineRouteBeforeAppMiddleware' => true,
-        'displayErrorDetails' => (env('APP_ENV', 'development') == 'development'),
+        'displayErrorDetails' => ('development' == env('APP_ENV', 'development')),
         'addContentLengthHeader' => true,
         'routerCacheFile' => false,
     ],
 
-    /**
+    /*
      * Define a versão da aplicação
      */
 
     'version' => [
-
-        /**
+        /*
          * Versão do framework
          */
 
         'framework' => 'v1.0.0',
 
-        /**
+        /*
          * Versão do skeleton
          */
 
         'skeleton' => 'v1.0.0',
-
     ],
 
-    /**
+    /*
      * Registra os serviços
      */
 
@@ -62,13 +59,12 @@ return [
         \App\Providers\EventProvider::class,
     ],
 
-    /**
+    /*
      * Registra as middlewares
      */
 
     'middlewares' => [
-
-        /**
+        /*
          * Middlewares iniciada automática
          */
 
@@ -79,12 +75,10 @@ return [
             \App\Middlewares\OldInputMiddleware::class,
         ],
 
-        /**
+        /*
          * Middlewares iniciada manual
          */
 
         'manual' => [],
-
     ],
-
 ];

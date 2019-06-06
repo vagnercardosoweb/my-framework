@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,22 +9,17 @@
  */
 
 namespace App\Providers {
-
     use Core\Password\Argon;
     use Core\Password\Argon2Id;
     use Core\Password\Bcrypt;
 
     /**
-     * Class PasswordProvider
+     * Class PasswordProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class PasswordProvider extends Provider
     {
-        /**
-         * @return void
-         */
         public function register()
         {
             $this->container['password'] = function () {

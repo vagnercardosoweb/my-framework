@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,19 +9,17 @@
  */
 
 namespace Core\Database {
-
     use Core\App;
     use Core\Helpers\Obj;
 
     /**
-     * Class Model
+     * Class Model.
      *
      * @property \Slim\Collection settings
      * @property \Slim\Http\Environment environment
      * @property \Slim\Http\Request request
      * @property \Slim\Http\Response response
      * @property \Slim\Router router
-     *
      * @property \Core\View view
      * @property \Core\Session\Session session
      * @property \Core\Session\Flash flash
@@ -31,10 +29,8 @@ namespace Core\Database {
      * @property \Core\Jwt jwt
      * @property \Core\Logger logger
      * @property \Core\Event event
-     *
      * @property \Core\Database\Database db
      *
-     * @package Core\Contracts
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     abstract class Model
@@ -97,12 +93,12 @@ namespace Core\Database {
         /**
          * @var int
          */
-        protected $limit = null;
+        protected $limit;
 
         /**
          * @var int
          */
-        protected $offset = null;
+        protected $offset;
 
         /**
          * @var array|object
@@ -115,7 +111,79 @@ namespace Core\Database {
         protected $reset = [];
 
         /**
+         * @param string $name
+         *
+         * @return mixed
+         */
+        public function __get($name)
+        {
+            // array
+            if (is_array($this->data) && !empty($this->data[$name])) {
+                return $this->data[$name];
+            }
+
+            // object
+            if (is_object($this->data) && isset($this->data->{$name})) {
+                return $this->data->{$name};
+            }
+
+            return App::getInstance()
+                ->resolve($name)
+            ;
+        }
+
+        /**
+         * @param string $name
+         * @param mixed  $value
+         */
+        public function __set($name, $value)
+        {
+            // Caso seja object
+            if ($this->db->isFetchObject($this->fetchStyle)) {
+                if (!is_object($this->data)) {
+                    $this->data = new \stdClass();
+                }
+
+                $this->data->{$name} = $value;
+            } else {
+                // Caso seja array
+                if (!is_array($this->data)) {
+                    $this->data = [];
+                }
+
+                $this->data[$name] = $value;
+            }
+        }
+
+        /**
+         * @param string $name
+         *
+         * @return bool
+         */
+        public function __isset($name)
+        {
+            if (is_object($this->data)) {
+                return isset($this->data->{$name});
+            }
+
+            return isset($this->data[$name]);
+        }
+
+        /**
+         * @param string $name
+         */
+        public function __unset($name)
+        {
+            if (is_object($this->data)) {
+                unset($this->data->{$name});
+            } else {
+                unset($this->data[$name]);
+            }
+        }
+
+        /**
          * @return int
+         *
          * @throws \Exception
          */
         public function rowCount()
@@ -124,122 +192,10 @@ namespace Core\Database {
         }
 
         /**
-         * @return \Core\Database\Statement
-         * @throws \Exception
-         */
-        protected function execute()
-        {
-            if (empty($this->table)) {
-                throw new \InvalidArgumentException(
-                    sprintf("[execute] `%s::table` is empty.", get_called_class()),
-                    E_USER_ERROR
-                );
-            }
-
-            // Verifica se o método está criado e executa
-            if (method_exists($this, '_conditions')) {
-                $this->_conditions();
-            }
-
-            // Select
-            $this->select = implode(', ', ($this->select ?: ["{$this->table}.*"]));
-            $sql = "SELECT {$this->select} FROM {$this->table} ";
-
-            // Join
-            if (!empty($this->join) && is_array($this->join)) {
-                $this->join = implode(' ', $this->join);
-                $sql .= "{$this->join} ";
-            }
-
-            // Where
-            if (!empty($this->where) && is_array($this->where)) {
-                $this->where = $this->normalizeProperty(implode(' ', $this->where));
-                $sql .= "WHERE {$this->where} ";
-            }
-
-            // Group BY
-            if (!empty($this->group) && is_array($this->group)) {
-                $this->group = implode(', ', $this->group);
-                $sql .= "GROUP BY {$this->group} ";
-            }
-
-            // Having
-            if (!empty($this->having) && is_array($this->having)) {
-                $this->having = $this->normalizeProperty(implode(' ', $this->having));
-                $sql .= "HAVING {$this->having} ";
-            }
-
-            // Order By
-            if (!empty($this->order) && is_array($this->order)) {
-                $this->order = implode(', ', $this->order);
-                $sql .= "ORDER BY {$this->order} ";
-            }
-
-            // Limit & Offset
-            if (!empty($this->limit) && is_int($this->limit)) {
-                $this->offset = $this->offset ?: '0';
-
-                if (in_array(config('database.default'), ['dblib', 'sqlsrv'])) {
-                    $sql .= "OFFSET {$this->offset} ROWS FETCH NEXT {$this->limit} ROWS ONLY";
-                } else {
-                    $sql .= "LIMIT {$this->limit} OFFSET {$this->offset}";
-                }
-            }
-
-            // Executa a query
-            $statement = $this->db->driver($this->driver)
-                ->query($sql, $this->bindings);
-
-            // Limpa as propriedades da classe
-            $this->clearProperties();
-
-            return $statement;
-        }
-
-        /**
-         * Remove caracteres no começo da string
-         *
-         * @param $string
-         *
-         * @return string
-         */
-        protected function normalizeProperty($string)
-        {
-            $chars = ['and', 'AND', 'or', 'OR'];
-
-            foreach ($chars as $char) {
-                $len = mb_strlen($char);
-
-                if (mb_substr($string, 0, $len) === (string) $char) {
-                    $string = trim(mb_substr($string, $len));
-                }
-            }
-
-            return $string;
-        }
-
-        /**
-         * Limpa as propriedade da classe para
-         * uma nova consulta
-         */
-        protected function clearProperties()
-        {
-            $this->select = [];
-            $this->join = [];
-            $this->where = [];
-            $this->group = [];
-            $this->having = [];
-            $this->order = [];
-            $this->bindings = [];
-            $this->limit = null;
-            $this->offset = null;
-            $this->reset = [];
-        }
-
-        /**
          * @param string $column
          *
          * @return int
+         *
          * @throws \Exception
          */
         public function count($column = '1')
@@ -294,25 +250,6 @@ namespace Core\Database {
             $this->mountProperty($order, 'order');
 
             return $this;
-        }
-
-        /**
-         * Monta os array
-         *
-         * @param string|array|null $conditions
-         * @param string $property
-         */
-        protected function mountProperty($conditions, $property)
-        {
-            if (!is_array($this->{$property})) {
-                $this->{$property} = [];
-            }
-
-            foreach ((array) $conditions as $condition) {
-                if (!empty($condition) && !array_search($condition, $this->{$property})) {
-                    $this->{$property}[] = trim((string) $condition);
-                }
-            }
         }
 
         /**
@@ -447,6 +384,7 @@ namespace Core\Database {
 
         /**
          * @return array|$this
+         *
          * @throws \Exception
          */
         public function save()
@@ -466,7 +404,7 @@ namespace Core\Database {
 
                 return $this->db->update(
                     $this->table, $this->data,
-                    "WHERE ".$this->normalizeProperty($where),
+                    'WHERE '.$this->normalizeProperty($where),
                     $bindings
                 );
             }
@@ -483,26 +421,11 @@ namespace Core\Database {
             if (!empty($primaryValue)) {
                 return $this->reset()
                     ->where($where, $bindings)
-                    ->fetchById($primaryValue);
+                    ->fetchById($primaryValue)
+                ;
             }
 
             return $this->data;
-        }
-
-        /**
-         * @return string
-         */
-        protected function getPrimaryValue()
-        {
-            return $this->{$this->getPrimaryKey()};
-        }
-
-        /**
-         * @return string
-         */
-        protected function getPrimaryKey()
-        {
-            return $this->primaryKey;
         }
 
         /**
@@ -546,9 +469,10 @@ namespace Core\Database {
 
         /**
          * @param int|array $id
-         * @param int $fetchStyle
+         * @param int       $fetchStyle
          *
          * @return bool|array|$this
+         *
          * @throws \Exception
          */
         public function fetchById($id, $fetchStyle = null)
@@ -561,11 +485,10 @@ namespace Core\Database {
                     ));
 
                     return $this->fetchAll($fetchStyle);
-                } else {
-                    $this->where("AND {$this->table}.{$this->primaryKey} = :pkbyid", [
-                        'pkbyid' => filter_var($id, FILTER_DEFAULT),
-                    ]);
                 }
+                $this->where("AND {$this->table}.{$this->primaryKey} = :pkbyid", [
+                    'pkbyid' => filter_var($id, FILTER_DEFAULT),
+                ]);
             }
 
             // Verificação se existe condições (where)
@@ -591,10 +514,11 @@ namespace Core\Database {
         }
 
         /**
-         * @param int $fetchStyle
+         * @param int   $fetchStyle
          * @param mixed $fetchArgument
          *
          * @return array[$this]
+         *
          * @throws \Exception
          */
         public function fetchAll($fetchStyle = null, $fetchArgument = null)
@@ -631,6 +555,7 @@ namespace Core\Database {
          * @param int $fetchStyle
          *
          * @return array|$this
+         *
          * @throws \Exception
          */
         public function fetch($fetchStyle = null)
@@ -660,6 +585,7 @@ namespace Core\Database {
 
         /**
          * @return array|bool|$this
+         *
          * @throws \Exception
          */
         public function delete()
@@ -679,7 +605,7 @@ namespace Core\Database {
 
             if (empty($this->where)) {
                 throw new \InvalidArgumentException(
-                    sprintf("[delete] `%s::where()` is empty.", get_called_class()),
+                    sprintf('[delete] `%s::where()` is empty.', get_called_class()),
                     E_USER_ERROR
                 );
             }
@@ -697,7 +623,7 @@ namespace Core\Database {
 
         /**
          * @param array|object $data
-         * @param bool $validate
+         * @param bool         $validate
          *
          * @return $this
          */
@@ -724,73 +650,153 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $name
+         * @return \Core\Database\Statement
          *
-         * @return mixed
+         * @throws \Exception
          */
-        public function __get($name)
+        protected function execute()
         {
-            // array
-            if (is_array($this->data) && !empty($this->data[$name])) {
-                return $this->data[$name];
+            if (empty($this->table)) {
+                throw new \InvalidArgumentException(
+                    sprintf('[execute] `%s::table` is empty.', get_called_class()),
+                    E_USER_ERROR
+                );
             }
 
-            // object
-            if (is_object($this->data) && isset($this->data->{$name})) {
-                return $this->data->{$name};
+            // Verifica se o método está criado e executa
+            if (method_exists($this, '_conditions')) {
+                $this->_conditions();
             }
 
-            return App::getInstance()
-                ->resolve($name);
+            // Select
+            $this->select = implode(', ', ($this->select ?: ["{$this->table}.*"]));
+            $sql = "SELECT {$this->select} FROM {$this->table} ";
+
+            // Join
+            if (!empty($this->join) && is_array($this->join)) {
+                $this->join = implode(' ', $this->join);
+                $sql .= "{$this->join} ";
+            }
+
+            // Where
+            if (!empty($this->where) && is_array($this->where)) {
+                $this->where = $this->normalizeProperty(implode(' ', $this->where));
+                $sql .= "WHERE {$this->where} ";
+            }
+
+            // Group BY
+            if (!empty($this->group) && is_array($this->group)) {
+                $this->group = implode(', ', $this->group);
+                $sql .= "GROUP BY {$this->group} ";
+            }
+
+            // Having
+            if (!empty($this->having) && is_array($this->having)) {
+                $this->having = $this->normalizeProperty(implode(' ', $this->having));
+                $sql .= "HAVING {$this->having} ";
+            }
+
+            // Order By
+            if (!empty($this->order) && is_array($this->order)) {
+                $this->order = implode(', ', $this->order);
+                $sql .= "ORDER BY {$this->order} ";
+            }
+
+            // Limit & Offset
+            if (!empty($this->limit) && is_int($this->limit)) {
+                $this->offset = $this->offset ?: '0';
+
+                if (in_array(config('database.default'), ['dblib', 'sqlsrv'])) {
+                    $sql .= "OFFSET {$this->offset} ROWS FETCH NEXT {$this->limit} ROWS ONLY";
+                } else {
+                    $sql .= "LIMIT {$this->limit} OFFSET {$this->offset}";
+                }
+            }
+
+            // Executa a query
+            $statement = $this->db->driver($this->driver)
+                ->query($sql, $this->bindings)
+            ;
+
+            // Limpa as propriedades da classe
+            $this->clearProperties();
+
+            return $statement;
         }
 
         /**
-         * @param string $name
-         * @param mixed $value
-         */
-        public function __set($name, $value)
-        {
-            // Caso seja object
-            if ($this->db->isFetchObject($this->fetchStyle)) {
-                if (!is_object($this->data)) {
-                    $this->data = new \stdClass();
-                }
-
-                $this->data->{$name} = $value;
-            } else {
-                // Caso seja array
-                if (!is_array($this->data)) {
-                    $this->data = [];
-                }
-
-                $this->data[$name] = $value;
-            }
-        }
-
-        /**
-         * @param string $name
+         * Remove caracteres no começo da string.
          *
-         * @return bool
+         * @param $string
+         *
+         * @return string
          */
-        public function __isset($name)
+        protected function normalizeProperty($string)
         {
-            if (is_object($this->data)) {
-                return isset($this->data->{$name});
+            $chars = ['and', 'AND', 'or', 'OR'];
+
+            foreach ($chars as $char) {
+                $len = mb_strlen($char);
+
+                if (mb_substr($string, 0, $len) === (string) $char) {
+                    $string = trim(mb_substr($string, $len));
+                }
             }
 
-            return isset($this->data[$name]);
+            return $string;
         }
 
         /**
-         * @param string $name
+         * Limpa as propriedade da classe para
+         * uma nova consulta.
          */
-        public function __unset($name)
+        protected function clearProperties()
         {
-            if (is_object($this->data)) {
-                unset($this->data->{$name});
-            } else {
-                unset($this->data[$name]);
+            $this->select = [];
+            $this->join = [];
+            $this->where = [];
+            $this->group = [];
+            $this->having = [];
+            $this->order = [];
+            $this->bindings = [];
+            $this->limit = null;
+            $this->offset = null;
+            $this->reset = [];
+        }
+
+        /**
+         * Monta os array.
+         *
+         * @param string|array|null $conditions
+         * @param string            $property
+         */
+        protected function mountProperty($conditions, $property)
+        {
+            if (!is_array($this->{$property})) {
+                $this->{$property} = [];
             }
+
+            foreach ((array) $conditions as $condition) {
+                if (!empty($condition) && !array_search($condition, $this->{$property})) {
+                    $this->{$property}[] = trim((string) $condition);
+                }
+            }
+        }
+
+        /**
+         * @return string
+         */
+        protected function getPrimaryValue()
+        {
+            return $this->{$this->getPrimaryKey()};
+        }
+
+        /**
+         * @return string
+         */
+        protected function getPrimaryKey()
+        {
+            return $this->primaryKey;
         }
     }
 }

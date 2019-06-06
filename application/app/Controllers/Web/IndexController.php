@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,19 +9,17 @@
  */
 
 namespace App\Controllers\Web {
-
     use App\Controller\Controller;
 
     /**
-     * Class IndexController
+     * Class IndexController.
      *
-     * @package App\Controllers\Web
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class IndexController extends Controller
     {
         /**
-         * [GET] /
+         * [GET] /.
          *
          * @return \Slim\Http\Response
          */

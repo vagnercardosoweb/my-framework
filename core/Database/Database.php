@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,7 +9,6 @@
  */
 
 namespace Core\Database {
-
     use BadMethodCallException;
     use Closure;
     use Core\App;
@@ -21,7 +20,7 @@ namespace Core\Database {
     use RuntimeException;
 
     /**
-     * Class Database
+     * Class Database.
      *
      * @method Statement getPdo()
      * @method Statement fetch($fetchStyle = null, $cursorOrientation = 0, $cursorOffset = 0)
@@ -40,7 +39,6 @@ namespace Core\Database {
      * @method Statement closeCursor()
      * @method Statement debugDumpParams()
      *
-     * @package Core\Database
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Database extends PDO
@@ -61,7 +59,7 @@ namespace Core\Database {
         private $bindings = [];
 
         /**
-         * Bloqueia a construção da classe
+         * Bloqueia a construção da classe.
          *
          * @param string $driver
          *
@@ -104,138 +102,27 @@ namespace Core\Database {
         }
 
         /**
-         * @param array $config
+         * @param string $method
+         * @param mixed  ...$arguments
          *
-         * @return string
+         * @return mixed
          */
-        protected function getDsn(array $config)
+        public function __call($method, $arguments)
         {
-            switch ($config['driver']) {
-                case 'pgsql':
-                    return "pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
-                    break;
-
-                case 'sqlsrv':
-                case 'dblib':
-                    return empty($config['dsn'])
-                        ? "dblib:version=7.0;charset=UTF-8;host={$config['host']};dbname={$config['database']}"
-                        : $config['dsn'];
-                    break;
-
-                case 'mysql':
-                    return !empty($config['unix_socket'])
-                        ? "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}"
-                        : "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
-                    break;
-
-                default:
-                    throw new InvalidArgumentException(
-                        "Driver `{$config['driver']}` inválido para criação do dsn.", E_USER_ERROR
-                    );
+            if ($this->statement && method_exists($this->statement, $method)) {
+                return $this->statement->{$method}(...$arguments);
             }
-        }
 
-        /**
-         * @inheritDoc
-         */
-        protected function setDefaultStatement()
-        {
-            $this->setAttribute(
-                PDO::ATTR_STATEMENT_CLASS, [Statement::class, [$this]]
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR
             );
-        }
-
-        /**
-         * @param array $config
-         *
-         * @return void
-         */
-        protected function setDefaultAttributesAndCommands(array $config)
-        {
-            if (!empty($config['attributes'])) {
-                foreach ((array) $config['attributes'] as $key => $value) {
-                    $this->setAttribute($key, $value);
-                }
-            }
-
-            // Comandos sql na inicialização
-            if (!empty($config['commands'])) {
-                foreach ((array) $config['commands'] as $command) {
-                    $this->exec($command);
-                }
-            }
-        }
-
-        /**
-         * @param array $config
-         *
-         * @return void
-         */
-        protected function setDefaultSchema(array $config)
-        {
-            if ($config['driver'] == 'pgsql' && !empty($config['schema'])) {
-                if (is_string($config['schema'])) {
-                    $config['schema'] = explode('', $config['schema']);
-                }
-
-                $this->exec(sprintf(
-                    "SET search_path TO %s", implode(
-                        ', ', array_map([$this, 'quote'], $config['schema'])
-                    )
-                ));
-            } else if ($config['driver'] !== 'sqlite' && !empty($config['database'])) {
-                $this->exec("USE {$config['database']}");
-            }
-        }
-
-        /**
-         * @param array $config
-         *
-         * @return void
-         */
-        protected function setDefaultEncoding(array $config)
-        {
-            if (!empty($config['charset'])) {
-                if ($config['driver'] == 'pgsql') {
-                    $this->exec("SET client_encoding TO {$this->quote(strtoupper($config['charset']))}");
-                } else if ($config['driver'] == 'mysql') {
-                    $encoding = "SET NAMES {$this->quote($config['charset'])}";
-
-                    if (!empty($config['collation'])) {
-                        $encoding .= " COLLATE {$this->quote($config['collation'])}";
-                    }
-
-                    $this->exec($encoding);
-                } else if ($config['driver'] == 'sqlsrv') {
-                    if ($config['charset'] == 'utf8' || $config['charset'] == PDO::SQLSRV_ENCODING_UTF8) {
-                        $this->setAttribute(
-                            PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8
-                        );
-                    }
-                }
-            }
-        }
-
-        /**
-         * @param array $config
-         *
-         * @return void
-         */
-        protected function setDefaultTimezone(array $config)
-        {
-            if (!empty($config['timezone'])) {
-                if ($config['driver'] == 'pgsql') {
-                    $this->exec("SET timezone TO {$this->quote($config['timezone'])}");
-                } else if ($config['driver'] == 'mysql') {
-                    $this->exec("SET time_zone = {$this->quote($config['timezone'])}");
-                }
-            }
         }
 
         /**
          * @param string $driver mysql|pgsql|dblib|sqlsrv
          *
          * @return $this
+         *
          * @throws \Exception
          */
         public function driver($driver)
@@ -253,6 +140,7 @@ namespace Core\Database {
          * @param string $driver
          *
          * @return $this
+         *
          * @throws \Exception
          */
         public static function getInstance($driver = null)
@@ -270,6 +158,7 @@ namespace Core\Database {
          * @param \Closure $callback
          *
          * @return \Closure|mixed
+         *
          * @throws \Exception
          */
         public function transaction(Closure $callback)
@@ -288,10 +177,11 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $table
+         * @param string       $table
          * @param array|object $data
          *
          * @return Statement
+         *
          * @throws \Exception
          */
         public function create($table, $data)
@@ -315,7 +205,7 @@ namespace Core\Database {
                     }
                 }
 
-                $values = '('.implode("), (", $values).')';
+                $values = '('.implode('), (', $values).')';
             } else {
                 $data = ($this->emitEvent("{$table}:creating", $data) ?: $data);
                 $values = '(:'.implode(', :', array_keys($data)).')';
@@ -334,7 +224,7 @@ namespace Core\Database {
         }
 
         /**
-         * @param mixed $data
+         * @param mixed  $data
          * @param string $type
          *
          * @return array
@@ -362,59 +252,12 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $name
-         * @param mixed ... (Opcional) Argumento(s)
-         *
-         * @return mixed
-         */
-        protected function emitEvent($name = null)
-        {
-            $event = App::getInstance()
-                ->resolve('event');
-
-            if (!empty($name) && $event) {
-                // Retorna o evento emitido
-                $arguments = func_get_args();
-                array_shift($arguments);
-
-                return $event->emit(
-                    (string) $name, ...$arguments
-                );
-            }
-
-            return false;
-        }
-
-        /**
+         * @param string       $statement
          * @param string|array $bindings
-         */
-        protected function setBindings($bindings)
-        {
-            if (!empty($bindings)) {
-                // Se for string da o parse e transforma em array
-                if (is_string($bindings)) {
-                    if (function_exists('mb_parse_str')) {
-                        mb_parse_str($bindings, $bindings);
-                    } else {
-                        parse_str($bindings, $bindings);
-                    }
-                }
-
-                // Filtra os valores dos bindings
-                foreach ($bindings as $key => $value) {
-                    $this->bindings[$key] = filter_var(
-                        $value, FILTER_DEFAULT
-                    );
-                }
-            }
-        }
-
-        /**
-         * @param string $statement
-         * @param string|array $bindings
-         * @param array $driverOptions
+         * @param array        $driverOptions
          *
          * @return Statement
+         *
          * @throws \Exception
          */
         public function query($statement, $bindings = null, $driverOptions = [])
@@ -439,45 +282,13 @@ namespace Core\Database {
         }
 
         /**
-         * Executa os bindings e trata os valores
-         */
-        protected function bindValues()
-        {
-            if (!$this->statement instanceof Statement) {
-                throw new RuntimeException(
-                    'Propriedade "->statement" não é uma instância de "\PDOStatement".', E_USER_ERROR
-                );
-            }
-
-            if (!empty($this->bindings) && is_array($this->bindings)) {
-                foreach ($this->bindings as $key => $value) {
-                    if (is_string($key) && in_array($key, ['limit', 'offset', 'l', 'o'])) {
-                        $value = (int) $value;
-                    }
-
-                    $value = ((empty($value) && $value != '0')
-                        ? null
-                        : filter_var($value, FILTER_DEFAULT));
-
-                    $this->statement->bindValue(
-                        (is_string($key) ? ":{$key}" : ((int) $key + 1)),
-                        $value,
-                        (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR)
-                    );
-                }
-            }
-
-            // Reseta os binds
-            $this->bindings = [];
-        }
-
-        /**
-         * @param string $table
+         * @param string       $table
          * @param array|object $data
-         * @param string $condition
+         * @param string       $condition
          * @param string|array $bindings
          *
          * @return mixed
+         *
          * @throws \Exception
          */
         public function update($table, $data, $condition, $bindings = null)
@@ -532,11 +343,12 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $table
-         * @param string $condition
+         * @param string       $table
+         * @param string       $condition
          * @param string|array $bindings
          *
          * @return Statement
+         *
          * @throws \Exception
          */
         public function read($table, $condition = null, $bindings = null)
@@ -565,11 +377,12 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $table
-         * @param string $condition
+         * @param string       $table
+         * @param string       $condition
          * @param string|array $bindings
          *
          * @return mixed
+         *
          * @throws \Exception
          */
         public function delete($table, $condition, $bindings = null)
@@ -598,20 +411,206 @@ namespace Core\Database {
         }
 
         /**
-         * @param string $method
-         * @param mixed ...$arguments
+         * @param array $config
+         *
+         * @return string
+         */
+        protected function getDsn(array $config)
+        {
+            switch ($config['driver']) {
+                case 'pgsql':
+                    return "pgsql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
+                    break;
+
+                case 'sqlsrv':
+                case 'dblib':
+                    return empty($config['dsn'])
+                        ? "dblib:version=7.0;charset=UTF-8;host={$config['host']};dbname={$config['database']}"
+                        : $config['dsn'];
+                    break;
+
+                case 'mysql':
+                    return !empty($config['unix_socket'])
+                        ? "mysql:unix_socket={$config['unix_socket']};dbname={$config['database']}"
+                        : "mysql:host={$config['host']};port={$config['port']};dbname={$config['database']}";
+                    break;
+
+                default:
+                    throw new InvalidArgumentException(
+                        "Driver `{$config['driver']}` inválido para criação do dsn.", E_USER_ERROR
+                    );
+            }
+        }
+
+        /**
+         * {@inheritdoc}
+         */
+        protected function setDefaultStatement()
+        {
+            $this->setAttribute(
+                PDO::ATTR_STATEMENT_CLASS, [Statement::class, [$this]]
+            );
+        }
+
+        /**
+         * @param array $config
+         */
+        protected function setDefaultAttributesAndCommands(array $config)
+        {
+            if (!empty($config['attributes'])) {
+                foreach ((array) $config['attributes'] as $key => $value) {
+                    $this->setAttribute($key, $value);
+                }
+            }
+
+            // Comandos sql na inicialização
+            if (!empty($config['commands'])) {
+                foreach ((array) $config['commands'] as $command) {
+                    $this->exec($command);
+                }
+            }
+        }
+
+        /**
+         * @param array $config
+         */
+        protected function setDefaultSchema(array $config)
+        {
+            if ('pgsql' == $config['driver'] && !empty($config['schema'])) {
+                if (is_string($config['schema'])) {
+                    $config['schema'] = explode('', $config['schema']);
+                }
+
+                $this->exec(sprintf(
+                    'SET search_path TO %s', implode(
+                        ', ', array_map([$this, 'quote'], $config['schema'])
+                    )
+                ));
+            } elseif ('sqlite' !== $config['driver'] && !empty($config['database'])) {
+                $this->exec("USE {$config['database']}");
+            }
+        }
+
+        /**
+         * @param array $config
+         */
+        protected function setDefaultEncoding(array $config)
+        {
+            if (!empty($config['charset'])) {
+                if ('pgsql' == $config['driver']) {
+                    $this->exec("SET client_encoding TO {$this->quote(strtoupper($config['charset']))}");
+                } elseif ('mysql' == $config['driver']) {
+                    $encoding = "SET NAMES {$this->quote($config['charset'])}";
+
+                    if (!empty($config['collation'])) {
+                        $encoding .= " COLLATE {$this->quote($config['collation'])}";
+                    }
+
+                    $this->exec($encoding);
+                } elseif ('sqlsrv' == $config['driver']) {
+                    if ('utf8' == $config['charset'] || PDO::SQLSRV_ENCODING_UTF8 == $config['charset']) {
+                        $this->setAttribute(
+                            PDO::SQLSRV_ATTR_ENCODING, PDO::SQLSRV_ENCODING_UTF8
+                        );
+                    }
+                }
+            }
+        }
+
+        /**
+         * @param array $config
+         */
+        protected function setDefaultTimezone(array $config)
+        {
+            if (!empty($config['timezone'])) {
+                if ('pgsql' == $config['driver']) {
+                    $this->exec("SET timezone TO {$this->quote($config['timezone'])}");
+                } elseif ('mysql' == $config['driver']) {
+                    $this->exec("SET time_zone = {$this->quote($config['timezone'])}");
+                }
+            }
+        }
+
+        /**
+         * @param string $name
+         * @param mixed ... (Opcional) Argumento(s)
          *
          * @return mixed
          */
-        public function __call($method, $arguments)
+        protected function emitEvent($name = null)
         {
-            if ($this->statement && method_exists($this->statement, $method)) {
-                return $this->statement->{$method}(...$arguments);
+            $event = App::getInstance()
+                ->resolve('event')
+            ;
+
+            if (!empty($name) && $event) {
+                // Retorna o evento emitido
+                $arguments = func_get_args();
+                array_shift($arguments);
+
+                return $event->emit(
+                    (string) $name, ...$arguments
+                );
             }
 
-            throw new BadMethodCallException(
-                sprintf("Call to undefined method %s::%s()", get_class(), $method), E_USER_ERROR
-            );
+            return false;
+        }
+
+        /**
+         * @param string|array $bindings
+         */
+        protected function setBindings($bindings)
+        {
+            if (!empty($bindings)) {
+                // Se for string da o parse e transforma em array
+                if (is_string($bindings)) {
+                    if (function_exists('mb_parse_str')) {
+                        mb_parse_str($bindings, $bindings);
+                    } else {
+                        parse_str($bindings, $bindings);
+                    }
+                }
+
+                // Filtra os valores dos bindings
+                foreach ($bindings as $key => $value) {
+                    $this->bindings[$key] = filter_var(
+                        $value, FILTER_DEFAULT
+                    );
+                }
+            }
+        }
+
+        /**
+         * Executa os bindings e trata os valores.
+         */
+        protected function bindValues()
+        {
+            if (!$this->statement instanceof Statement) {
+                throw new RuntimeException(
+                    'Propriedade "->statement" não é uma instância de "\PDOStatement".', E_USER_ERROR
+                );
+            }
+
+            if (!empty($this->bindings) && is_array($this->bindings)) {
+                foreach ($this->bindings as $key => $value) {
+                    if (is_string($key) && in_array($key, ['limit', 'offset', 'l', 'o'])) {
+                        $value = (int) $value;
+                    }
+
+                    $value = ((empty($value) && '0' != $value)
+                        ? null
+                        : filter_var($value, FILTER_DEFAULT));
+
+                    $this->statement->bindValue(
+                        (is_string($key) ? ":{$key}" : ((int) $key + 1)),
+                        $value,
+                        (is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR)
+                    );
+                }
+            }
+
+            // Reseta os binds
+            $this->bindings = [];
         }
     }
 }

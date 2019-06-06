@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,8 +9,7 @@
  */
 
 return [
-
-    /**
+    /*
      * Configuração do site
      */
 
@@ -20,7 +19,7 @@ return [
     'abstract' => '',
     'keywords' => '',
 
-    /**
+    /*
      * Google Plus
      */
 
@@ -29,7 +28,7 @@ return [
         'page' => '', /* ID da Página */
     ],
 
-    /**
+    /*
      * Facebook
      */
 
@@ -40,22 +39,21 @@ return [
         'pageId' => '', /* ID do Facebook Pages */
     ],
 
-    /**
+    /*
      * Twitter
      */
 
     'twitter' => '', /* https://www.twitter.com/????? */
 
-    /**
+    /*
      * Youtube
      */
 
     'youtube' => '', /* https://www.youtube.com/user/????? */
 
-    /**
+    /*
      * Instagram
      */
 
     'instagram' => '', /* https://www.instagram.com/????? */
-
 ];

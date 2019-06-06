@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,14 +9,12 @@
  */
 
 namespace Core {
-
     use Psr\Http\Message\ResponseInterface;
     use Slim\Http\StatusCode;
 
     /**
-     * Class View
+     * Class View.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class View
@@ -33,7 +31,7 @@ namespace Core {
 
         /**
          * @param string|array $path
-         * @param array $options
+         * @param array        $options
          *
          * @throws \Twig\Error\LoaderError
          */
@@ -44,32 +42,10 @@ namespace Core {
         }
 
         /**
-         * @param array $paths
-         *
-         * @return \Twig\Loader\FilesystemLoader
-         * @throws \Twig\Error\LoaderError
-         */
-        private function createLoader(array $paths)
-        {
-            $loader = new \Twig\Loader\FilesystemLoader();
-
-            foreach ($paths as $namespace => $path) {
-                if (is_string($namespace)) {
-                    $loader->setPaths($path, $namespace);
-                } else {
-                    $loader->addPath($path);
-                }
-            }
-
-            return $loader;
-        }
-
-        /**
          * @param \Psr\Http\Message\ResponseInterface $response
-         * @param string $template
-         * @param array $context
-         *
-         * @param int $statusCode
+         * @param string                              $template
+         * @param array                               $context
+         * @param int                                 $statusCode
          *
          * @return \Psr\Http\Message\ResponseInterface
          */
@@ -88,13 +64,13 @@ namespace Core {
 
         /**
          * @param string $template
-         * @param array $context
+         * @param array  $context
          *
          * @return string
          */
         public function fetch(string $template, array $context = [])
         {
-            if (substr($template, -5) === '.twig') {
+            if ('.twig' === substr($template, -5)) {
                 $template = substr($template, 0, -5);
             }
 
@@ -122,9 +98,9 @@ namespace Core {
         }
 
         /**
-         * @param string $name
+         * @param string   $name
          * @param callable $callable
-         * @param array $options
+         * @param array    $options
          *
          * @return $this
          */
@@ -138,9 +114,9 @@ namespace Core {
         }
 
         /**
-         * @param string $name
+         * @param string   $name
          * @param callable $callable
-         * @param array $options
+         * @param array    $options
          *
          * @return $this
          */
@@ -155,7 +131,7 @@ namespace Core {
 
         /**
          * @param string $name
-         * @param mixed $value
+         * @param mixed  $value
          *
          * @return $this
          */
@@ -167,13 +143,35 @@ namespace Core {
         }
 
         /**
-         * Get instanceof ViewProvider
+         * Get instanceof ViewProvider.
          *
          * @return \Twig\Environment
          */
         public function getEnvironment()
         {
             return $this->environment;
+        }
+
+        /**
+         * @param array $paths
+         *
+         * @return \Twig\Loader\FilesystemLoader
+         *
+         * @throws \Twig\Error\LoaderError
+         */
+        private function createLoader(array $paths)
+        {
+            $loader = new \Twig\Loader\FilesystemLoader();
+
+            foreach ($paths as $namespace => $path) {
+                if (is_string($namespace)) {
+                    $loader->setPaths($path, $namespace);
+                } else {
+                    $loader->addPath($path);
+                }
+            }
+
+            return $loader;
         }
     }
 }

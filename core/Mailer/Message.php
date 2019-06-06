@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,14 +9,12 @@
  */
 
 namespace Core\Mailer {
-
     use Exception;
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
-     * Class Message
+     * Class Message.
      *
-     * @package Core\Mailer
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Message
@@ -41,6 +39,7 @@ namespace Core\Mailer {
          * @param string $name
          *
          * @return \Core\Mailer\Message
+         *
          * @throws \Exception
          */
         public function from(string $address, ?string $name = ''): Message
@@ -126,6 +125,7 @@ namespace Core\Mailer {
          * @param string $disposition
          *
          * @return \Core\Mailer\Message
+         *
          * @throws \Exception
          */
         public function addFile(
@@ -134,8 +134,7 @@ namespace Core\Mailer {
             ?string $encoding = PHPMailer::ENCODING_BASE64,
             ?string $type = '',
             ?string $disposition = 'attachment'
-        ): Message
-        {
+        ): Message {
             try {
                 $this->mail->addAttachment($path, $name, $encoding, $type, $disposition);
             } catch (Exception $e) {

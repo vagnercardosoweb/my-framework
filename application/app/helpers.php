@@ -1,13 +1,12 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
-
 use App\Core\Date;
 use Core\App;
 use Core\Helpers\Helper;
@@ -16,14 +15,14 @@ use Core\Helpers\Upload;
 use Core\Router;
 use Slim\Http\StatusCode;
 
-/**
+/*
  * FUNCTIONS
  */
 
 if (!function_exists('validate_params')) {
     /**
      * @param array|object $params
-     * @param array $rules
+     * @param array        $rules
      */
     function validate_params($params, array $rules)
     {
@@ -45,15 +44,14 @@ if (!function_exists('validate_params')) {
                 $params[$index] = array_filter($params[$index]);
             }
 
-            if (array_key_exists($index, $params) && (empty($params[$index]) && $params[$index] != '0')) {
-                if (array_key_exists('force', (array) $rule) && $rule['force'] == false) {
+            if (array_key_exists($index, $params) && (empty($params[$index]) && '0' != $params[$index])) {
+                if (array_key_exists('force', (array) $rule) && false == $rule['force']) {
                     continue;
-                } else {
-                    throw new \InvalidArgumentException(
+                }
+                throw new \InvalidArgumentException(
                         (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
                         (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
                     );
-                }
             }
         }
     }
@@ -61,10 +59,10 @@ if (!function_exists('validate_params')) {
 
 if (!function_exists('json_trigger')) {
     /**
-     * @param string $message
+     * @param string     $message
      * @param string|int $type
-     * @param array $params
-     * @param int $status
+     * @param array      $params
+     * @param int        $status
      *
      * @return \Slim\Http\Response
      */
@@ -79,8 +77,8 @@ if (!function_exists('json_trigger')) {
 if (!function_exists('json_error')) {
     /**
      * @param \Exception $exception
-     * @param array $params
-     * @param int $status
+     * @param array      $params
+     * @param int        $status
      *
      * @return \Slim\Http\Response
      */
@@ -102,8 +100,8 @@ if (!function_exists('json_error')) {
 if (!function_exists('json_success')) {
     /**
      * @param string $message
-     * @param array $params
-     * @param int $status
+     * @param array  $params
+     * @param int    $status
      *
      * @return \Slim\Http\Response
      */
@@ -145,7 +143,7 @@ if (!function_exists('json_success')) {
 
 if (!function_exists('error_type')) {
     /**
-     * Verifica o tipo de erro e retorna a classe css
+     * Verifica o tipo de erro e retorna a classe css.
      *
      * @param string|int $type
      *
@@ -153,7 +151,7 @@ if (!function_exists('error_type')) {
      */
     function error_type($type)
     {
-        if (is_string($type) && $type !== 'success') {
+        if (is_string($type) && 'success' !== $type) {
             $type = E_USER_ERROR;
         }
 
@@ -185,20 +183,20 @@ if (!function_exists('error_type')) {
 
 if (!function_exists('get_image')) {
     /**
-     * Recupera a imagem do asset
+     * Recupera a imagem do asset.
      *
-     * @param string $table
+     * @param string     $table
      * @param int|string $id
-     * @param string $name
-     * @param bool $baseUrl
-     * @param bool $version
-     * @param string $extension
+     * @param string     $name
+     * @param bool       $baseUrl
+     * @param bool       $version
+     * @param string     $extension
      *
      * @return bool|string
      */
     function get_image($table, $id, $name, $baseUrl = true, $version = true, $extension = 'jpg')
     {
-        if (!empty($id) && $id != '0') {
+        if (!empty($id) && '0' != $id) {
             $name = mb_strtoupper($name, 'UTF-8');
             $path = "/fotos/{$table}/{$id}/{$name}";
 
@@ -215,11 +213,11 @@ if (!function_exists('get_image')) {
 
 if (!function_exists('get_galeria')) {
     /**
-     * Recupera a imagem do asset
+     * Recupera a imagem do asset.
      *
-     * @param string $table
+     * @param string     $table
      * @param int|string $id
-     * @param string $name
+     * @param string     $name
      *
      * @return array
      */
@@ -255,7 +253,7 @@ if (!function_exists('get_galeria')) {
 
 if (!function_exists('get_month')) {
     /**
-     * Retorna o mes do ano em pt-BR
+     * Retorna o mes do ano em pt-BR.
      *
      * @param string $month
      *
@@ -288,7 +286,7 @@ if (!function_exists('get_month')) {
 
 if (!function_exists('get_day')) {
     /**
-     * Retorna o dia da semana pt-BR
+     * Retorna o dia da semana pt-BR.
      *
      * @param string $day
      *
@@ -316,17 +314,18 @@ if (!function_exists('get_day')) {
 
 if (!function_exists('upload')) {
     /**
-     * Upload de arquivos/images
+     * Upload de arquivos/images.
      *
-     * @param array $file
+     * @param array  $file
      * @param string $directory
      * @param string $name
-     * @param int $width
-     * @param int $height
-     * @param bool $forceJpg
-     * @param bool $whExact
+     * @param int    $width
+     * @param int    $height
+     * @param bool   $forceJpg
+     * @param bool   $whExact
      *
      * @return array
+     *
      * @throws \Exception
      */
     function upload(array $file, $directory, $name = null, $width = 500, $height = 500, $forceJpg = false, $whExact = false)
@@ -342,7 +341,7 @@ if (!function_exists('upload')) {
             $name = (empty($name) ? Str::slug(substr($value['name'], 0, strrpos($value['name'], '.'))) : $name);
 
             // Muda extenção caso seja JPEG
-            if ($extension == 'jpeg' || ($forceJpg === true && in_array($extension, $extImages))) {
+            if ('jpeg' == $extension || (true === $forceJpg && in_array($extension, $extImages))) {
                 $extension = 'jpg';
             }
 
@@ -352,17 +351,17 @@ if (!function_exists('upload')) {
             // Checa extension
             if (in_array($extension, $extImages)) {
                 if (!in_array($extension, $extImages)) {
-                    throw new \Exception("Opsss, apenas as extenções <b>".strtoupper(implode(', ', $extImages))."</b> são aceita para enviar sua imagem.", E_USER_ERROR);
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.', E_USER_ERROR);
                 }
             } else {
                 if (!in_array($extension, $extensions)) {
-                    throw new \Exception("Opsss, apenas as extenções <b>".strtoupper(implode(', ', $extensions))."</b> são aceita para enviar seu arquivo.", E_USER_ERROR);
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.', E_USER_ERROR);
                 }
             }
 
             // Checa tamanho
-            if (($value['size'] > $maxFilesize = Upload::getMaxFilesize()) || $value['error'] == 1) {
-                throw new \Exception("Opsss, seu upload ultrapassou o limite de tamanho de <b>".Helper::convertBytesForHuman($maxFilesize)."</b>.", E_USER_ERROR);
+            if (($value['size'] > $maxFilesize = Upload::getMaxFilesize()) || 1 == $value['error']) {
+                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.', E_USER_ERROR);
             }
 
             // Cria pasta
@@ -381,20 +380,20 @@ if (!function_exists('upload')) {
 
             // Corrige orientação da imagem
             // Normalmente quando é enviada pelo celular
-            if ($extension == 'jpg' && in_array($value['type'], ['image/jpeg', 'image/jpg'])) {
+            if ('jpg' == $extension && in_array($value['type'], ['image/jpeg', 'image/jpg'])) {
                 upload_fix_orientation($value['tmp_name'], $extension);
             }
 
             // Verifica se é arquivo ou imagem para upload
             $uploadError = upload_error($value['error']);
 
-            if (in_array($extension, $extFiles) || $extension === 'gif') {
+            if (in_array($extension, $extFiles) || 'gif' === $extension) {
                 if (!move_uploaded_file($value['tmp_name'], PUBLIC_FOLDER.$path)) {
                     throw new \Exception("<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
                 }
             } else {
                 // Verifica se é o tamanho exato da imagem
-                if ($whExact === true) {
+                if (true === $whExact) {
                     $fnImg = 'imagemTamExato';
                 } else {
                     $fnImg = 'imagem';
@@ -425,7 +424,7 @@ if (!function_exists('upload')) {
 
 if (!function_exists('upload_fix_orientation')) {
     /**
-     * Corrige orientação da imagem
+     * Corrige orientação da imagem.
      *
      * @param string $pathImage [Caminho do arquivo ou file enviado pelo formulário]
      * @param string $extension
@@ -459,7 +458,7 @@ if (!function_exists('upload_fix_orientation')) {
                 }
 
                 // Caso a rotação e extenção seja válida
-                if ($rotation !== null && $extension !== null) {
+                if (null !== $rotation && null !== $extension) {
                     // Cria a imagem original dependendo da extenção
                     switch ($extension) {
                         case 'jpg':
@@ -508,7 +507,7 @@ if (!function_exists('upload_fix_orientation')) {
 
 if (!function_exists('upload_error')) {
     /**
-     * Recupera o tipo do erro do upload
+     * Recupera o tipo do erro do upload.
      *
      * @param int $code
      *
@@ -518,29 +517,29 @@ if (!function_exists('upload_error')) {
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
-                $message = "O arquivo enviado excede o limite definido na diretiva `upload_max_filesize` do php.ini";
+                $message = 'O arquivo enviado excede o limite definido na diretiva `upload_max_filesize` do php.ini';
                 break;
             case UPLOAD_ERR_FORM_SIZE:
-                $message = "O arquivo excede o limite definido em `MAX_FILE_SIZE` no formulário HTML.";
+                $message = 'O arquivo excede o limite definido em `MAX_FILE_SIZE` no formulário HTML.';
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $message = "O upload do arquivo foi feito parcialmente.";
+                $message = 'O upload do arquivo foi feito parcialmente.';
                 break;
             case UPLOAD_ERR_NO_FILE:
-                $message = "Nenhum arquivo foi enviado.";
+                $message = 'Nenhum arquivo foi enviado.';
                 break;
             case UPLOAD_ERR_NO_TMP_DIR:
-                $message = "Pasta temporária ausênte.";
+                $message = 'Pasta temporária ausênte.';
                 break;
             case UPLOAD_ERR_CANT_WRITE:
-                $message = "Falha em escrever o arquivo em disco.";
+                $message = 'Falha em escrever o arquivo em disco.';
                 break;
             case UPLOAD_ERR_EXTENSION:
-                $message = "Uma extensão do PHP interrompeu o upload do arquivo.";
+                $message = 'Uma extensão do PHP interrompeu o upload do arquivo.';
                 break;
 
             default:
-                $message = "";
+                $message = '';
                 break;
         }
 
@@ -550,17 +549,18 @@ if (!function_exists('upload_error')) {
 
 if (!function_exists('upload_image')) {
     /**
-     * Upload de imagem
+     * Upload de imagem.
      *
-     * @param array $file
+     * @param array  $file
      * @param string $directory
      * @param string $name
-     * @param int $width
-     * @param int $height
-     * @param bool $forceJpg
-     * @param bool $whExact
+     * @param int    $width
+     * @param int    $height
+     * @param bool   $forceJpg
+     * @param bool   $whExact
      *
      * @return array
+     *
      * @throws \Exception
      */
     function upload_image($file, $directory, $name = null, $width = 500, $height = 500, $forceJpg = false, $whExact = false)
@@ -571,13 +571,14 @@ if (!function_exists('upload_image')) {
 
 if (!function_exists('upload_archive')) {
     /**
-     * Upload de arquivo
+     * Upload de arquivo.
      *
-     * @param array $file
+     * @param array  $file
      * @param string $directory
      * @param string $name
      *
      * @return array
+     *
      * @throws \Exception
      */
     function upload_archive($file, $directory, $name = null)
@@ -588,7 +589,7 @@ if (!function_exists('upload_archive')) {
 
 if (!function_exists('delete_recursive_directory')) {
     /**
-     * Remove os arquivos e os diretórios do path passado
+     * Remove os arquivos e os diretórios do path passado.
      *
      * @param string $path
      */
@@ -622,7 +623,7 @@ if (!function_exists('delete_recursive_directory')) {
 if (!function_exists('date_for_human')) {
     /**
      * @param string $dateTime
-     * @param int $precision
+     * @param int    $precision
      *
      * @return string
      */
@@ -643,17 +644,17 @@ if (!function_exists('date_for_human')) {
         $decade = $century * 10;
 
         // Tempos
-        $periods = array(
-            $decade => array("decada", "decadas"),
-            $century => array("seculo", "seculos"),
-            $year => array("ano", "anos"),
-            $month => array("mês", "mêses"),
-            $week => array("semana", "semanas"),
-            $day => array("dia", "dias"),
-            $hour => array("hora", "horas"),
-            $minute => array("minuto", "minutos"),
-            1 => array("segundo", "segundos"),
-        );
+        $periods = [
+            $decade => ['decada', 'decadas'],
+            $century => ['seculo', 'seculos'],
+            $year => ['ano', 'anos'],
+            $month => ['mês', 'mêses'],
+            $week => ['semana', 'semanas'],
+            $day => ['dia', 'dias'],
+            $hour => ['hora', 'horas'],
+            $minute => ['minuto', 'minutos'],
+            1 => ['segundo', 'segundos'],
+        ];
 
         // Time atual
         $currentTime = (new Date())->getTimestamp();
@@ -668,9 +669,9 @@ if (!function_exists('date_for_human')) {
 
         // Monta o resultado
         if ($passed < 5) {
-            $output = "5 segundos";
+            $output = '5 segundos';
         } else {
-            $output = array();
+            $output = [];
             $exit = 0;
 
             foreach ($periods as $period => $name) {
@@ -681,13 +682,13 @@ if (!function_exists('date_for_human')) {
                 $result = floor($passed / $period);
 
                 if ($result > 0) {
-                    $output[] = $result." ".($result == 1 ? $name[0] : $name[1]);
+                    $output[] = $result.' '.(1 == $result ? $name[0] : $name[1]);
                     $passed -= $result * $period;
-                    $exit++;
+                    ++$exit;
                 }
             }
 
-            $output = implode(" e ", $output);
+            $output = implode(' e ', $output);
         }
 
         return $output;
@@ -696,7 +697,7 @@ if (!function_exists('date_for_human')) {
 
 if (!function_exists('preg_replace_space')) {
     /**
-     * Remove tags e espaços vázios
+     * Remove tags e espaços vázios.
      *
      * @param string $string
      *
@@ -715,12 +716,10 @@ if (!function_exists('preg_replace_space')) {
         $string = preg_replace('/(?<=\.)(?=[a-zA-Z])/m', ' ', $string);
 
         // Remove tag `p` vázia
-        $string = preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
+        return preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
 
         // Remove todas tags vázia
         //$string = preg_replace('/<[\w]*[^>]*>[\s\s|&nbsp;]*<\/[\w]*>/m', '', $string);
-
-        return $string;
     }
 }
 
@@ -732,7 +731,7 @@ if (!function_exists('database_format_float')) {
      */
     function database_format_float($value)
     {
-        if (strpos($value, ',') !== false) {
+        if (false !== strpos($value, ',')) {
             $value = str_replace(',', '.', str_replace('.', '', $value));
         }
 
@@ -743,7 +742,7 @@ if (!function_exists('database_format_float')) {
 if (!function_exists('database_format_datetime')) {
     /**
      * @param string|null $dateTime
-     * @param string $type
+     * @param string      $type
      *
      * @return string
      */
@@ -754,14 +753,14 @@ if (!function_exists('database_format_datetime')) {
         $dateTimeFormat = "{$dateFormat} {$timeFormat}";
 
         return (new Date($dateTime))->format(
-            ($type == 'time' ? $timeFormat : ($type == 'date' ? $dateFormat : $dateTimeFormat))
+            ('time' == $type ? $timeFormat : ('date' == $type ? $dateFormat : $dateTimeFormat))
         );
     }
 }
 
 if (!function_exists('in_web')) {
     /**
-     * Verifica se está no site
+     * Verifica se está no site.
      *
      * return bool
      */
@@ -794,28 +793,28 @@ if (!function_exists('get_code_video_youtube')) {
             preg_match('/(https:|http:|)(\/\/www\.|\/\/|)(.*?)\/(.{11})/i', $url, $matches);
 
             return $matches[4];
-        } else if (strstr($url, "/v/")) {
-            $aux = explode("v/", $url);
-            $aux2 = explode("?", $aux[1]);
-            $cod_youtube = $aux2[0];
+        }
+        if (strstr($url, '/v/')) {
+            $aux = explode('v/', $url);
+            $aux2 = explode('?', $aux[1]);
 
-            return $cod_youtube;
-        } else if (strstr($url, "v=")) {
-            $aux = explode("v=", $url);
-            $aux2 = explode("&", $aux[1]);
-            $cod_youtube = $aux2[0];
+            return $aux2[0];
+        }
+        if (strstr($url, 'v=')) {
+            $aux = explode('v=', $url);
+            $aux2 = explode('&', $aux[1]);
 
-            return $cod_youtube;
-        } else if (strstr($url, "/embed/")) {
-            $aux = explode("/embed/", $url);
-            $cod_youtube = $aux[1];
+            return $aux2[0];
+        }
+        if (strstr($url, '/embed/')) {
+            $aux = explode('/embed/', $url);
 
-            return $cod_youtube;
-        } else if (strstr($url, "be/")) {
-            $aux = explode("be/", $url);
-            $cod_youtube = $aux[1];
+            return $aux[1];
+        }
+        if (strstr($url, 'be/')) {
+            $aux = explode('be/', $url);
 
-            return $cod_youtube;
+            return $aux[1];
         }
 
         return false;
@@ -855,7 +854,7 @@ if (!function_exists('imagem')) {
             }
 
             // retifica o arquivo
-            if ($destInfo['extension'] == "gif") {
+            if ('gif' == $destInfo['extension']) {
                 $dest = substr_replace($dest, 'jpg', -3);
             }
 
@@ -878,18 +877,18 @@ if (!function_exists('imagem')) {
             }
 
             // ajusta a cor
-            if (function_exists("imagecreatetruecolor")) {
+            if (function_exists('imagecreatetruecolor')) {
                 $destImage = imagecreatetruecolor($destSize[0], $destSize[1]);
             } else {
                 $destImage = imagecreate($destSize[0], $destSize[1]);
             }
 
-            if (function_exists("imageantialias")) {
+            if (function_exists('imageantialias')) {
                 imageantialias($destImage, true);
             }
 
             if ($png) {
-                if (substr($dest, -3) == 'png') {
+                if ('png' == substr($dest, -3)) {
                     imagealphablending($destImage, false);
                     imagesavealpha($destImage, true);
                     $transparent = imagecolorallocatealpha($destImage, 255, 255, 255, 127);
@@ -900,22 +899,22 @@ if (!function_exists('imagem')) {
             }
 
             // copia a figura redimencionando o seu tamanho
-            if (function_exists("imagecopyresampled")) {
+            if (function_exists('imagecopyresampled')) {
                 imagecopyresampled($destImage, $srcImage, 0, 0, 0, 0, $destSize[0], $destSize[1], $srcSize[0], $srcSize[1]);
             } else {
                 imagecopyresized($destImage, $srcImage, 0, 0, 0, 0, $destSize[0], $destSize[1], $srcSize[0], $srcSize[1]);
             }
 
-            if (substr($dest, -3) == 'png') {
+            if ('png' == substr($dest, -3)) {
                 imagepng($destImage, $dest);
             } else {
                 imagejpeg($destImage, $dest, $quality);
             }
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }
 
@@ -936,7 +935,7 @@ if (!function_exists('imagemTamExato')) {
             $destInfo = pathinfo($dest);
 
             // retifica o arquivo
-            if ($destInfo['extension'] == "gif") {
+            if ('gif' == $destInfo['extension']) {
                 $dest = substr_replace($dest, 'jpg', -3);
             }
 
@@ -977,7 +976,7 @@ if (!function_exists('imagemTamExato')) {
             $thumb = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
 
             if ($png) {
-                if (substr($dest, -3) == 'png') {
+                if ('png' == substr($dest, -3)) {
                     imagesavealpha($myImage, true);
                     imagealphablending($process, false);
                     imagesavealpha($process, true);
@@ -995,15 +994,15 @@ if (!function_exists('imagemTamExato')) {
                 imagecopyresampled($thumb, $process, 0, 0, ($x_mid - ($thumbnail_width / 2)), ($y_mid - ($thumbnail_height / 2)), $thumbnail_width, $thumbnail_height, $thumbnail_width, $thumbnail_height);
             }
 
-            if (substr($dest, -3) == 'png') {
+            if ('png' == substr($dest, -3)) {
                 imagepng($thumb, $dest);
             } else {
                 imagejpeg($thumb, $dest, $quality);
             }
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

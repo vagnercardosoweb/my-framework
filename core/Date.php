@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,13 +9,11 @@
  */
 
 namespace App\Core {
-
     use DateTimeZone;
 
     /**
-     * Class Date
+     * Class Date.
      *
-     * @package App\Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Date extends \DateTime
@@ -26,7 +24,7 @@ namespace App\Core {
 
         const FORMAT_DATE_DATABASE = 'Y-m-d H:i:s';
 
-        /***
+        /*
          * @param string|int $time
          * @param \DateTimeZone|null $timezone
          */
@@ -42,7 +40,7 @@ namespace App\Core {
         }
 
         /**
-         * @param int $timestamp
+         * @param int                $timestamp
          * @param \DateTimeZone|null $timezone
          *
          * @return \App\Core\Date

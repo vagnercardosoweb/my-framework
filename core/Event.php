@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,24 +9,21 @@
  */
 
 namespace Core {
-
     /**
-     * Class Event
+     * Class Event.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Event
     {
         /**
-         * @var Event
-         */
-        private static $instance;
-
-        /**
          * @var array
          */
         protected $events = [];
+        /**
+         * @var Event
+         */
+        private static $instance;
 
         /**
          * @return Event
@@ -41,9 +38,9 @@ namespace Core {
         }
 
         /**
-         * @param string $event
+         * @param string   $event
          * @param callable $callable
-         * @param int $priority
+         * @param int      $priority
          */
         public function on(string $event, callable $callable, int $priority = 10)
         {
@@ -61,7 +58,7 @@ namespace Core {
 
         /**
          * @param string $event
-         * @param ... $params
+         * @param ...    $params
          *
          * @return mixed
          */

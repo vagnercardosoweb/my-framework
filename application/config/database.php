@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,8 +9,7 @@
  */
 
 return [
-
-    /**
+    /*
      * Eventos
      *
      * tbName:creating | tbName:created
@@ -18,7 +17,7 @@ return [
      * tbName:deleting | tbName:deleted
      */
 
-    /**
+    /*
      * Default
      *
      * Driver de conexão padrão
@@ -26,7 +25,7 @@ return [
 
     'default' => env('DB_DRIVER', 'mysql'),
 
-    /**
+    /*
      * Options
      *
      * Configura as opções para conexão
@@ -39,15 +38,14 @@ return [
         \PDO::ATTR_PERSISTENT => false,
     ],
 
-    /**
+    /*
      * Drivers
      *
      * Define os tipo de conexões que serão aceitos
      */
 
     'connections' => [
-
-        /**
+        /*
          * MySQL
          */
 
@@ -62,7 +60,7 @@ return [
             'timezone' => env('APP_TIMEZONE', null),
         ],
 
-        /**
+        /*
          * PostgreSQL
          */
 
@@ -77,7 +75,7 @@ return [
             'timezone' => env('APP_TIMEZONE', null),
         ],
 
-        /**
+        /*
          * SQLServer
          *
          * conexão padrão usa o driver "pdo_dblib" e caso
@@ -94,7 +92,5 @@ return [
             'database' => env('DB_DATABASE', ''),
             'charset' => env('DB_CHARSET', 'utf8'),
         ],
-
     ],
-
 ];

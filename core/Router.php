@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core {
-
     /**
-     * Class Router
+     * Class Router.
      *
-     * @package Core
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Router
@@ -29,9 +27,10 @@ namespace Core {
             $current = App::getInstance()
                 ->resolve('request')
                 ->getUri()
-                ->getPath();
+                ->getPath()
+            ;
 
-            if (substr($current, 0, 1) !== '/') {
+            if ('/' !== substr($current, 0, 1)) {
                 $current = "/{$current}";
             }
 
@@ -56,10 +55,11 @@ namespace Core {
             $current = App::getInstance()
                 ->resolve('request')
                 ->getUri()
-                ->getPath();
+                ->getPath()
+            ;
 
             foreach ((array) $router as $route) {
-                if (mb_strpos($current, $route) !== false) {
+                if (false !== mb_strpos($current, $route)) {
                     return true;
                 }
             }
@@ -69,8 +69,8 @@ namespace Core {
 
         /**
          * @param string $name
-         * @param array $data
-         * @param array $queryParams
+         * @param array  $data
+         * @param array  $queryParams
          * @param string $hash
          *
          * @return string
@@ -80,7 +80,7 @@ namespace Core {
             $name = strtolower($name);
             $baseUrl = '';
 
-            if ($name[0] === ':') {
+            if (':' === $name[0]) {
                 $name = substr($name, 1);
                 $baseUrl = BASE_URL;
             }
@@ -90,10 +90,10 @@ namespace Core {
             }
 
             return $baseUrl.App::getInstance()
-                    ->resolve('router')
-                    ->pathFor(
-                        $name, $data, $queryParams
-                    ).$hash;
+                ->resolve('router')
+                ->pathFor(
+                    $name, $data, $queryParams
+                ).$hash;
         }
     }
 }

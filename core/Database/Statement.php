@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core\Database {
-
     /**
-     * Class Statement
+     * Class Statement.
      *
-     * @package Core\Database
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Statement extends \PDOStatement
@@ -58,7 +56,7 @@ namespace Core\Database {
         {
             $rowCount = parent::rowCount();
 
-            if ($rowCount === -1) {
+            if (-1 === $rowCount) {
                 $rowCount = count($this->fetchAll());
             }
 
@@ -66,7 +64,7 @@ namespace Core\Database {
         }
 
         /**
-         * @param int $fetchStyle
+         * @param int   $fetchStyle
          * @param mixed $fetchArgument
          * @param array $ctorArgs
          *
@@ -80,25 +78,27 @@ namespace Core\Database {
                 );
             }
 
-            if ($fetchStyle === \PDO::FETCH_CLASS && !class_exists($fetchArgument)) {
+            if (\PDO::FETCH_CLASS === $fetchStyle && !class_exists($fetchArgument)) {
                 $fetchArgument = 'stdClass';
             }
 
-            if ($fetchStyle === \PDO::FETCH_BOTH) {
+            if (\PDO::FETCH_BOTH === $fetchStyle) {
                 return parent::fetchAll();
-            } else if ($fetchStyle === \PDO::FETCH_CLASS) {
-                return parent::fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
-            } else if (in_array($fetchStyle, [\PDO::FETCH_ASSOC, \PDO::FETCH_NUM, \PDO::FETCH_OBJ])) {
-                return parent::fetchAll($fetchStyle);
-            } else {
-                return parent::fetchAll($fetchStyle, $fetchArgument);
             }
+            if (\PDO::FETCH_CLASS === $fetchStyle) {
+                return parent::fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
+            }
+            if (in_array($fetchStyle, [\PDO::FETCH_ASSOC, \PDO::FETCH_NUM, \PDO::FETCH_OBJ])) {
+                return parent::fetchAll($fetchStyle);
+            }
+
+            return parent::fetchAll($fetchStyle, $fetchArgument);
         }
 
         /**
          * @param mixed $fetchStyle
-         * @param int $cursorOrientation
-         * @param int $cursorOffset
+         * @param int   $cursorOrientation
+         * @param int   $cursorOffset
          *
          * @return array|object
          */

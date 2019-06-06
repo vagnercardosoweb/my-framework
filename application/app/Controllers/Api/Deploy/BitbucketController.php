@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,20 +9,18 @@
  */
 
 namespace App\Controllers\Api\Deploy {
-
     use App\Controller\Controller;
     use Slim\Http\StatusCode;
 
     /**
-     * Class BitbucketController
+     * Class BitbucketController.
      *
-     * @package App\Controllers\Api\Deploy
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class BitbucketController extends Controller
     {
         /**
-         * [POST] /api/deploy/bitbucket
+         * [POST] /api/deploy/bitbucket.
          *
          * @return \Slim\Http\Response
          */
@@ -33,22 +31,22 @@ namespace App\Controllers\Api\Deploy {
                 $token = request_params('token');
 
                 if ($token !== env('DEPLOY_KEY')) {
-                    throw new \Exception("Token inválid.", E_USER_ERROR);
+                    throw new \Exception('Token inválid.', E_USER_ERROR);
                 }
 
                 // Body
                 $body = json_decode(file_get_contents('php://input'), true);
 
                 if (empty($body['push']['changes'])) {
-                    throw new \InvalidArgumentException("Body push changes empty.", E_USER_ERROR);
+                    throw new \InvalidArgumentException('Body push changes empty.', E_USER_ERROR);
                 }
 
                 if (($countChange = count($body['push']['changes'])) > 0) {
                     $lastChange = $body['push']['changes'][$countChange - 1]['new'];
 
                     // Verify type
-                    if ($lastChange['type'] !== 'branch') {
-                        throw new \Exception("Type change new diff branch.", E_USER_ERROR);
+                    if ('branch' !== $lastChange['type']) {
+                        throw new \Exception('Type change new diff branch.', E_USER_ERROR);
                     }
 
                     // Muda o diretório para a raiz
@@ -56,7 +54,7 @@ namespace App\Controllers\Api\Deploy {
 
                     // Verifica pasta .git
                     if (!file_exists(ROOT.'/.git')) {
-                        throw new \Exception("Git not initialize.", E_USER_ERROR);
+                        throw new \Exception('Git not initialize.', E_USER_ERROR);
                     }
 
                     switch ($lastChange['name']) {
@@ -64,10 +62,10 @@ namespace App\Controllers\Api\Deploy {
                             `git fetch origin && git reset --hard origin/master 2>&1`;
                             break;
                         default:
-                            throw new \Exception("Branch undefined.", E_USER_ERROR);
+                            throw new \Exception('Branch undefined.', E_USER_ERROR);
                     }
                 } else {
-                    throw new \Exception("Count change less than 0.", E_USER_ERROR);
+                    throw new \Exception('Count change less than 0.', E_USER_ERROR);
                 }
 
                 return json([

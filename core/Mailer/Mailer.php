@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,7 +9,6 @@
  */
 
 namespace Core\Mailer {
-
     use Closure;
     use Core\App;
     use Exception;
@@ -17,9 +16,8 @@ namespace Core\Mailer {
     use PHPMailer\PHPMailer\PHPMailer;
 
     /**
-     * Class Mailer
+     * Class Mailer.
      *
-     * @package Core\Mailer
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Mailer
@@ -41,29 +39,72 @@ namespace Core\Mailer {
         }
 
         /**
-         * @param array $options
+         * @param string   $template
+         * @param array    $context
+         * @param \Closure $callback
          *
-         * @return void
+         * @return \Core\Mailer\Mailer
+         *
+         * @throws \Exception
+         */
+        public function send(string $template, array $context, Closure $callback): Mailer
+        {
+            try {
+                $message = new Message($this->mail);
+                $message->body(App::getInstance()->resolve('view')->fetch("@mail.{$template}", $context));
+
+                call_user_func_array($callback->bindTo($this->mail), [
+                    $message,
+                    $context,
+                ]);
+
+                // Send mailer
+                if (!$this->mail->send()) {
+                    throw new Exception(
+                        $this->mail->ErrorInfo, E_USER_ERROR
+                    );
+                }
+
+                // Clear properties
+                $this->clearAll();
+
+                return $this;
+            } catch (Exception $e) {
+                throw $e;
+            }
+        }
+
+        public function clearAll(): void
+        {
+            $this->mail->clearAddresses();
+            $this->mail->clearAllRecipients();
+            $this->mail->clearAttachments();
+            $this->mail->clearBCCs();
+            $this->mail->clearCCs();
+            $this->mail->clearCustomHeaders();
+            $this->mail->clearReplyTos();
+        }
+
+        /**
+         * @param array $options
          */
         protected function validateOptions(array &$options): void
         {
             if (empty($options['host'])) {
                 throw new InvalidArgumentException(
-                    "Host not configured.", E_USER_ERROR
+                    'Host not configured.', E_USER_ERROR
                 );
             }
 
             if (empty($options['username']) || empty($options['password'])) {
                 throw new InvalidArgumentException(
-                    "User and password not configured.", E_USER_ERROR
+                    'User and password not configured.', E_USER_ERROR
                 );
             }
         }
 
         /**
          * @param array $options
-         *
-         * @return void
          */
         protected function configureDefaultMailer(array $options): void
         {
@@ -114,55 +155,6 @@ namespace Core\Mailer {
             }
 
             return $host;
-        }
-
-        /**
-         * @param string $template
-         * @param array $context
-         * @param \Closure $callback
-         *
-         * @return \Core\Mailer\Mailer
-         * @throws \Exception
-         */
-        public function send(string $template, array $context, Closure $callback): Mailer
-        {
-            try {
-                $message = new Message($this->mail);
-                $message->body(App::getInstance()->resolve('view')->fetch("@mail.{$template}", $context));
-
-                call_user_func_array($callback->bindTo($this->mail), [
-                    $message,
-                    $context,
-                ]);
-
-                // Send mailer
-                if (!$this->mail->send()) {
-                    throw new Exception(
-                        $this->mail->ErrorInfo, E_USER_ERROR
-                    );
-                }
-
-                // Clear properties
-                $this->clearAll();
-
-                return $this;
-            } catch (Exception $e) {
-                throw $e;
-            }
-        }
-
-        /**
-         * @inheritDoc
-         */
-        public function clearAll(): void
-        {
-            $this->mail->clearAddresses();
-            $this->mail->clearAllRecipients();
-            $this->mail->clearAttachments();
-            $this->mail->clearBCCs();
-            $this->mail->clearCCs();
-            $this->mail->clearCustomHeaders();
-            $this->mail->clearReplyTos();
         }
     }
 }

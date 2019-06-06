@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,14 +9,12 @@
  */
 
 namespace Core\Session {
-
     use Core\App;
     use Core\Helpers\Arr;
 
     /**
-     * Class Flash
+     * Class Flash.
      *
-     * @package Core\Session
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class Flash
@@ -26,7 +24,7 @@ namespace Core\Session {
          */
         protected $key = '__flash__';
 
-        /***
+        /*
          * @var array
          */
         protected $data = [];
@@ -56,7 +54,7 @@ namespace Core\Session {
 
         /**
          * @param string $name
-         * @param mixed $value
+         * @param mixed  $value
          */
         public function set($name, $value)
         {

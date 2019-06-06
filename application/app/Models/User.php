@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,14 +9,12 @@
  */
 
 namespace App\Models {
-
     use App\Core\Helpers\Validate;
     use Core\Database\Model;
 
     /**
-     * Class User
+     * Class User.
      *
-     * @package App\Models
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class User extends Model
@@ -29,13 +27,12 @@ namespace App\Models {
         /**
          * @var string
          */
-        protected $primaryKey = "id";
+        protected $primaryKey = 'id';
 
         /**
          * @param array $data
-         * @param bool $validate
+         * @param bool  $validate
          *
-         * @return void
          * @throws \Exception
          */
         protected function _data(array &$data, $validate)
@@ -56,13 +53,13 @@ namespace App\Models {
             if (!empty($data['email'])) {
                 if (!Validate::mail($data['email'])) {
                     throw new \InvalidArgumentException(
-                        "O E-mail informado não é válido.", E_USER_WARNING
+                        'O E-mail informado não é válido.', E_USER_WARNING
                     );
                 }
 
                 if ($this->where("AND {$this->table}.email = '{$data['email']}'")->count() > 0) {
                     throw new \InvalidArgumentException(
-                        "O e-mail digitado já foi registrado.", E_USER_WARNING
+                        'O e-mail digitado já foi registrado.', E_USER_WARNING
                     );
                 }
             }

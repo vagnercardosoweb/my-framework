@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,11 +9,9 @@
  */
 
 namespace Core\Password {
-
     /**
-     * Class Password
+     * Class Password.
      *
-     * @package Core\Contracts
      * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     abstract class Password
@@ -32,11 +30,11 @@ namespace Core\Password {
          * @param string $password
          * @param string $hash
          *
-         * @return boolean
+         * @return bool
          */
         public function verify($password, string $hash): bool
         {
-            if (strlen($hash) === 0) {
+            if (0 === strlen($hash)) {
                 return false;
             }
 
@@ -45,23 +43,23 @@ namespace Core\Password {
 
         /**
          * @param string $password
-         * @param array $options
+         * @param array  $options
          *
          * @return string
          */
-        abstract function hash($password, array $options = []): string;
+        abstract public function hash($password, array $options = []): string;
 
         /**
          * @param string $hash
-         * @param array $options
+         * @param array  $options
          *
          * @return bool
          */
-        abstract function needsRehash(string $hash, array $options = []): bool;
+        abstract public function needsRehash(string $hash, array $options = []): bool;
 
         /**
          * @return int
          */
-        abstract function algorithm(): int;
+        abstract public function algorithm(): int;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -9,19 +9,17 @@
  */
 
 namespace App\Providers {
-
     use Core\Mailer\Mailer;
 
     /**
-     * Class MailerProvider
+     * Class MailerProvider.
      *
-     * @package App\Providers
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
     class MailerProvider extends Provider
     {
         /**
-         * @inheritDoc
+         * {@inheritdoc}
          */
         public function register()
         {
