@@ -1,6 +1,6 @@
 <?php
 
-/**
+/*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>.
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
@@ -12,7 +12,7 @@ namespace App\Providers {
     use Core\Event;
 
     /**
-     * Class EventProvider.
+     * Class EventProvider
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -28,9 +28,12 @@ namespace App\Providers {
             };
         }
 
+        /**
+         * {@inheritdoc}
+         */
         public function boot()
         {
-            $this->view->addFunction('event_emit', function (string $event) {
+            $this->view->addFunction('event_emit', function ($event) {
                 $params = func_get_args();
                 array_shift($params);
 

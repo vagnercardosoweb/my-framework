@@ -10,7 +10,7 @@
 
 namespace Core {
     /**
-     * Class Event.
+     * Class Event
      *
      * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
      */
@@ -28,7 +28,7 @@ namespace Core {
         /**
          * @return Event
          */
-        public static function getInstance()
+        public static function getInstance(): Event
         {
             if (empty(self::$instance)) {
                 self::$instance = new self();
@@ -41,11 +41,13 @@ namespace Core {
          * @param string   $event
          * @param callable $callable
          * @param int      $priority
+         *
+         * @return void
          */
-        public function on(string $event, callable $callable, int $priority = 10)
+        public function on(string $event, callable $callable, int $priority = 10): void
         {
-            $event = (string) $event;
-            $priority = (int) $priority;
+            $event = (string)$event;
+            $priority = (int)$priority;
 
             if (!isset($this->events[$event])) {
                 $this->events[$event] = [];
@@ -64,7 +66,7 @@ namespace Core {
          */
         public function emit(string $event)
         {
-            $event = (string) $event;
+            $event = (string)$event;
 
             if (!isset($this->events[$event])) {
                 $this->events[$event] = [[]];
@@ -110,10 +112,12 @@ namespace Core {
 
         /**
          * @param string $event
+         *
+         * @return void
          */
-        public function clear(?string $event = null)
+        public function clear(?string $event = null): void
         {
-            $event = (string) $event;
+            $event = (string)$event;
 
             if (!empty($event) && isset($this->events[$event])) {
                 $this->events[$event] = [[]];
