@@ -18,6 +18,7 @@ return PhpCsFixer\Config::create()
         '@PhpCsFixer' => true,
         '@Symfony' => true,
         'phpdoc_order' => false,
+        'phpdoc_summary' => false,
         'array_syntax' => ['syntax' => 'short'],
         'ordered_imports' => true,
     ])

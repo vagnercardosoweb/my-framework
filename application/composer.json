@@ -40,11 +40,11 @@
   "autoload": {
     "files": [
       "app/helpers.php",
-      "../core/helpers.php"
+      "../source/helpers.php"
     ],
     "psr-4": {
       "App\\": "app/",
-      "Core\\": "../core"
+      "Core\\": "../source"
     }
   },
   "config": {
