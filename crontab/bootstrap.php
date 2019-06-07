@@ -17,16 +17,16 @@ try {
      */
 
     define('ROOT', __DIR__);
-    define('PUBLIC_FOLDER', __DIR__ . '/../public_html');
-    define('APP_FOLDER', __DIR__ . '/../application');
-    define('RESOURCE_FOLDER', APP_FOLDER . '/resources');
+    define('PUBLIC_FOLDER', __DIR__.'/../public_html');
+    define('APP_FOLDER', __DIR__.'/../application');
+    define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
     define('BASE_URL', 'http://localhost');
 
     /*
      * Autoload.
      */
 
-    require_once APP_FOLDER . '/vendor/autoload.php';
+    require_once APP_FOLDER.'/vendor/autoload.php';
 
     /*
      * Carrega a aplicação.

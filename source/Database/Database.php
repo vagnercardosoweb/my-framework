@@ -198,17 +198,17 @@ namespace Core\Database {
             if (!empty($data[0])) {
                 foreach ($data as $i => $item) {
                     $data = ($this->emitEvent("{$table}:creating", $item) ?: $item);
-                    $values[] = ':' . implode("_{$i}, :", array_keys($data)) . "_{$i}";
+                    $values[] = ':'.implode("_{$i}, :", array_keys($data))."_{$i}";
 
                     foreach ($data as $k => $v) {
                         $this->setBindings(["{$k}_{$i}" => $v]);
                     }
                 }
 
-                $values = '(' . implode('), (', $values) . ')';
+                $values = '('.implode('), (', $values).')';
             } else {
                 $data = ($this->emitEvent("{$table}:creating", $data) ?: $data);
-                $values = '(:' . implode(', :', array_keys($data)) . ')';
+                $values = '(:'.implode(', :', array_keys($data)).')';
                 $this->setBindings($data);
             }
 

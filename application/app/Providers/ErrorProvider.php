@@ -49,7 +49,7 @@ namespace App\Providers {
                             'file' => str_replace([PUBLIC_FOLDER, APP_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
                             'line' => $exception->getLine(),
                             'message' => $exception->getMessage(),
-                            'route' => (is_object($route) ? '(' . implode(', ', $route->getMethods()) . ') ' : null) . $request->getUri(),
+                            'route' => (is_object($route) ? '('.implode(', ', $route->getMethods()).') ' : null).$request->getUri(),
                             'trace' => explode("\n", $exception->getTraceAsString()),
                         ],
                     ];

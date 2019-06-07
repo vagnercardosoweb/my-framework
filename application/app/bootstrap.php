@@ -31,10 +31,10 @@ ob_start(function ($buffer) {
 /**
  * Autoload.
  */
-$authload = APP_FOLDER . '/vendor/autoload.php';
+$authload = APP_FOLDER.'/vendor/autoload.php';
 
 if (!file_exists($authload)) {
-    die('Run command in terminal: <br>' .
+    die('Run command in terminal: <br>'.
         '<code style="background: #000; color: #fff;">composer install</code>');
 }
 

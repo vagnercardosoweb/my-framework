@@ -103,7 +103,7 @@ namespace Core {
          */
         protected function hash(string $iv, string $value): string
         {
-            return hash_hmac('sha256', $iv . $value, $this->key);
+            return hash_hmac('sha256', $iv.$value, $this->key);
         }
 
         /**

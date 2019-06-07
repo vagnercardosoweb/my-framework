@@ -142,7 +142,7 @@ namespace App\Controllers\Api {
                 }
 
                 if (!empty($data['model']) && (!empty($data['id']) && $data['id'] > 0)) {
-                    $model = '\\App\\Models\\' . Str::studly($data['model']);
+                    $model = '\\App\\Models\\'.Str::studly($data['model']);
 
                     if (!$data['row'] = (new $model())->reset()->fetchById($data['id'])) {
                         throw new \Exception('Registro não encontrado.', E_USER_ERROR);

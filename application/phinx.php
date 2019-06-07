@@ -16,15 +16,15 @@ try {
      */
 
     define('ROOT', __DIR__);
-    define('PUBLIC_FOLDER', __DIR__ . '/../public_html');
+    define('PUBLIC_FOLDER', __DIR__.'/../public_html');
     define('APP_FOLDER', __DIR__);
-    define('RESOURCE_FOLDER', __DIR__ . '/resources');
+    define('RESOURCE_FOLDER', __DIR__.'/resources');
     define('BASE_URL', 'http://localhost');
 
     /**
      * Autoload.
      */
-    require_once APP_FOLDER . '/vendor/autoload.php';
+    require_once APP_FOLDER.'/vendor/autoload.php';
 
     /**
      * Carrega a aplicação.
@@ -58,7 +58,7 @@ try {
          */
 
         'templates' => [
-            'file' => __DIR__ . '/storage/database/templates/Migration.php.dist',
+            'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
         ],
 
         /*
@@ -67,8 +67,8 @@ try {
          */
 
         'paths' => [
-            'migrations' => __DIR__ . '/storage/database/migrations',
-            'seeds' => __DIR__ . '/storage/database/seeds',
+            'migrations' => __DIR__.'/storage/database/migrations',
+            'seeds' => __DIR__.'/storage/database/seeds',
         ],
 
         /*

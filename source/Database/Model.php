@@ -404,7 +404,7 @@ namespace Core\Database {
 
                 return $this->db->update(
                     $this->table, $this->data,
-                    'WHERE ' . $this->normalizeProperty($where),
+                    'WHERE '.$this->normalizeProperty($where),
                     $bindings
                 );
             }

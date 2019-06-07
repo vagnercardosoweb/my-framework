@@ -24,7 +24,7 @@ namespace Core {
     {
         public static function dotEnvironment()
         {
-            $pathEnv = APP_FOLDER . '/.env';
+            $pathEnv = APP_FOLDER.'/.env';
 
             if (file_exists($pathEnv)) {
                 Dotenv::create(APP_FOLDER, '.env', new DotenvFactory([
@@ -33,7 +33,7 @@ namespace Core {
                     new ServerConstAdapter(),
                 ]))->overload();
             } else {
-                $pathEnvExample = APP_FOLDER . '/.env-example';
+                $pathEnvExample = APP_FOLDER.'/.env-example';
 
                 if (!file_exists($pathEnv) && (file_exists($pathEnvExample) && !is_dir($pathEnvExample))) {
                     file_put_contents($pathEnv, file_get_contents($pathEnvExample), FILE_APPEND);
@@ -59,7 +59,7 @@ namespace Core {
              */
 
             ini_set('log_errors', ('true' == env('INI_LOG_ERRORS', 'true')));
-            ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER . '/storage/logs/php-%s.log'), date('dmY')));
+            ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));
             ini_set('display_errors', env('INI_DISPLAY_ERRORS', 'On'));
             ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', 'On'));
 
@@ -130,7 +130,7 @@ namespace Core {
 
             $file = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator(
-                    $folder ?: APP_FOLDER . '/routes', \FilesystemIterator::SKIP_DOTS
+                    $folder ?: APP_FOLDER.'/routes', \FilesystemIterator::SKIP_DOTS
                 )
             );
 

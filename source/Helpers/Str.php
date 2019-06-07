@@ -33,7 +33,7 @@ namespace Core\Helpers {
                     $string, 0, strrpos(
                         self::substr($string, 0, $limit), ' '
                     )
-                ) . $end;
+                ).$end;
         }
 
         /**

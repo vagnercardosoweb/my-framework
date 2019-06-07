@@ -17,7 +17,7 @@ define('ROOT', str_ireplace('\\', '/', realpath(dirname(__DIR__))));
  * Diretório raiz da pasta publica
  */
 
-define('PUBLIC_FOLDER', ROOT . '/public_html');
+define('PUBLIC_FOLDER', ROOT.'/public_html');
 
 /*
  * Diretório raiz da aplicação
@@ -25,13 +25,13 @@ define('PUBLIC_FOLDER', ROOT . '/public_html');
  * OBS: Esse diretório não pode ser acesso pela URL
  */
 
-define('APP_FOLDER', ROOT . '/application');
+define('APP_FOLDER', ROOT.'/application');
 
 /*
  * Diretório que armazena os recursos dos assets e views
  */
 
-define('RESOURCE_FOLDER', APP_FOLDER . '/resources');
+define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
 
 /**
  *  Define a URL base da aplicação.
@@ -53,11 +53,11 @@ define('BASE_URL', "{$schema}://{$host}");
  */
 
 define('REQUEST_URI', $_SERVER['REQUEST_URI']);
-define('FULL_URL', BASE_URL . "{$_SERVER['REQUEST_URI']}");
+define('FULL_URL', BASE_URL."{$_SERVER['REQUEST_URI']}");
 
 /**
  * Bootstrap.
  *
  * Inicia a aplicação
  */
-require_once APP_FOLDER . '/app/bootstrap.php';
+require_once APP_FOLDER.'/app/bootstrap.php';

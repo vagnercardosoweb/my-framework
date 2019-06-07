@@ -89,7 +89,7 @@ namespace App\Providers {
         protected function createFile(string $id): string
         {
             // Variáveis
-            $path = APP_FOLDER . '/storage/cache/slack';
+            $path = APP_FOLDER.'/storage/cache/slack';
             $filename = "{$path}/{$id}";
 
             // Cria a pasta caso não exista
@@ -124,7 +124,7 @@ namespace App\Providers {
             $text = [];
             $text[] = "*ip:* {$ip}";
             $text[] = "*hostname:* {$hostname}";
-            $text[] = '*date:* ' . date('d/m/Y H:i:s', time());
+            $text[] = '*date:* '.date('d/m/Y H:i:s', time());
 
             // Monta payload do erro
             foreach ($error as $key => $value) {

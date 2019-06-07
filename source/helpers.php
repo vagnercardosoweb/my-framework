@@ -209,7 +209,7 @@ if (!function_exists('htmlentities_recursive')) {
     {
         $data = [];
 
-        foreach ((array) $values as $key => $value) {
+        foreach ((array)$values as $key => $value) {
             if (is_array($value)) {
                 $data[$key] = htmlentities_recursive($value);
             } else {
@@ -237,7 +237,7 @@ if (!function_exists('empty_recursive')) {
             return true;
         }
 
-        foreach ((array) $data as $key => $value) {
+        foreach ((array)$data as $key => $value) {
             if (is_array($value)) {
                 return empty_recursive($value);
             }

@@ -49,7 +49,7 @@ namespace App\Controllers\Api\Deploy {
                 chdir(ROOT);
 
                 // Verifica pasta .git
-                if (!file_exists(ROOT . '/.git')) {
+                if (!file_exists(ROOT.'/.git')) {
                     throw new \Exception('Git not initialize.', E_USER_ERROR);
                 }
 

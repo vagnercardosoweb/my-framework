@@ -177,7 +177,7 @@ namespace Core\Helpers {
                 if (is_array($value)) {
                     $build[] = self::httpBuildQuery($value, $key);
                 } else {
-                    $build[] = $key . '=' . urlencode($value);
+                    $build[] = $key.'='.urlencode($value);
                 }
             }
 
@@ -208,7 +208,7 @@ namespace Core\Helpers {
 
             return number_format(
                     round($bytes, $precision), 2, ',', ''
-                ) . ' ' . $units[$base];
+                ).' '.$units[$base];
         }
 
         /**

@@ -86,7 +86,7 @@ namespace Core {
                 $route = $this->map($methods, $pattern, function (Request $request, Response $response, array $params) use ($callable) {
                     // Separa o namespace e método
                     list($namespace, $originalMethod) = (explode('@', $callable) + [1 => null]);
-                    $method = mb_strtolower($request->getMethod()) . ucfirst($originalMethod);
+                    $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
 
                     // Valida se existe o `Controller` na string
                     if (!strripos($namespace, 'Controller')) {
@@ -111,7 +111,7 @@ namespace Core {
                     }
 
                     // Inicia o controller
-                    $namespace = 'App\\Controllers\\' . str_ireplace('/', '\\', $namespace);
+                    $namespace = 'App\\Controllers\\'.str_ireplace('/', '\\', $namespace);
                     $controller = new $namespace($request, $response, $this);
 
                     // Verifica se existe o método

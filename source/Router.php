@@ -89,11 +89,11 @@ namespace Core {
                 $hash = "#{$hash}";
             }
 
-            return $baseUrl . App::getInstance()
+            return $baseUrl.App::getInstance()
                 ->resolve('router')
                 ->pathFor(
                     $name, $data, $queryParams
-                ) . $hash;
+                ).$hash;
         }
     }
 }

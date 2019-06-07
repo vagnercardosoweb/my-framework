@@ -37,11 +37,11 @@ namespace App\Middlewares {
                     $scaped = preg_quote("={$value}", '/');
 
                     file_put_contents(
-                        APP_FOLDER . '/.env',
+                        APP_FOLDER.'/.env',
                         preg_replace(
                             "/^{$key}{$scaped}/m",
                             "{$key}=vcw_{$random}",
-                            file_get_contents(APP_FOLDER . '/.env')
+                            file_get_contents(APP_FOLDER.'/.env')
                         )
                     );
                 }

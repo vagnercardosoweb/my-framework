@@ -49,10 +49,11 @@ if (!function_exists('validate_params')) {
                 if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
                     continue;
                 }
+
                 throw new \InvalidArgumentException(
-                        (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
-                        (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
-                    );
+                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
+                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
+                );
             }
         }
     }
@@ -230,13 +231,13 @@ if (!function_exists('get_galeria')) {
         $images = [];
 
         // Imagens antigas
-        if (file_exists(PUBLIC_FOLDER . "/{$path[1]}")) {
-            $images = array_values(array_diff(scandir(PUBLIC_FOLDER . "/{$path[1]}"), ['.', '..']));
+        if (file_exists(PUBLIC_FOLDER."/{$path[1]}")) {
+            $images = array_values(array_diff(scandir(PUBLIC_FOLDER."/{$path[1]}"), ['.', '..']));
             $path = $path[1];
         } else {
             // Imagens novas
-            if (file_exists(PUBLIC_FOLDER . "/{$path[0]}")) {
-                $images = array_values(array_diff(scandir(PUBLIC_FOLDER . "/{$path[0]}/0"), ['.', '..']));
+            if (file_exists(PUBLIC_FOLDER."/{$path[0]}")) {
+                $images = array_values(array_diff(scandir(PUBLIC_FOLDER."/{$path[0]}/0"), ['.', '..']));
                 $path = "{$path[0]}/";
             }
         }
@@ -352,30 +353,39 @@ if (!function_exists('upload')) {
             // Checa extension
             if (in_array($extension, $extImages)) {
                 if (!in_array($extension, $extImages)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>' . strtoupper(implode(', ', $extImages)) . '</b> são aceita para enviar sua imagem.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.',
+                        E_USER_ERROR
+                    );
                 }
             } else {
                 if (!in_array($extension, $extensions)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>' . strtoupper(implode(', ', $extensions)) . '</b> são aceita para enviar seu arquivo.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.',
+                        E_USER_ERROR
+                    );
                 }
             }
 
             // Checa tamanho
             if (($value['size'] > $maxFilesize = Upload::getMaxFilesize()) || 1 == $value['error']) {
-                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>' . Helper::convertBytesForHuman($maxFilesize) . '</b>.', E_USER_ERROR);
+                throw new \Exception(
+                    'Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.',
+                    E_USER_ERROR
+                );
             }
 
             // Cria pasta
-            if (!file_exists(PUBLIC_FOLDER . $directory)) {
-                mkdir(PUBLIC_FOLDER . $directory, 0755, true);
+            if (!file_exists(PUBLIC_FOLDER.$directory)) {
+                mkdir(PUBLIC_FOLDER.$directory, 0755, true);
             }
 
             // Verifica arquivo
             foreach ($extensions as $ext) {
                 $deleted = str_replace(".{$extension}", ".{$ext}", $path);
 
-                if (file_exists(PUBLIC_FOLDER . "{$deleted}")) {
-                    unlink(PUBLIC_FOLDER . "{$deleted}");
+                if (file_exists(PUBLIC_FOLDER."{$deleted}")) {
+                    unlink(PUBLIC_FOLDER."{$deleted}");
                 }
             }
 
@@ -389,7 +399,7 @@ if (!function_exists('upload')) {
             $uploadError = upload_error($value['error']);
 
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
-                if (!move_uploaded_file($value['tmp_name'], PUBLIC_FOLDER . $path)) {
+                if (!move_uploaded_file($value['tmp_name'], PUBLIC_FOLDER.$path)) {
                     throw new \Exception("<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
                 }
             } else {
@@ -405,7 +415,7 @@ if (!function_exists('upload')) {
                     $height = ($height > $heightOri ? $heightOri : $height);
                 }
 
-                if (!$fnImg($value['tmp_name'], PUBLIC_FOLDER . $path, $width, $height, 90)) {
+                if (!$fnImg($value['tmp_name'], PUBLIC_FOLDER.$path, $width, $height, 90)) {
                     throw new \Exception("<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
                 }
             }
@@ -415,7 +425,7 @@ if (!function_exists('upload')) {
                 'path' => $path,
                 'extension' => $extension,
                 'size' => $value['size'],
-                'md5' => md5_file(PUBLIC_FOLDER . $path),
+                'md5' => md5_file(PUBLIC_FOLDER.$path),
             ];
         }
 
@@ -683,7 +693,7 @@ if (!function_exists('date_for_human')) {
                 $result = floor($passed / $period);
 
                 if ($result > 0) {
-                    $output[] = $result . ' ' . (1 == $result ? $name[0] : $name[1]);
+                    $output[] = $result.' '.(1 == $result ? $name[0] : $name[1]);
                     $passed -= $result * $period;
                     $exit++;
                 }

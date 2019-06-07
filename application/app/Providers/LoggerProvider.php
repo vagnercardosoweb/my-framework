@@ -25,7 +25,7 @@ namespace App\Providers {
         {
             $this->container['logger'] = function () {
                 return new Logger(
-                    'VCWebNetworks', APP_FOLDER . '/storage/logs'
+                    'VCWebNetworks', APP_FOLDER.'/storage/logs'
                 );
             };
         }

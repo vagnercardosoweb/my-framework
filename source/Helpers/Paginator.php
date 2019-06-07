@@ -113,8 +113,8 @@ namespace Core\Helpers {
                     break;
 
                 default:
-                    if (method_exists($this, 'get' . ucfirst($method))) {
-                        return $this->{'get' . ucfirst($method)}(...$arguments);
+                    if (method_exists($this, 'get'.ucfirst($method))) {
+                        return $this->{'get'.ucfirst($method)}(...$arguments);
                     }
 
                     throw new \BadMethodCallException(
