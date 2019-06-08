@@ -5,7 +5,7 @@
  *
  * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @copyright 07/06/2019 Vagner Cardoso
  */
 
 return [
@@ -17,19 +17,11 @@ return [
      * tbName:deleting | tbName:deleted
      */
 
-    /*
-     * Default
-     *
-     * Driver de conexão padrão
-     */
+    // Driver de conexão padrão
 
     'default' => env('DB_DRIVER', 'mysql'),
 
-    /*
-     * Options
-     *
-     * Configura as opções para conexão
-     */
+    // Configura as opções para conexão
 
     'options' => [
         \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
@@ -38,16 +30,10 @@ return [
         \PDO::ATTR_PERSISTENT => false,
     ],
 
-    /*
-     * Drivers
-     *
-     * Define os tipo de conexões que serão aceitos
-     */
+    // Define os tipo de conexões que serão aceitos
 
     'connections' => [
-        /*
-         * MySQL
-         */
+        // MySQL
 
         'mysql' => [
             'host' => env('DB_HOST', 'localhost'),
@@ -60,9 +46,7 @@ return [
             'timezone' => env('APP_TIMEZONE', null),
         ],
 
-        /*
-         * PostgreSQL
-         */
+        // PostgreSQL
 
         'pgsql' => [
             'host' => env('DB_HOST', 'localhost'),

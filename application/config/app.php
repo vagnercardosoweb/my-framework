@@ -9,9 +9,7 @@
  */
 
 return [
-    /*
-     * Configurações do slim
-     */
+    // Configurações do slim
 
     'slim' => [
         'httpVersion' => '1.1',
@@ -23,27 +21,14 @@ return [
         'routerCacheFile' => false,
     ],
 
-    /*
-     * Define a versão da aplicação
-     */
+    // Define a versão da aplicação
 
     'version' => [
-        /*
-         * Versão do framework
-         */
-
         'framework' => 'v0.1.0',
-
-        /*
-         * Versão do skeleton
-         */
-
         'skeleton' => 'v0.1.0',
     ],
 
-    /*
-     * Registra os serviços
-     */
+    // Registra os serviços
 
     'providers' => [
         \App\Providers\ViewProvider::class,
@@ -59,14 +44,10 @@ return [
         \App\Providers\EventProvider::class,
     ],
 
-    /*
-     * Registra as middlewares
-     */
+    // Registra as middlewares
 
     'middlewares' => [
-        /*
-         * Middlewares iniciada automática
-         */
+        // Middlewares iniciada automática
 
         'automatic' => [
             \App\Middlewares\TrailingSlashMiddleware::class,
@@ -75,9 +56,7 @@ return [
             \App\Middlewares\OldInputMiddleware::class,
         ],
 
-        /*
-         * Middlewares iniciada manual
-         */
+        // Middlewares iniciada manual
 
         'manual' => [],
     ],

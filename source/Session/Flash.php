@@ -24,8 +24,8 @@ namespace Core\Session {
          */
         protected $key = '__flash__';
 
-        /*
-         * @var array
+        /**
+         * @var array|object
          */
         protected $data = [];
 
@@ -35,7 +35,7 @@ namespace Core\Session {
         protected $storage;
 
         /**
-         * Flash constructor.
+         * Flash constructor
          */
         public function __construct()
         {

@@ -1,4 +1,4 @@
-FROM php:7.2-apache
+FROM php:7.3-apache
 
 # Atualiza e instala dependências
 RUN  apt-get update \
@@ -55,10 +55,13 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
   && php -r "unlink('composer-setup.php'); unlink('installer.sig');"
 
-# Configura rar e xdebug
-RUN pecl -v install rar xdebug
-RUN docker-php-ext-enable rar
+# Instala xdebug
+RUN pecl -v install xdebug
 RUN docker-php-ext-enable xdebug
+
+# Instala rar
+# RUN pecl -v install rar
+# RUN docker-php-ext-enable rar
 
 # Habilita modulos do apache
 RUN a2enmod rewrite
@@ -66,9 +69,9 @@ RUN a2enmod ssl
 
 # Cria certificado SSL
 RUN openssl req -new -x509 -days 365 -nodes \
-    -out /etc/ssl/certs/ssl-cert-snakeoil.pem \
-    -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
-    -subj "/C=BR/ST=Paraná/L=Umuarama/O=VCWeb Networks/CN=*.localhost"
+  -out /etc/ssl/certs/ssl-cert-snakeoil.pem \
+  -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
+  -subj "/C=BR/ST=Paraná/L=Umuarama/O=VCWeb Networks/CN=*.localhost"
 
 # Habilita o certificado SSL
 RUN a2ensite default-ssl

@@ -20,9 +20,7 @@ $app->group('/api', function () use ($app) {
         $app->route('post', '/bitbucket', 'Api/Deploy/BitbucketController', 'api.deploy-bitbucket', 'cors');
     });
 
-    /*
-     * Criação de api dinâmicas
-     */
+    // Criação de api dinâmicas
 
     $app->route('get,post,put,delete,options', '/util/{method:[\w\-]+}[/{params:.*}]', 'Api/UtilController', 'api.util');
 });

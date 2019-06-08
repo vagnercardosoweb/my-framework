@@ -18,11 +18,11 @@ namespace App\Providers {
      */
     class DatabaseProvider extends Provider
     {
+        /**
+         * {@inheritdoc}
+         */
         public function register()
         {
-            /*
-             * @return Database
-             */
             $this->container['db'] = function () {
                 return Database::getInstance();
             };

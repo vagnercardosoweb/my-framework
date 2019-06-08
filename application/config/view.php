@@ -7,14 +7,11 @@
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
+
 use Core\App;
 
 return [
-    /*
-     * Options
-     *
-     * Configura as opções padões do twig
-     */
+    // Configura as opções padões do twig
 
     'options' => [
         'debug' => true,
@@ -41,17 +38,9 @@ return [
         'mail' => RESOURCE_FOLDER.'/views/mail',
     ],
 
-    /*
-     * Helpers & Functions
-     *
-     * Registra funções e filtros para usar na view
-     */
+    // Registra funções e filtros para usar na view
 
     'registers' => [
-        /*
-         * Funções
-         */
-
         'functions' => [
             'asset' => 'asset',
             'asset_content' => 'asset_content',
@@ -73,10 +62,6 @@ return [
                     : $token;
             },
         ],
-
-        /*
-         * Filtros
-         */
 
         'filters' => [
             'is_string' => 'is_string',

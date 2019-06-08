@@ -9,51 +9,39 @@
  */
 
 return [
-    /*
-     * Configuração do site
-     */
+    // Configuração do site
 
-    'name' => 'VCWeb Networks', /* Nome do site do cliente */
-    'subname' => '', /* Slogan do site do cliente */
-    'description' => '', /* Descrição do site do cliente */
+    'name' => 'VCWeb Networks', // Nome do site do cliente
+    'subname' => '', // Slogan do site do cliente
+    'description' => '', // Descrição do site do cliente
     'abstract' => '',
     'keywords' => '',
 
-    /*
-     * Google Plus
-     */
+    // Google Plus
 
     'google' => [
-        'author' => '', /* ID do Usuário */
-        'page' => '', /* ID da Página */
+        'author' => '', // ID do Usuário
+        'page' => '', // ID da Página
     ],
 
-    /*
-     * Facebook
-     */
+    // Facebook
 
     'facebook' => [
-        'app' => '', /* Opcional APP do facebook */
-        'author' => '', /* https://www.facebook.com/????? */
-        'page' => '', /* https://www.facebook.com/????? */
-        'pageId' => '', /* ID do Facebook Pages */
+        'app' => '', // Opcional APP do facebook
+        'author' => '', // https://www.facebook.com/?????
+        'page' => '', // https://www.facebook.com/?????
+        'pageId' => '', // ID do Facebook Pages
     ],
 
-    /*
-     * Twitter
-     */
+    // Twitter
 
-    'twitter' => '', /* https://www.twitter.com/????? */
+    'twitter' => '', // https://www.twitter.com/?????
 
-    /*
-     * Youtube
-     */
+    // Youtube
 
-    'youtube' => '', /* https://www.youtube.com/user/????? */
+    'youtube' => '', // https://www.youtube.com/user/?????
 
-    /*
-     * Instagram
-     */
+    // Instagram
 
-    'instagram' => '', /* https://www.instagram.com/????? */
+    'instagram' => '', // https://www.instagram.com/?????
 ];

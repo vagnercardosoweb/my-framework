@@ -7,13 +7,12 @@
  * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
  * @copyright 31/05/2019 Vagner Cardoso
  */
+
 use Core\App;
 use Core\Loader;
 
 try {
-    /*
-     * Constantes
-     */
+    // Constantes
 
     define('ROOT', __DIR__);
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
@@ -21,19 +20,15 @@ try {
     define('RESOURCE_FOLDER', __DIR__.'/resources');
     define('BASE_URL', 'http://localhost');
 
-    /**
-     * Autoload.
-     */
+    // Autoload
+
     require_once APP_FOLDER.'/vendor/autoload.php';
 
-    /**
-     * Carrega a aplicação.
-     */
+    // Carrega a aplicação
+
     $app = App::getInstance();
 
-    /*
-     * Carrega os serviços
-     */
+    // Carrega os serviços
 
     Loader::providers($app, [
         \App\Providers\DatabaseProvider::class,
@@ -42,20 +37,14 @@ try {
         \App\Providers\JwtProvider::class,
     ]);
 
-    /*
-     * Configurações do phinx
-     */
+    // Configurações do phinx
 
     return [
-        /*
-         * Class padrão para a migração
-         */
+        // Class padrão para a migração
 
         'migration_base_class' => \Core\Contracts\Migration::class,
 
-        /*
-         * Template para criação da migration
-         */
+        // Template para criação da migration
 
         'templates' => [
             'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
@@ -71,17 +60,13 @@ try {
             'seeds' => __DIR__.'/storage/database/seeds',
         ],
 
-        /*
-         * Configurações que é usada no escopo do phinx
-         */
+        // Configurações que é usada no escopo do phinx
 
         'environments' => [
             'default_migration_table' => 'migrations',
             'default_database' => env('DB_DRIVER', 'mysql'),
 
-            /*
-             * MySQL
-             */
+            // MySQL
 
             'mysql' => [
                 'adapter' => 'mysql',
@@ -96,9 +81,7 @@ try {
                 'table_suffix' => false,
             ],
 
-            /*
-             * PostgreSQL
-             */
+            // PostgreSQL
 
             'pgsql' => [
                 'adapter' => 'pgsql',
@@ -113,9 +96,7 @@ try {
                 'table_suffix' => false,
             ],
 
-            /*
-             * SQLServer
-             */
+            // SQLServer
 
             'sqlsrv' => [
                 'adapter' => 'sqlsrv',

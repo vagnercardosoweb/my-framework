@@ -54,9 +54,7 @@ namespace Core {
             date_default_timezone_set(env('APP_TIMEZONE', 'America/Sao_Paulo'));
             setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
 
-            /*
-             * Configurações de erros
-             */
+            // Configurações de erros
 
             ini_set('log_errors', ('true' == env('INI_LOG_ERRORS', 'true')));
             ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));

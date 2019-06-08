@@ -12,9 +12,7 @@ use Core\App;
 use Core\Loader;
 
 try {
-    /*
-     * Constantes
-     */
+    // Constantes
 
     define('ROOT', __DIR__);
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
@@ -22,21 +20,15 @@ try {
     define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
     define('BASE_URL', 'http://localhost');
 
-    /*
-     * Autoload.
-     */
+    // Autoload
 
     require_once APP_FOLDER.'/vendor/autoload.php';
 
-    /*
-     * Carrega a aplicação.
-     */
+    // Carrega a aplicação
 
     $app = App::getInstance();
 
-    /*
-     * Carrega os serviços
-     */
+    // Carrega os serviços
 
     Loader::providers($app, [
         \App\Providers\ViewProvider::class,

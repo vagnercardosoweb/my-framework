@@ -16,9 +16,7 @@ use Core\Helpers\Upload;
 use Core\Router;
 use Slim\Http\StatusCode;
 
-/*
- * FUNCTIONS
- */
+// FUNCTIONS
 
 if (!function_exists('validate_params')) {
     /**

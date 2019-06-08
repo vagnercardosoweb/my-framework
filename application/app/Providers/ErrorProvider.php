@@ -27,11 +27,9 @@ namespace App\Providers {
          */
         public function register()
         {
-            /**
-             * @return \Closure
-             */
+            // @return \Closure
             $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
                  * @param \Exception          $exception
@@ -71,11 +69,9 @@ namespace App\Providers {
                 };
             };
 
-            /**
-             * @return \Closure
-             */
+            // @return \Closure
             $this->container['notFoundHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
                  *
@@ -102,11 +98,9 @@ namespace App\Providers {
                 };
             };
 
-            /**
-             * @return \Closure
-             */
+            // @return \Closure
             $this->container['notAllowedHandler'] = function () {
-                /**
+                /*
                  * @param \Slim\Http\Request  $request
                  * @param \Slim\Http\Response $response
                  * @param string[]            $methods

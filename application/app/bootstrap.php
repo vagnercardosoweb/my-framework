@@ -11,9 +11,7 @@
 use Core\App;
 use Core\Loader;
 
-/*
- * Minifier o html, js, css etc...
- */
+// Minifier o html, js, css etc...
 
 ob_start(function ($buffer) {
     if (!preg_match('/localhost|.dev|.local/', $_SERVER['HTTP_HOST'])) {
@@ -49,8 +47,6 @@ Loader::middlewares($app);
 Loader::routes($app);
 $app->run();
 
-/*
- * Buffer de saída
- */
+// Buffer de saída
 
 ob_end_flush();
