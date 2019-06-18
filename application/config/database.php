@@ -3,78 +3,63 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 07/06/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
 return [
     /*
-     * Eventos
+     * Events
      *
      * tbName:creating | tbName:created
      * tbName:updating | tbName:updated
      * tbName:deleting | tbName:deleted
      */
 
-    // Driver de conexão padrão
-
+    // Default connection driver
     'default' => env('DB_DRIVER', 'mysql'),
 
-    // Configura as opções para conexão
-
-    'options' => [
-        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ,
-        \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
-        \PDO::ATTR_PERSISTENT => false,
-    ],
-
-    // Define os tipo de conexões que serão aceitos
-
+    // Defines the types of connections that will be accepted
     'connections' => [
-        // MySQL
-
         'mysql' => [
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', 3306),
-            'username' => env('DB_USER', ''),
-            'password' => env('DB_PASS', ''),
-            'database' => env('DB_DATABASE', ''),
-            'charset' => env('DB_CHARSET', 'utf8mb4'),
-            'collation' => env('DB_COLLATE', 'utf8mb4_general_ci'),
+            'username' => env('DB_USER', null),
+            'password' => env('DB_PASS', null),
+            'database' => env('DB_DATABASE', null),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'collation' => env('DB_COLLATE', 'utf8_general_ci'),
             'timezone' => env('APP_TIMEZONE', null),
+            'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
+            'attributes' => [], // Use pdo->setAttribute(key => value)
+            'commands' => [], // Use pdo->exec(...command...)
         ],
-
-        // PostgreSQL
 
         'pgsql' => [
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', 5432),
-            'username' => env('DB_USER', ''),
-            'password' => env('DB_PASS', ''),
-            'database' => env('DB_DATABASE', ''),
+            'username' => env('DB_USER', null),
+            'password' => env('DB_PASS', null),
+            'database' => env('DB_DATABASE', null),
             'schema' => ['public'],
             'charset' => env('DB_CHARSET', 'utf8'),
             'timezone' => env('APP_TIMEZONE', null),
+            'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
+            'attributes' => [], // Use pdo->setAttribute(key => value)
+            'commands' => [], // Use pdo->exec(...command...)
         ],
 
-        /*
-         * SQLServer
-         *
-         * conexão padrão usa o driver "pdo_dblib" e caso
-         * queira usar o driver "sqlsrv" você deve passar o "dsn"
-         * manual conforme a linha "89" comentada
-         */
-
-        'dblib' => [
-            // 'dsn' => 'sqlsrv:Server=%s;Connect=%s;ConnectionPooling=0',
+        'sqlsrv' => [
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', 1433),
-            'username' => env('DB_USER', ''),
-            'password' => env('DB_PASS', ''),
-            'database' => env('DB_DATABASE', ''),
+            'username' => env('DB_USER', null),
+            'password' => env('DB_PASS', null),
+            'database' => env('DB_DATABASE', null),
             'charset' => env('DB_CHARSET', 'utf8'),
+            'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
+            'attributes' => [], // Use pdo->setAttribute(key => value)
+            'commands' => [], // Use pdo->exec(...command...)
         ],
     ],
 ];

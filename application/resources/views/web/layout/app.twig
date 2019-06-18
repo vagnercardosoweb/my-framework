@@ -122,7 +122,7 @@
     <link rel="shortcut icon" type="image/png" href="{{ asset('/assets/icons/icon-32x32.png', true) }}">
     
     {# Stylesheets #}
-    <style>{{ asset_content('/assets/web/app.css') }}</style>
+    <style>{{ asset_source('/assets/web/app.css') }}</style>
     {% block style %}{% endblock %}
     
     <!--[if lt IE 9]
@@ -135,7 +135,7 @@
     {% block content %}{% endblock %}
     
     {# Scripts #}
-    <script>{{ asset_content('/assets/web/app.js') }}</script>
+    <script>{{ asset_source('/assets/web/app.js') }}</script>
     {% block script %}{% endblock %}
   </body>
 </html>

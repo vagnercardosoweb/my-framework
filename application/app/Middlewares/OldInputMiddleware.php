@@ -3,36 +3,36 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Middlewares {
-    use Slim\Http\Request;
-    use Slim\Http\Response;
+namespace App\Middlewares;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * Class OldInputMiddleware.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class OldInputMiddleware extends Middleware
+{
     /**
-     * Class OldInputMiddleware
+     * @param \Psr\Http\Message\RequestInterface|\Slim\Http\Request $request  PSR7 request
+     * @param \Psr\Http\Message\ResponseInterface                   $response PSR7 response
+     * @param callable                                              $next     Next middleware
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    class OldInputMiddleware extends Middleware
+    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
-        /**
-         * @param \Slim\Http\Request  $request  PSR7 request
-         * @param \Slim\Http\Response $response PSR7 response
-         * @param callable            $next     Next middleware
-         *
-         * @return \Slim\Http\Response
-         */
-        public function __invoke(Request $request, Response $response, callable $next)
-        {
-            if (!$request->isXhr()) {
-                $this->view->addGlobal('_input', request_params());
-            }
-
-            return $next($request, $response);
+        if (!$request->isXhr()) {
+            $this->view->addGlobal('_input', request_params());
         }
+
+        return $next($request, $response);
     }
 }

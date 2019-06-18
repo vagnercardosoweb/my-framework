@@ -3,8 +3,8 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
  * @copyright {DATE} Vagner Cardoso
  */
 
@@ -27,15 +27,16 @@ class $className extends $baseClassName
     /**
      * @var string
      */
-    protected $primaryKey = '';
+    protected $primaryKey = false;
 
     /**
-     * @return void
      * @throws \Exception
+     *
+     * @return void
      *
      * @see http://docs.phinx.org/en/latest/migrations.html
      */
-    public function up()
+    public function up(): void
     {
         $this->table($this->table)
             ->addColumn('column_name', 'type', [])
@@ -43,11 +44,12 @@ class $className extends $baseClassName
     }
 
     /**
-     * @return void
      * @throws \Exception
+     *
+     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        // parent::down();
+         // $this->table($this->table)->drop()->save();
     }
 }

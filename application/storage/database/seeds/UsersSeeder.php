@@ -3,15 +3,16 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
+
 use App\Models\User;
 use Phinx\Seed\AbstractSeed;
 
 /**
- * Class UsersSeeder
+ * Class UsersSeeder.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -19,16 +20,16 @@ class UsersSeeder extends AbstractSeed
 {
     /**
      * @throws \Exception
+     *
+     * @return void
      */
-    public function run()
+    public function run(): void
     {
         try {
-            // Prevent duplicates
             if ('mysql' == $this->getAdapter()->getOption('adapter')) {
                 $this->table('users')->truncate();
             }
 
-            // Create users
             for ($i = 1; $i <= 10; $i++) {
                 $user = new User();
                 $user->data([

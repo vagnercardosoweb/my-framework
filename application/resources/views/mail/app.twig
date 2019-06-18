@@ -7,7 +7,7 @@
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <meta http-equiv="X-UA-Compatible" content="ie=edge">
       <title>{{ config('client.name') ?: 'Mail' }}</title>
-      <style>{{ asset_content('/assets/mail.css') }}</style>
+      <style>{{ asset_source('/assets/mail.css') }}</style>
       {% block style %}{% endblock %}
     </head>
     <body>

@@ -3,50 +3,68 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Middlewares {
-    use Slim\Http\Request;
-    use Slim\Http\Response;
+namespace App\Middlewares;
+
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+
+/**
+ * Class CorsMiddleware.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class CorsMiddleware extends Middleware
+{
+    /**
+     * @var array
+     */
+    protected $allowedHeaders = [
+        'X-Requested-With',
+        'X-Http-Method-Override',
+        'Content-Type',
+        'Accept',
+        'Origin',
+        'Authorization',
+        'X-Csrf-Token',
+    ];
 
     /**
-     * Class CorsMiddleware
-     *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @var array
      */
-    class CorsMiddleware extends Middleware
+    protected $allowedMethods = [
+        'GET',
+        'POST',
+        'PUT',
+        'DELETE',
+        'PATCH',
+        'OPTIONS',
+    ];
+
+    /**
+     * @param \Psr\Http\Message\RequestInterface  $request  PSR7 request
+     * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
+     * @param callable                            $next     Next middleware
+     *
+     * @return \Psr\Http\Message\ResponseInterface
+     */
+    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
-        /**
-         * @param \Slim\Http\Request  $request  PSR7 request
-         * @param \Slim\Http\Response $response PSR7 response
-         * @param callable            $next     Next middleware
-         *
-         * @return \Slim\Http\Response
-         */
-        public function __invoke(Request $request, Response $response, callable $next)
-        {
-            /** @var Response $response */
-            $response = $next($request, $response);
+        /** @var ResponseInterface $response */
+        $response = $next($request, $response);
 
-            /*header_remove("Cache-Control");
-            header_remove("Expires");
-            header_remove("Pragma");*/
+        /*header_remove("Cache-Control");
+        header_remove("Expires");
+        header_remove("Pragma");*/
 
-            return $response->withHeader('Access-Control-Allow-Origin', '*')
-                ->withHeader('Access-Control-Allow-Headers', implode(', ', [
-                    'X-Requested-With',
-                    'X-Http-Method-Override',
-                    'Content-Type',
-                    'Accept',
-                    'Origin',
-                    'Authorization',
-                    'X-Csrf-Token',
-                ]))
-                ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
-            ;
-        }
+        return $response->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Vary', 'Origin')
+            ->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders))
+            ->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods))
+        ;
     }
 }

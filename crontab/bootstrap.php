@@ -3,17 +3,16 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
 use Core\App;
 use Core\Loader;
 
 try {
-    // Constantes
-
+    // Constants
     define('ROOT', __DIR__);
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
     define('APP_FOLDER', __DIR__.'/../application');
@@ -21,15 +20,12 @@ try {
     define('BASE_URL', 'http://localhost');
 
     // Autoload
-
     require_once APP_FOLDER.'/vendor/autoload.php';
 
-    // Carrega a aplicação
-
+    // Loader app
     $app = App::getInstance();
 
-    // Carrega os serviços
-
+    // Loader providers
     Loader::providers($app, [
         \App\Providers\ViewProvider::class,
         \App\Providers\ErrorProvider::class,

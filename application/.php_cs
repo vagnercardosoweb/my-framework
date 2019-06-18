@@ -39,7 +39,7 @@ return PhpCsFixer\Config::create()
         'list_syntax' => ['syntax' => 'long'],
         'no_short_echo_tag' => true,
         'phpdoc_trim' => true,
-        'phpdoc_summary' => false,
+        //'phpdoc_summary' => false,
         'phpdoc_to_comment' => true,
         'phpdoc_add_missing_param_annotation' => ['only_untyped' => false],
         'phpdoc_align' => true,

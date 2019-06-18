@@ -3,59 +3,71 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace Core\Password {
+namespace Core\Password;
+
+/**
+ * Class Bcrypt.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class Bcrypt extends Password
+{
     /**
-     * Class Bcrypt
+     * @param string $password
+     * @param array  $options
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return string
      */
-    class Bcrypt extends Password
+    public function hash($password, array $options = []): string
     {
-        /**
-         * @param string $password
-         * @param array  $options
-         *
-         * @return string
-         */
-        public function hash($password, array $options = []): string
-        {
-            $hash = password_hash($password, $this->algorithm(), [
-                'cost' => $options['cost'] ?? PASSWORD_BCRYPT_DEFAULT_COST,
-            ]);
+        $hash = password_hash(
+            $password, $this->algorithm(), $this->getOptions($options)
+        );
 
-            if (false === $hash) {
-                throw new \RuntimeException(
-                    'Bcrypt password not supported.'
-                );
-            }
-
-            return $hash;
+        if (false === $hash) {
+            throw new \RuntimeException(
+                'Bcrypt password not supported.'
+            );
         }
 
-        /**
-         * @param string $hash
-         * @param array  $options
-         *
-         * @return bool
-         */
-        public function needsRehash(string $hash, array $options = []): bool
-        {
-            return password_needs_rehash($hash, $this->algorithm(), [
-                'cost' => $options['cost'] ?? PASSWORD_BCRYPT_DEFAULT_COST,
-            ]);
-        }
+        return $hash;
+    }
 
-        /**
-         * @return int
-         */
-        public function algorithm(): int
-        {
-            return PASSWORD_BCRYPT;
-        }
+    /**
+     * @param string $hash
+     * @param array  $options
+     *
+     * @return bool
+     */
+    public function needsRehash(string $hash, array $options = []): bool
+    {
+        return password_needs_rehash(
+            $hash, $this->algorithm(), $this->getOptions($options)
+        );
+    }
+
+    /**
+     * @return int
+     */
+    public function algorithm(): int
+    {
+        return PASSWORD_BCRYPT;
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return array
+     */
+    protected function getOptions(array $options): array
+    {
+        return [
+            'cost' => $options['cost'] ?? PASSWORD_BCRYPT_DEFAULT_COST,
+        ];
     }
 }

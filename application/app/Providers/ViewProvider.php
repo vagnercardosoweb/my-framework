@@ -3,53 +3,57 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Providers {
-    use Core\View;
-    use Twig\Extension\DebugExtension;
+namespace App\Providers;
+
+use Core\View;
+use Twig\Extension\DebugExtension;
+
+/**
+ * Class ViewProvider.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class ViewProvider extends Provider
+{
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
+    public function register(): void
+    {
+        $this->container['view'] = function () {
+            return new View(
+                config('view.templates'),
+                config('view.options')
+            );
+        };
+    }
 
     /**
-     * Class ViewProvider.
+     * {@inheritdoc}
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return void
      */
-    class ViewProvider extends Provider
+    public function boot(): void
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function register()
-        {
-            $this->container['view'] = function () {
-                return new View(
-                    config('view.templates'),
-                    config('view.options')
-                );
-            };
-        }
+        $this->view->addExtension(new DebugExtension());
 
-        /**
-         * {@inheritdoc}
-         */
-        public function boot()
-        {
-            $this->view->addExtension(new DebugExtension());
+        foreach (config('view.registers') as $key => $items) {
+            foreach ($items as $name => $item) {
+                switch ($key) {
+                    case 'functions':
+                        $this->view->addFunction($name, $item);
+                        break;
 
-            foreach (config('view.registers') as $key => $items) {
-                foreach ($items as $name => $item) {
-                    switch ($key) {
-                        case 'functions':
-                            $this->view->addFunction($name, $item);
-                            break;
-
-                        case 'filters':
-                            $this->view->addFilter($name, $item);
-                            break;
-                    }
+                    case 'filters':
+                        $this->view->addFilter($name, $item);
+                        break;
                 }
             }
         }

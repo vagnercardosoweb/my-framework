@@ -3,56 +3,26 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
 return [
-    /*
-     * 0 = Off ( Em produção manter em off )
-     * 1 = Mensagem cliente
-     * 2 = Mensagem do servidor e cliente
-     */
-
-    'debug' => env('MAIL_DEBUG', 0),
-
-    // Codigicação das palavras
-
-    'charset' => env('MAIL_CHARSET', 'utf-8'),
-
-    // Servidor que irá envia o e-mail
-
-    'host' => env('MAIL_HOST', null),
-
-    // Porta do servidor
-
-    'port' => env('MAIL_PORT', 587),
-
-    // Usuário do servidor
-
-    'username' => env('MAIL_USER', null),
-
-    // Senha do usuário do servidor
-
-    'password' => env('MAIL_PASS', null),
-
-    // Define se os e-mail serão autenticado
-
+    'debug' => env('MAIL_DEBUG', 0), // 0 | 1 | 2
+    'charset' => env('MAIL_CHARSET', null), // default utf-8
     'auth' => env('MAIL_AUTH', true),
-
-    /*
-     * Define o nível de segurança
-     *
-     * tls | ssl
-     */
-
-    'secure' => env('MAIL_SECURE', 'tls'),
-
-    // Remetente que irá envia os e-mails
-
+    'secure' => env('MAIL_SECURE', 'tls'), // ssl | tls
+    'host' => env('MAIL_HOST', null),
+    'post' => env('MAIL_PORT', 587),
+    'username' => env('MAIL_USER', null),
+    'password' => env('MAIL_PASS', null),
     'from' => [
-        'name' => env('MAIL_FROM_NAME', ''),
-        'mail' => env('MAIL_FROM_MAIL', ''),
+        'name' => env('MAIL_FROM_NAME', null),
+        'mail' => env('MAIL_FROM_MAIL', null),
+    ],
+    'language' => [
+        'code' => env('MAIL_LANGUAGE_CODE', null),
+        'path' => env('MAIL_LANGUAGE_PATH', null),
     ],
 ];

@@ -3,17 +3,16 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
 use Core\App;
 use Core\Loader;
 
 try {
-    // Constantes
-
+    // Constants
     define('ROOT', __DIR__);
     define('PUBLIC_FOLDER', __DIR__.'/../public_html');
     define('APP_FOLDER', __DIR__);
@@ -21,15 +20,12 @@ try {
     define('BASE_URL', 'http://localhost');
 
     // Autoload
-
     require_once APP_FOLDER.'/vendor/autoload.php';
 
-    // Carrega a aplicação
-
+    // Loader app
     $app = App::getInstance();
 
-    // Carrega os serviços
-
+    // Loader providers
     Loader::providers($app, [
         \App\Providers\DatabaseProvider::class,
         \App\Providers\EncryptionProvider::class,
@@ -37,36 +33,25 @@ try {
         \App\Providers\JwtProvider::class,
     ]);
 
-    // Configurações do phinx
+    // Configuration:
+    //
+    // @see https://book.cakephp.org/3.0/en/phinx/configuration.html
 
     return [
-        // Class padrão para a migração
-
-        'migration_base_class' => \Core\Contracts\Migration::class,
-
-        // Template para criação da migration
+        'migration_base_class' => \Core\Phinx\Migration::class,
 
         'templates' => [
             'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
         ],
-
-        /*
-         * Caminhos relativos até a pasta que será salvo os arquivos
-         * de migrations, seeds e bootstrapper
-         */
 
         'paths' => [
             'migrations' => __DIR__.'/storage/database/migrations',
             'seeds' => __DIR__.'/storage/database/seeds',
         ],
 
-        // Configurações que é usada no escopo do phinx
-
         'environments' => [
             'default_migration_table' => 'migrations',
             'default_database' => env('DB_DRIVER', 'mysql'),
-
-            // MySQL
 
             'mysql' => [
                 'adapter' => 'mysql',
@@ -81,8 +66,6 @@ try {
                 'table_suffix' => false,
             ],
 
-            // PostgreSQL
-
             'pgsql' => [
                 'adapter' => 'pgsql',
                 'host' => env('DB_HOST', 'localhost'),
@@ -95,8 +78,6 @@ try {
                 'table_prefix' => false,
                 'table_suffix' => false,
             ],
-
-            // SQLServer
 
             'sqlsrv' => [
                 'adapter' => 'sqlsrv',
@@ -111,16 +92,6 @@ try {
                 'table_suffix' => false,
             ],
         ],
-
-        /*
-         * Ordem da versionamento
-         *
-         * creation:
-         * - As migrações são ordenadas pelo tempo de criação, que também faz parte do nome do arquivo.
-         *
-         * execution:
-         * - As migrações são ordenadas pelo tempo de execução, também conhecido como horário de início.
-         */
 
         'version_order' => 'creation',
     ];

@@ -3,15 +3,15 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-use Core\Contracts\Migration;
+use Core\Phinx\Migration;
 
 /**
- * Class CreateUsers
+ * Class CreateUsers.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -30,9 +30,11 @@ class CreateUsers extends Migration
     /**
      * @throws \Exception
      *
+     * @return void
+     *
      * @see http://docs.phinx.org/en/latest/migrations.html
      */
-    public function up()
+    public function up(): void
     {
         $this->table($this->table)
             ->addColumn('name', 'string', ['limit' => 150])
@@ -50,9 +52,11 @@ class CreateUsers extends Migration
 
     /**
      * @throws \Exception
+     *
+     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        parent::down();
+        $this->table($this->table)->drop()->save();
     }
 }

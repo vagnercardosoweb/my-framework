@@ -3,29 +3,46 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Providers {
-    use Core\Database\Database;
+namespace App\Providers;
 
+use Core\Database\Connect;
+
+/**
+ * Class DatabaseProvider.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class DatabaseProvider extends Provider
+{
     /**
-     * Class DatabaseProvider.
+     * {@inheritdoc}
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return void
      */
-    class DatabaseProvider extends Provider
+    public function register(): void
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function register()
-        {
-            $this->container['db'] = function () {
-                return Database::getInstance();
-            };
+        // Connect instance
+        $connect = new Connect();
+        $connect->setDefaultConnection(config('database.default', 'mysql'));
+
+        // Add connections config
+        foreach (config('database.connections') as $driver => $config) {
+            $connect->addConnection($config, $driver);
         }
+
+        // Add connect provider
+        $this->container['connect'] = function () use ($connect) {
+            return $connect;
+        };
+
+        // Add connect default database provider (mysql)
+        $this->container['db'] = function () use ($connect) {
+            return $connect->connection();
+        };
     }
 }

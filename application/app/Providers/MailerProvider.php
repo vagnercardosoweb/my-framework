@@ -3,46 +3,48 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Providers {
-    use Core\Mailer\Mailer;
+namespace App\Providers;
 
+use Core\Mailer\Mailer;
+
+/**
+ * Class MailerProvider.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class MailerProvider extends Provider
+{
     /**
-     * Class MailerProvider.
+     * {@inheritdoc}
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return void
      */
-    class MailerProvider extends Provider
+    public function register(): void
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function register()
-        {
-            $this->container['mailer'] = function () {
-                return new Mailer([
-                    'debug' => config('mail.debug', 0),
-                    'charset' => config('mail.charset', null),
-                    'auth' => config('mail.auth', true),
-                    'secure' => config('mail.secure', 'tls'),
-                    'host' => config('mail.host', null),
-                    'post' => config('mail.post', 587),
-                    'username' => config('mail.username', null),
-                    'password' => config('mail.password', null),
-                    'from' => [
-                        'name' => config('mail.from.name', null),
-                        'mail' => config('mail.from.mail', null),
-                    ],
-                    'language' => [
-                        'code' => config('mail.language.code', null),
-                        'path' => config('mail.language.path', null),
-                    ],
-                ]);
-            };
-        }
+        $this->container['mailer'] = function () {
+            return new Mailer([
+                'debug' => config('mail.debug', 0),
+                'charset' => config('mail.charset', null),
+                'auth' => config('mail.auth', true),
+                'secure' => config('mail.secure', 'tls'),
+                'host' => config('mail.host', null),
+                'post' => config('mail.post', 587),
+                'username' => config('mail.username', null),
+                'password' => config('mail.password', null),
+                'from' => [
+                    'name' => config('mail.from.name', null),
+                    'mail' => config('mail.from.mail', null),
+                ],
+                'language' => [
+                    'code' => config('mail.language.code', null),
+                    'path' => config('mail.language.path', null),
+                ],
+            ]);
+        };
     }
 }

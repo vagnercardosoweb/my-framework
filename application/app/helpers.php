@@ -3,18 +3,23 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-use App\Core\Date;
 use Core\App;
+use Core\Date;
 use Core\Helpers\Helper;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
 use Core\Router;
 use Slim\Http\StatusCode;
+
+// Constants
+if (!defined('E_USER_SUCCESS')) {
+    define('E_USER_SUCCESS', 'success');
+}
 
 // FUNCTIONS
 
@@ -143,15 +148,13 @@ if (!function_exists('json_success')) {
 
 if (!function_exists('error_type')) {
     /**
-     * Verifica o tipo de erro e retorna a classe css.
-     *
      * @param string|int $type
      *
      * @return string
      */
     function error_type($type)
     {
-        if (is_string($type) && 'success' !== $type) {
+        if (is_string($type) && E_USER_SUCCESS !== $type) {
             $type = E_USER_ERROR;
         }
 
@@ -169,7 +172,7 @@ if (!function_exists('error_type')) {
             case '0':
                 $result = 'danger';
                 break;
-            case 'success':
+            case E_USER_SUCCESS:
                 $result = 'success';
                 break;
 

@@ -3,25 +3,25 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace Core\Password {
+namespace Core\Password;
+
+/**
+ * Class Argon2Id.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class Argon2Id extends Argon
+{
     /**
-     * Class Argon2Id
-     *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return int
      */
-    class Argon2Id extends Argon
+    public function algorithm(): int
     {
-        /**
-         * @return int
-         */
-        public function algorithm(): int
-        {
-            return PASSWORD_ARGON2ID;
-        }
+        return PASSWORD_ARGON2ID;
     }
 }

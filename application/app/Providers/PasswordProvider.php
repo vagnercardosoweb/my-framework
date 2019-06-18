@@ -3,43 +3,45 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace App\Providers {
-    use Core\Password\Argon;
-    use Core\Password\Argon2Id;
-    use Core\Password\Bcrypt;
+namespace App\Providers;
 
+use Core\Password\Argon;
+use Core\Password\Argon2Id;
+use Core\Password\Bcrypt;
+
+/**
+ * Class PasswordProvider.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class PasswordProvider extends Provider
+{
     /**
-     * Class PasswordProvider
+     * {@inheritdoc}
      *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return void
      */
-    class PasswordProvider extends Provider
+    public function register(): void
     {
-        /**
-         * {@inheritdoc}
-         */
-        public function register()
-        {
-            $this->container['password'] = function () {
-                switch (env('APP_PASSWORD_DRIVER', 'bcrypt')) {
-                    case 'bcrypt':
-                        return new Bcrypt();
-                        break;
+        $this->container['password'] = function () {
+            switch (env('APP_PASSWORD_DRIVER', 'bcrypt')) {
+                case 'bcrypt':
+                    return new Bcrypt();
+                    break;
 
-                    case 'argon':
-                        return new Argon();
-                        break;
+                case 'argon':
+                    return new Argon();
+                    break;
 
-                    case 'argon2id':
-                        return new Argon2Id();
-                        break;
-                }
-            };
-        }
+                case 'argon2id':
+                    return new Argon2Id();
+                    break;
+            }
+        };
     }
 }

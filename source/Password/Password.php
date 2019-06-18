@@ -3,63 +3,63 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace Core\Password {
+namespace Core\Password;
+
+/**
+ * Class Password.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+abstract class Password
+{
     /**
-     * Class Password
+     * @param string $hash
      *
-     * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
+     * @return array
      */
-    abstract class Password
+    public function info(string $hash): array
     {
-        /**
-         * @param string $hash
-         *
-         * @return array
-         */
-        public function info(string $hash): array
-        {
-            return password_get_info($hash);
-        }
-
-        /**
-         * @param string $password
-         * @param string $hash
-         *
-         * @return bool
-         */
-        public function verify($password, string $hash): bool
-        {
-            if (0 === strlen($hash)) {
-                return false;
-            }
-
-            return password_verify($password, $hash);
-        }
-
-        /**
-         * @param string $password
-         * @param array  $options
-         *
-         * @return string
-         */
-        abstract public function hash($password, array $options = []): string;
-
-        /**
-         * @param string $hash
-         * @param array  $options
-         *
-         * @return bool
-         */
-        abstract public function needsRehash(string $hash, array $options = []): bool;
-
-        /**
-         * @return int
-         */
-        abstract public function algorithm(): int;
+        return password_get_info($hash);
     }
+
+    /**
+     * @param string $password
+     * @param string $hash
+     *
+     * @return bool
+     */
+    public function verify($password, string $hash): bool
+    {
+        if (0 === strlen($hash)) {
+            return false;
+        }
+
+        return password_verify($password, $hash);
+    }
+
+    /**
+     * @param string $password
+     * @param array  $options
+     *
+     * @return string
+     */
+    abstract public function hash($password, array $options = []): string;
+
+    /**
+     * @param string $hash
+     * @param array  $options
+     *
+     * @return bool
+     */
+    abstract public function needsRehash(string $hash, array $options = []): bool;
+
+    /**
+     * @return int
+     */
+    abstract public function algorithm(): int;
 }

@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
+ */
+
 use Core\App;
 use Core\Helpers\Arr;
 use Core\Helpers\Helper;
@@ -80,13 +88,13 @@ if (!function_exists('asset')) {
     }
 }
 
-if (!function_exists('asset_content')) {
+if (!function_exists('asset_source')) {
     /**
      * @param string|array $files
      *
      * @return bool|string
      */
-    function asset_content($files)
+    function asset_source($files)
     {
         $contents = [];
 

@@ -3,18 +3,18 @@
 /*
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
- * @author    Vagner Cardoso <vagnercardosoweb@gmail.com>
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @copyright 31/05/2019 Vagner Cardoso
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 18/06/2019 Vagner Cardoso
  */
 
-namespace Core\Helpers {
-    /**
-     * Class Arr
-     *
-     * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
-     */
-    class Arr extends \Illuminate\Support\Arr
-    {
-    }
+namespace Core\Helpers;
+
+/**
+ * Class Arr.
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ */
+class Arr extends \Illuminate\Support\Arr
+{
 }
