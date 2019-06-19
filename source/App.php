@@ -68,12 +68,13 @@ class App extends \Slim\App
      * @param string                $pattern
      * @param string|\Closure       $callable
      * @param string                $name
-     * @param string|array|\Closure $middlewares
+     * @param string|array|\Closure $middleware
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public function route($methods, $pattern, $callable, $name = null, $middlewares = null)
+    public function route($methods, $pattern, $callable, $name = null, $middleware = null)
     {
+        $methods = '*' == $methods ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] : $methods;
         $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
         $pattern = (string)$pattern;
 
@@ -124,21 +125,21 @@ class App extends \Slim\App
             $route->setName($name);
         }
 
-        if (!empty($middlewares)) {
-            $middlewaresManual = config('app.middlewares.manual', []);
+        if (!empty($middleware)) {
+            $middlewareManual = config('app.middlewares.manual', []);
 
-            if (!is_array($middlewares)) {
-                $middlewares = [$middlewares];
+            if (!is_array($middleware)) {
+                $middleware = [$middleware];
             }
 
-            sort($middlewares);
+            sort($middleware);
 
-            foreach ($middlewares as $middleware) {
-                if ($middleware instanceof \Closure) {
-                    $route->add($middleware);
+            foreach ($middleware as $middle) {
+                if ($middle instanceof \Closure) {
+                    $route->add($middle);
                 } else {
-                    if (array_key_exists($middleware, $middlewaresManual)) {
-                        $route->add($middlewaresManual[$middleware]);
+                    if (array_key_exists($middle, $middlewareManual)) {
+                        $route->add($middlewareManual[$middle]);
                     }
                 }
             }

@@ -12,7 +12,7 @@ namespace App\Controllers\Api;
 
 use App\Controller\Controller;
 use Core\App;
-use Core\Helpers\Curl;
+use Core\Curl\Request;
 use Core\Helpers\Str;
 
 /**
@@ -32,36 +32,30 @@ class UtilController extends Controller
      */
     public function __call($name, $arguments)
     {
-        if (!empty($name) && !empty($arguments)) {
-            // Se for o método options retorna
+        try {
             if (in_array($name, ['options', 'patch'])) {
                 return $this->response;
             }
 
-            // Verifica se o méthod existe
             if (!method_exists(App::class, $name)) {
                 throw new \Exception(
                     'Invalid requisition method.', E_USER_ERROR
                 );
             }
 
-            // Variáveis
             $method = Str::camel(str_replace('/', '-', $arguments[0]));
             $path = (!empty($arguments[1]) ? $arguments[1] : '');
             $data = array_merge(($path ? explode('/', $path) : []), request_params());
 
-            // Veririca se o método existe
             if (!method_exists($this, $method)) {
                 throw new \BadMethodCallException(
                     sprintf('Call to undefined method %s::%s()', get_class($this), $method), E_ERROR
                 );
             }
 
-            try {
-                return $this->{$method}($data);
-            } catch (\Exception $e) {
-                throw $e;
-            }
+            return $this->{$method}($data);
+        } catch (\Exception $e) {
+            throw $e;
         }
     }
 
@@ -93,29 +87,32 @@ class UtilController extends Controller
                 );
             }
 
-            // Busca cep
-            $cep = (new Curl())->get("https://viacep.com.br/ws/{$data['cep']}/json");
+            // Find cep...
+            $response = (new Request())->get("https://viacep.com.br/ws/{$data['cep']}/json");
+            $cep = $response->getBody();
 
-            if (!empty($cep->erro)) {
+            if (!empty($cep->erro) || $response->getError()) {
                 throw new \Exception(
                     "O CEP {$data['cep']} informado não foi encontrado.", E_USER_ERROR
                 );
             }
 
-            // Formata endereço
+            // Format address
             $cep->endereco = "{$cep->logradouro} - {$cep->bairro}, {$cep->localidade} - {$cep->uf}, {$data['cep']}, Brasil";
 
             // Google Maps
-            $map = (new Curl())->get('https://maps.google.com/maps/api/geocode/json', [
-                'key' => 'AIzaSyCUiWvcqkPMCH_CgTwbkOp74-9oEHlhMOA',
-                'sensor' => true,
-                'address' => urlencode($cep->endereco),
-            ]);
+            if ($googleMapsKey = env('GOOGLE_MAPS_KEY', null)) {
+                $map = (new Request())->get('https://maps.google.com/maps/api/geocode/json', [
+                    'key' => $googleMapsKey,
+                    'sensor' => true,
+                    'address' => urlencode($cep->endereco),
+                ])->getBody();
 
-            if ('OK' === $map->status && !empty($map->results[0])) {
-                $location = $map->results[0]->geometry->location;
-                $cep->latitude = (string)$location->lat;
-                $cep->longitude = (string)$location->lng;
+                if ('OK' === $map->status && !empty($map->results[0])) {
+                    $location = $map->results[0]->geometry->location;
+                    $cep->latitude = (string)$location->lat;
+                    $cep->longitude = (string)$location->lng;
+                }
             }
 
             return json($cep);
@@ -146,7 +143,9 @@ class UtilController extends Controller
                 $model = '\\App\\Models\\'.Str::studly($data['model']);
 
                 if (!$data['row'] = (new $model())->reset()->fetchById($data['id'])) {
-                    throw new \Exception('Registro não encontrado.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Registro não encontrado.', E_USER_ERROR
+                    );
                 }
             }
 

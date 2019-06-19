@@ -1,6 +1,5 @@
 - Revisar ainda todas as configuraçeõs.
 - Refazer provider de session.
 - Adiciona provider de cookie.
-- Revisar Database, Contracts.
 - Adiciona suporte a upload de arquivos e imagens.
 - Todos providers deixa independentes e receber as configurações.

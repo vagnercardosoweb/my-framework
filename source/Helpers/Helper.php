@@ -34,18 +34,18 @@ class Helper
     /**
      * @param string $xml
      *
-     * @return bool|\SimpleXMLElement
+     * @return \SimpleXMLElement|null
      */
-    public static function isXml(string $xml)
+    public static function isXml(string $xml): ?\SimpleXMLElement
     {
         $xml = trim($xml);
 
         if (empty($xml)) {
-            return false;
+            return null;
         }
 
         if (false !== stripos($xml, '<!DOCTYPE html>')) {
-            return false;
+            return null;
         }
 
         libxml_use_internal_errors(true);
@@ -54,7 +54,7 @@ class Helper
         libxml_clear_errors();
 
         if (!empty($errors)) {
-            return false;
+            return null;
         }
 
         return $xml;
@@ -66,14 +66,14 @@ class Helper
      * @param int    $depth
      * @param int    $options
      *
-     * @return object|bool
+     * @return object|null
      */
-    public static function isJson(string $json, bool $assoc = false, int $depth = 512, int $options = 0)
+    public static function isJson(string $json, bool $assoc = false, int $depth = 512, int $options = 0): ?object
     {
         $json = json_decode($json, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            return false;
+            return null;
         }
 
         return $json;

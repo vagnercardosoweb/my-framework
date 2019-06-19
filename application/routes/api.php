@@ -8,19 +8,13 @@
  * @copyright 18/06/2019 Vagner Cardoso
  */
 
-$app->group('/api', function () use ($app) {
-    /*
-     * Deploy
-     *
-     * gitlab | bitbucket
-     */
-
-    $app->group('/deploy', function () use ($app) {
-        $app->route('post', '/gitlab', 'Api/Deploy/GitlabController', 'api.deploy-gitlab', 'cors');
-        $app->route('post', '/bitbucket', 'Api/Deploy/BitbucketController', 'api.deploy-bitbucket', 'cors');
+$app->group(['prefix' => '/api', 'namespace' => 'Api/'], function () use ($app) {
+    // Deploy
+    $app->group(['prefix' => '/deploy', 'namespace' => 'Deploy/'], function () use ($app) {
+        $app->route('post', '/gitlab', 'GitlabController', 'api.deploy-gitlab', 'cors');
+        $app->route('post', '/bitbucket', 'BitbucketController', 'api.deploy-bitbucket', 'cors');
     });
 
-    // Criação de api dinâmicas
-
-    $app->route('get,post,put,delete,options', '/util/{method:[\w\-]+}[/{params:.*}]', 'Api/UtilController', 'api.util');
+    // Utils
+    $app->route('*', '/util/{method:[\w\-]+}[/{params:.*}]', 'UtilController', 'api.util');
 });
