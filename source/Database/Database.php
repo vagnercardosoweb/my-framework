@@ -139,33 +139,19 @@ class Database
      */
     public function create(string $table, $data): ?int
     {
-        $data = Obj::toArray($data);
-        $values = [];
-        $bindings = [];
+        $data = Obj::fromArray($data);
+        $data = $bindings = ($this->emitEvent("{$table}:creating", $data) ?: $data);
+        $values = '(:'.implode(', :', array_keys(get_object_vars($data))).')';
+        $columns = implode(', ', array_keys(get_object_vars($data)));
 
-        if (!empty($data[0])) {
-            foreach ($data as $i => $item) {
-                $data = ($this->emitEvent("{$table}:creating", $item) ?: $item);
-                $values[] = ':'.implode("_{$i}, :", array_keys($data))."_{$i}";
-
-                foreach ($data as $k => $v) {
-                    $bindings["{$k}_{$i}"] = $v;
-                }
-            }
-
-            $values = '('.implode('), (', $values).')';
-        } else {
-            $data = $bindings = ($this->emitEvent("{$table}:creating", $data) ?: $data);
-            $values = '(:'.implode(', :', array_keys($data)).')';
-        }
-
-        $columns = implode(', ', array_keys($data));
         $sql = "INSERT INTO {$table} ({$columns}) VALUES {$values}";
         $lastInsertId = $this->query($sql, $bindings)->lastInsertId();
 
         $this->emitEvent("{$table}:created", $lastInsertId);
 
-        return !empty($lastInsertId) ? (int)$lastInsertId : null;
+        return !empty($lastInsertId)
+            ? (int)$lastInsertId
+            : null;
     }
 
     /**
@@ -227,8 +213,7 @@ class Database
             $updated->{$key} = $value;
 
             if (!empty($bindings[$key])) {
-                $uniqid = mt_rand(1, time());
-                $key = "{$key}_{$uniqid}";
+                $key = sprintf("{$key}_%s", mt_rand(1, time()));
             }
 
             $set[] = "{$key} = :{$key}";

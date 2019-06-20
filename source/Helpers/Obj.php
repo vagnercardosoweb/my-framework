@@ -35,7 +35,7 @@ class Obj
         }
 
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (is_array($value) && !empty($value)) {
                 $object->{$key} = self::fromArray($value);
             } else {
                 $object->{$key} = isset($value) ? $value : null;

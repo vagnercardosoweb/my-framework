@@ -11,6 +11,7 @@
 namespace Core\Database\Connection;
 
 use Core\Helpers\Helper;
+use Core\Helpers\Obj;
 
 /**
  * Class Statement.
@@ -127,7 +128,13 @@ class Statement extends \PDOStatement
      */
     public function bindValues($bindings): void
     {
-        Helper::parseStr($bindings, $bindings);
+        if (is_object($bindings)) {
+            $bindings = Obj::toArray($bindings);
+        }
+
+        if (is_string($bindings)) {
+            Helper::parseStr($bindings, $bindings);
+        }
 
         if (!empty($bindings)) {
             foreach ($bindings as $key => $value) {
