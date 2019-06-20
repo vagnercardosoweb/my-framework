@@ -269,7 +269,7 @@ class Helper
 
     /**
      * @param string|array $encodedString
-     * @param array        $result
+     * @param array|string $result
      */
     public static function parseStr($encodedString, &$result): void
     {

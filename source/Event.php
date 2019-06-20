@@ -78,6 +78,7 @@ class Event
             if (count($this->events[$event]) > 1) {
                 ksort($this->events[$event]);
             }
+
             $params = func_get_args();
             array_shift($params);
             $executed = [];
