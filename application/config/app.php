@@ -24,8 +24,8 @@ return [
     // Define a versão da aplicação
 
     'version' => [
-        'framework' => 'v0.1.0',
-        'skeleton' => 'v0.1.0',
+        'framework' => 'v1.0.0',
+        'skeleton' => 'v1.0.0',
     ],
 
     // Registra os serviços
@@ -42,7 +42,6 @@ return [
         \App\Providers\JwtProvider::class,
         \App\Providers\LoggerProvider::class,
         \App\Providers\EventProvider::class,
-        // \App\Providers\AuthProvider::class,
     ],
 
     // Registra as middlewares
