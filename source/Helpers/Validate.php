@@ -416,7 +416,7 @@ class Validate
             ->query($sql, ['field' => $value])
             ->fetch(\PDO::FETCH_OBJ)
             ->total
-            ;
+        ;
     }
 
     /**
@@ -480,10 +480,8 @@ class Validate
                     $validate['force'] = true;
                 }
 
-                if ($validate['force']) {
-                    if (!isset($data[$field])) {
-                        $data[$field] = null;
-                    }
+                if ($validate['force'] && !isset($data[$field])) {
+                    $data[$field] = null;
                 }
 
                 // Run validate
@@ -519,7 +517,7 @@ class Validate
      *
      * @return bool
      */
-    public static function activeUrl($value)
+    public static function activeUrl($value): bool
     {
         if (!is_string($value)) {
             return false;

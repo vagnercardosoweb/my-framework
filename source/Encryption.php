@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 22/06/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -77,7 +77,7 @@ class Encryption
      * @param string $payload
      * @param bool   $unserialize
      *
-     * @return mixed
+     * @return mixed|false
      */
     public function decrypt(string $payload, bool $unserialize = true)
     {
@@ -88,7 +88,7 @@ class Encryption
         );
 
         if (false === $decrypted) {
-            return null;
+            return false;
         }
 
         return $unserialize
