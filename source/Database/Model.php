@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 21/06/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -313,15 +313,119 @@ abstract class Model
     }
 
     /**
-     * @param string|array $bindings
+     * @param \Closure $callback
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    public function transaction(\Closure $callback)
+    {
+        /** @var \Core\Database\Database $db */
+        $db = $this->db->driver($this->driver);
+
+        try {
+            $db->beginTransaction();
+            $callback = $callback($this);
+            $db->commit();
+
+            return $callback;
+        } catch (\Exception $e) {
+            $db->rollBack();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @throws \Exception
+     *
+     * @return $this|object
+     */
+    public function save($data = [], bool $validate = true): object
+    {
+        $this->data($data, $validate);
+
+        $data = $this->data;
+        $where = implode(' ', $this->where);
+        $bindings = $this->bindings;
+        $primaryValue = $this->getPrimaryValue();
+
+        $this->reset();
+        $this->clear();
+
+        if ($row = $this->fetchById($primaryValue)) {
+            if (!empty($primaryValue)) {
+                $where = "{$this->table}.{$this->getPrimaryKey()} = :pkid {$where}";
+                $bindings['pkid'] = $primaryValue;
+            }
+
+            $row->data = $this->db->driver($this->driver)
+                ->update(
+                    $this->table, $data,
+                    'WHERE '.$this->normalizeProperty($where),
+                    $bindings
+                )
+            ;
+
+            return $row;
+        }
+
+        $lastInsertId = $this->db->driver($this->driver)
+            ->create($this->table, $data)
+        ;
+
+        if (!empty($lastInsertId)) {
+            return $this->reset()
+                ->where($where, $bindings)
+                ->fetchById($lastInsertId)
+            ;
+        }
+
+        return Obj::fromArray($data);
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
      *
      * @return $this
      */
-    public function bindings($bindings)
+    public function data($data, bool $validate = true): self
     {
-        Helper::parseStr($bindings, $this->bindings);
+        $data = array_merge(
+            Obj::toArray($this->data),
+            Obj::toArray($data)
+        );
+
+        if (method_exists($this, '_data')) {
+            $this->_data($data, $validate);
+        }
+
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryValue()
+    {
+        return $this->{$this->getPrimaryKey()};
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
     }
 
     /**
@@ -403,6 +507,18 @@ abstract class Model
     }
 
     /**
+     * @param string|array $bindings
+     *
+     * @return $this
+     */
+    public function bindings($bindings)
+    {
+        Helper::parseStr($bindings, $this->bindings);
+
+        return $this;
+    }
+
+    /**
      * @throws \Exception
      *
      * @return array[$this]|null
@@ -452,43 +568,37 @@ abstract class Model
     }
 
     /**
-     * @param array|object $data
-     * @param bool         $validate
+     * @throws \Exception
      *
-     * @return $this
+     * @return object|null
      */
-    public function data($data, bool $validate = true): self
+    public function delete(): ?object
     {
-        $data = array_merge(
-            Obj::toArray($this->data),
-            Obj::toArray($data)
+        if (!empty($this->getPrimaryValue())) {
+            $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkid ";
+            $this->bindings['pkid'] = $this->getPrimaryValue();
+        }
+
+        if (is_array($this->where)) {
+            $this->where = $this->normalizeProperty(
+                implode(' ', $this->where)
+            );
+        }
+
+        if (empty($this->where)) {
+            throw new \InvalidArgumentException(
+                sprintf('[delete] `%s::where()` is empty.', get_called_class()),
+                E_USER_ERROR
+            );
+        }
+
+        $deleted = $this->db->driver($this->driver)->delete(
+            $this->table, "WHERE {$this->where}", $this->bindings
         );
 
-        if (method_exists($this, '_data')) {
-            $this->_data($data, $validate);
-        }
+        $this->clear();
 
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryValue()
-    {
-        return $this->{$this->getPrimaryKey()};
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
+        return $deleted;
     }
 
     /**

@@ -11,6 +11,7 @@
 namespace App\Controller;
 
 use Core\App;
+use Core\Router;
 use Slim\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -89,6 +90,146 @@ abstract class Controller
     public function view(string $template, ?array $context = [], ?int $status = StatusCode::HTTP_OK)
     {
         return $this->view->render($this->response, $template, $context, $status);
+    }
+
+    /**
+     * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
+     * @return \Slim\Http\Response
+     */
+    public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
+    {
+        return json($data, $status, $options);
+    }
+
+    /**
+     * @param \Exception|\Throwable $exception
+     * @param array                 $data
+     * @param int                   $status
+     *
+     * @return \Slim\Http\Response
+     */
+    public function jsonError($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
+    {
+        return json_error($exception, $data, $status);
+    }
+
+    /**
+     * @param string      $name
+     * @param array       $data
+     * @param array       $queryParams
+     * @param string|null $hash
+     *
+     * @return string
+     */
+    public function pathFor(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
+    {
+        return Router::pathFor($name, $data, $queryParams, $hash);
+    }
+
+    /**
+     * @param string      $name
+     * @param array       $data
+     * @param array       $queryParams
+     * @param string|null $hash
+     *
+     * @return string|null
+     */
+    public function redirect(string $name, array $data = [], array $queryParams = [], string $hash = null): ?string
+    {
+        return Router::redirect($name, $data, $queryParams, $hash);
+    }
+
+    /**
+     * @param string|null $key
+     * @param bool        $filtered
+     *
+     * @return array|mixed|object|null
+     */
+    public function getParsedBody(?string $key = null, bool $filtered = false)
+    {
+        $result = empty($key)
+            ? $this->request->getParsedBody()
+            : $this->request->getParsedBodyParam($key);
+
+        if ($filtered) {
+            $result = filter_values($result);
+            $result = empty($key) ? $result : $result[0];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|null $key
+     *
+     * @return array|mixed|object|null
+     */
+    public function getParsedBodyFiltered(?string $key = null)
+    {
+        return $this->getParsedBody($key, true);
+    }
+
+    /**
+     * @param string|null $key
+     * @param bool        $filtered
+     *
+     * @return array|mixed|object|null
+     */
+    public function getQueryParams(?string $key = null, bool $filtered = false)
+    {
+        $result = empty($key)
+            ? $this->request->getQueryParams()
+            : $this->request->getQueryParam($key);
+
+        if ($filtered) {
+            $result = filter_values($result);
+            $result = empty($key) ? $result : $result[0];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|null $key
+     *
+     * @return array|mixed|object|null
+     */
+    public function getQueryParamsFiltered(?string $key = null)
+    {
+        return $this->getQueryParams($key, true);
+    }
+
+    /**
+     * @param string|null $key
+     * @param bool        $filtered
+     *
+     * @return array|mixed|null
+     */
+    public function getParams(?string $key = null, bool $filtered = false)
+    {
+        $result = empty($key)
+            ? $this->request->getParams()
+            : $this->request->getParam($key);
+
+        if ($filtered) {
+            $result = filter_values($result);
+            $result = empty($key) ? $result : $result[0];
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|null $key
+     *
+     * @return array|mixed|null
+     */
+    public function getParamsFiltered(?string $key = null)
+    {
+        return $this->getParams($key, true);
     }
 
     /**

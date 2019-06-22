@@ -32,51 +32,11 @@ class Helper
     }
 
     /**
-     * @param string $xml
-     *
-     * @return \SimpleXMLElement|null
+     * @return bool
      */
-    public static function isXml(string $xml): ?\SimpleXMLElement
+    public static function isPhpCli(): bool
     {
-        $xml = trim($xml);
-
-        if (empty($xml)) {
-            return null;
-        }
-
-        if (false !== stripos($xml, '<!DOCTYPE html>')) {
-            return null;
-        }
-
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($xml);
-        $errors = libxml_get_errors();
-        libxml_clear_errors();
-
-        if (!empty($errors)) {
-            return null;
-        }
-
-        return $xml;
-    }
-
-    /**
-     * @param string $json
-     * @param bool   $assoc
-     * @param int    $depth
-     * @param int    $options
-     *
-     * @return object|null
-     */
-    public static function isJson(string $json, bool $assoc = false, int $depth = 512, int $options = 0): ?object
-    {
-        $json = json_decode($json, $assoc, $depth, $options);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            return null;
-        }
-
-        return $json;
+        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
     }
 
     /**
@@ -155,6 +115,40 @@ class Helper
     }
 
     /**
+     * @param string $data
+     *
+     * @return string
+     */
+    public static function base64Encode(string $data): string
+    {
+        return str_replace(
+            '=', '', strtr(
+                base64_encode($data), '+/', '-_'
+            )
+        );
+    }
+
+    /**
+     * @param string    $data
+     * @param bool|null $strict
+     *
+     * @return bool|string
+     */
+    public static function base64Decode(string $data, ?bool $strict = null)
+    {
+        $remainder = strlen($data) % 4;
+
+        if ($remainder) {
+            $padlen = 4 - $remainder;
+            $data .= str_repeat('=', $padlen);
+        }
+
+        return base64_decode(
+            strtr($data, '-_', '+/'), $strict
+        );
+    }
+
+    /**
      * @param array  $array
      * @param string $prefix
      *
@@ -183,14 +177,6 @@ class Helper
         }
 
         return implode('&', $build);
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isPhpCli(): bool
-    {
-        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
     }
 
     /**
@@ -234,37 +220,17 @@ class Helper
     }
 
     /**
-     * @param string $data
+     * @param string|int|float $value
      *
-     * @return string
+     * @return mixed
      */
-    public static function base64Encode(string $data): string
+    public static function formatFloat($value)
     {
-        return str_replace(
-            '=', '', strtr(
-                base64_encode($data), '+/', '-_'
-            )
-        );
-    }
-
-    /**
-     * @param string    $data
-     * @param bool|null $strict
-     *
-     * @return bool|string
-     */
-    public static function base64Decode(string $data, ?bool $strict = null)
-    {
-        $remainder = strlen($data) % 4;
-
-        if ($remainder) {
-            $padlen = 4 - $remainder;
-            $data .= str_repeat('=', $padlen);
+        if (false !== strpos($value, ',')) {
+            $value = str_replace(',', '.', str_replace('.', '', $value));
         }
 
-        return base64_decode(
-            strtr($data, '-_', '+/'), $strict
-        );
+        return (float)$value;
     }
 
     /**

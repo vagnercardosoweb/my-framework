@@ -27,10 +27,16 @@ try {
 
     // Loader providers
     Loader::providers($app, [
+        \App\Providers\ViewProvider::class,
+        \App\Providers\ErrorProvider::class,
+        \App\Providers\SessionProvider::class,
         \App\Providers\DatabaseProvider::class,
+        \App\Providers\MailerProvider::class,
         \App\Providers\EncryptionProvider::class,
         \App\Providers\PasswordProvider::class,
         \App\Providers\JwtProvider::class,
+        \App\Providers\LoggerProvider::class,
+        \App\Providers\EventProvider::class,
     ]);
 
     // Configuration:

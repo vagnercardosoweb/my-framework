@@ -66,8 +66,8 @@ return [
         'filters' => [
             'is_string' => 'is_string',
             'is_array' => 'is_array',
-            'get_day' => 'get_day',
-            'get_month' => 'get_month',
+            'get_day' => 'get_day_string',
+            'get_month' => 'get_month_string',
         ],
     ],
 ];

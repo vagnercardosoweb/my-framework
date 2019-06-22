@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 21/06/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api;
@@ -45,7 +45,7 @@ class UtilController extends Controller
 
             $method = Str::camel(str_replace('/', '-', $arguments[0]));
             $path = (!empty($arguments[1]) ? $arguments[1] : '');
-            $data = array_merge(($path ? explode('/', $path) : []), request_params());
+            $data = array_merge(($path ? explode('/', $path) : []), $this->getParamsFiltered());
 
             if (!method_exists($this, $method)) {
                 throw new \BadMethodCallException(

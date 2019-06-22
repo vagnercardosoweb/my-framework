@@ -53,7 +53,7 @@ return [
             \App\Middlewares\TrailingSlashMiddleware::class,
             \App\Middlewares\GenerateKeysMiddleware::class,
             \App\Middlewares\MaintenanceMiddleware::class,
-            \App\Middlewares\OldInputMiddleware::class,
+            \App\Middlewares\OldParamMiddleware::class,
         ],
 
         // Middlewares iniciada manual

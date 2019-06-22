@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 22/06/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -14,11 +14,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class OldInputMiddleware.
+ * Class OldParamMiddleware.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class OldInputMiddleware extends Middleware
+class OldParamMiddleware extends Middleware
 {
     /**
      * @param \Psr\Http\Message\RequestInterface|\Slim\Http\Request $request  PSR7 request
@@ -30,7 +30,7 @@ class OldInputMiddleware extends Middleware
     public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
         if (!$request->isXhr()) {
-            $this->view->addGlobal('_input', request_params());
+            $this->view->addGlobal('oldParam', filter_values($request->getParams()));
         }
 
         return $next($request, $response);

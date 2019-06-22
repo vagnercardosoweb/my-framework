@@ -16,52 +16,6 @@ use Core\Helpers\Upload;
 use Core\Router;
 use Slim\Http\StatusCode;
 
-// Constants
-if (!defined('E_USER_SUCCESS')) {
-    define('E_USER_SUCCESS', 'success');
-}
-
-// FUNCTIONS
-
-if (!function_exists('validate_params')) {
-    /**
-     * @param array|object $params
-     * @param array        $rules
-     */
-    function validate_params($params, array $rules)
-    {
-        if (is_object($params)) {
-            $params = \Core\Helpers\Obj::toArray($params);
-        }
-
-        // Percorre os parâmetros
-        foreach ($rules as $index => $rule) {
-            // Força checagem
-            if (!empty($rule['force'])) {
-                if (!array_key_exists($index, $params)) {
-                    $params[$index] = null;
-                }
-            }
-
-            // Verifica caso esteja preenchido
-            if (!empty($params[$index]) && is_array($params[$index])) {
-                $params[$index] = array_filter($params[$index]);
-            }
-
-            if (array_key_exists($index, $params) && (empty($params[$index]) && '0' != $params[$index])) {
-                if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
-                    continue;
-                }
-
-                throw new \InvalidArgumentException(
-                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
-                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
-                );
-            }
-        }
-    }
-}
-
 if (!function_exists('json_trigger')) {
     /**
      * @param string     $message
@@ -74,30 +28,7 @@ if (!function_exists('json_trigger')) {
     function json_trigger($message, $type = 'success', array $params = [], $status = StatusCode::HTTP_OK)
     {
         return json(array_merge([
-            'trigger' => [error_type($type), $message],
-        ], $params), $status);
-    }
-}
-
-if (!function_exists('json_error')) {
-    /**
-     * @param \Exception $exception
-     * @param array      $params
-     * @param int        $status
-     *
-     * @return \Slim\Http\Response
-     */
-    function json_error($exception, array $params = [], $status = StatusCode::HTTP_BAD_REQUEST)
-    {
-        return json(array_merge([
-            'error' => [
-                'code' => $exception->getCode(),
-                'status' => $status,
-                'type' => error_type($exception->getCode()),
-                'file' => str_replace([APP_FOLDER, PUBLIC_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
-                'line' => $exception->getLine(),
-                'message' => $exception->getMessage(),
-            ],
+            'trigger' => [error_code_type($type), $message],
         ], $params), $status);
     }
 }
@@ -112,18 +43,19 @@ if (!function_exists('json_success')) {
      */
     function json_success($message, array $params = [], $status = StatusCode::HTTP_OK)
     {
-        // Caso seja web
         if (in_web()) {
-            // Caso a mensagem seja vázia
-            // envia apenas os parametros e status
             if (empty($message)) {
                 return json($params, $status);
             }
 
-            return json_trigger($message, (!empty($params['messageType']) ? $params['messageType'] : 'success'), $params, $status);
+            return json_trigger(
+                $message,
+                (!empty($params['messageType']) ? $params['messageType'] : 'success'),
+                $params,
+                $status
+            );
         }
 
-        // Filtra os parametros caso seja da web
         $params = array_filter($params, function ($param) {
             if (!in_array($param, [
                 'storage',
@@ -143,44 +75,6 @@ if (!function_exists('json_success')) {
             'error' => false,
             'message' => $message,
         ], $params), $status);
-    }
-}
-
-if (!function_exists('error_type')) {
-    /**
-     * @param string|int $type
-     *
-     * @return string
-     */
-    function error_type($type)
-    {
-        if (is_string($type) && E_USER_SUCCESS !== $type) {
-            $type = E_USER_ERROR;
-        }
-
-        switch ($type) {
-            case E_USER_NOTICE:
-            case E_NOTICE:
-                $result = 'info';
-                break;
-            case E_USER_WARNING:
-            case E_WARNING:
-                $result = 'warning';
-                break;
-            case E_USER_ERROR:
-            case E_ERROR:
-            case '0':
-                $result = 'danger';
-                break;
-            case E_USER_SUCCESS:
-                $result = 'success';
-                break;
-
-            default:
-                $result = 'danger';
-        }
-
-        return $result;
     }
 }
 
@@ -254,67 +148,6 @@ if (!function_exists('get_galeria')) {
     }
 }
 
-if (!function_exists('get_month')) {
-    /**
-     * Retorna o mes do ano em pt-BR.
-     *
-     * @param string $month
-     *
-     * @return string
-     */
-    function get_month($month)
-    {
-        $months = [
-            '01' => 'Janeiro',
-            '02' => 'Fevereiro',
-            '03' => 'Março',
-            '04' => 'Abril',
-            '05' => 'Maio',
-            '06' => 'Junho',
-            '07' => 'Julho',
-            '08' => 'Agosto',
-            '09' => 'Setembro',
-            '10' => 'Outubro',
-            '11' => 'Novembro',
-            '12' => 'Dezembro',
-        ];
-
-        if (array_key_exists($month, $months)) {
-            return $months[$month];
-        }
-
-        return '';
-    }
-}
-
-if (!function_exists('get_day')) {
-    /**
-     * Retorna o dia da semana pt-BR.
-     *
-     * @param string $day
-     *
-     * @return string
-     */
-    function get_day($day)
-    {
-        $days = [
-            '0' => 'Domingo',
-            '1' => 'Segunda Feira',
-            '2' => 'Terça Feira',
-            '3' => 'Quarta Feira',
-            '4' => 'Quinta Feira',
-            '5' => 'Sexta Feira',
-            '6' => 'Sábado',
-        ];
-
-        if (array_key_exists($day, $days)) {
-            return $days[$day];
-        }
-
-        return '';
-    }
-}
-
 if (!function_exists('upload')) {
     /**
      * Upload de arquivos/images.
@@ -369,7 +202,7 @@ if (!function_exists('upload')) {
             }
 
             // Checa tamanho
-            if (($value['size'] > $maxFilesize = Upload::getMaxFilesize()) || 1 == $value['error']) {
+            if (($value['size'] > $maxFilesize = Upload::getPhpMaxFilesize()) || 1 == $value['error']) {
                 throw new \Exception(
                     'Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.',
                     E_USER_ERROR
@@ -390,14 +223,8 @@ if (!function_exists('upload')) {
                 }
             }
 
-            // Corrige orientação da imagem
-            // Normalmente quando é enviada pelo celular
-            if ('jpg' == $extension && in_array($value['type'], ['image/jpeg', 'image/jpg'])) {
-                upload_fix_orientation($value['tmp_name'], $extension);
-            }
-
             // Verifica se é arquivo ou imagem para upload
-            $uploadError = upload_error($value['error']);
+            $uploadError = Upload::getStringError($value['error'], false);
 
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
                 if (!move_uploaded_file($value['tmp_name'], PUBLIC_FOLDER.$path)) {
@@ -431,131 +258,6 @@ if (!function_exists('upload')) {
         }
 
         return $uploads;
-    }
-}
-
-if (!function_exists('upload_fix_orientation')) {
-    /**
-     * Corrige orientação da imagem.
-     *
-     * @param string $pathImage [Caminho do arquivo ou file enviado pelo formulário]
-     * @param string $extension
-     */
-    function upload_fix_orientation($pathImage, $extension)
-    {
-        if (file_exists($pathImage) && function_exists('exif_read_data')) {
-            // Variáveis
-            $exifData = exif_read_data($pathImage);
-            $originalImage = null;
-            $rotateImage = null;
-
-            // Verifica se existe a orientação na imagem
-            if (!empty($exifData['Orientation'])) {
-                // Verifica a orientação e ajusta a rotação
-                switch ($exifData['Orientation']) {
-                    case 3:
-                        $rotation = 180;
-                        break;
-
-                    case 6:
-                        $rotation = -90;
-                        break;
-
-                    case 8:
-                        $rotation = 90;
-                        break;
-
-                    default:
-                        $rotation = null;
-                }
-
-                // Caso a rotação e extenção seja válida
-                if (null !== $rotation && null !== $extension) {
-                    // Cria a imagem original dependendo da extenção
-                    switch ($extension) {
-                        case 'jpg':
-                        case 'jpeg':
-                            $originalImage = imagecreatefromjpeg($pathImage);
-                            break;
-
-                        case 'png':
-                            $originalImage = imagecreatefrompng($pathImage);
-                            imagealphablending($originalImage, false);
-                            imagesavealpha($originalImage, true);
-                            break;
-
-                        case 'gif':
-                            $originalImage = imagecreatefromgif($pathImage);
-                            break;
-                    }
-
-                    // Rotaciona a imagem corretamente
-                    $rotateImage = imagerotate($originalImage, $rotation, 0);
-
-                    // Cria a imagem
-                    switch ($extension) {
-                        case 'jpg':
-                        case 'jpeg':
-                            imagejpeg($rotateImage, $pathImage, 100);
-                            break;
-
-                        case 'png':
-                            imagepng($rotateImage, $pathImage, 80);
-                            break;
-
-                        case 'gif':
-                            imagegif($rotateImage, $pathImage);
-                            break;
-                    }
-
-                    // Destroi as imagens
-                    imagedestroy($originalImage);
-                    imagedestroy($rotateImage);
-                }
-            }
-        }
-    }
-}
-
-if (!function_exists('upload_error')) {
-    /**
-     * Recupera o tipo do erro do upload.
-     *
-     * @param int $code
-     *
-     * @return string
-     */
-    function upload_error($code)
-    {
-        switch ($code) {
-            case UPLOAD_ERR_INI_SIZE:
-                $message = 'O arquivo enviado excede o limite definido na diretiva `upload_max_filesize` do php.ini';
-                break;
-            case UPLOAD_ERR_FORM_SIZE:
-                $message = 'O arquivo excede o limite definido em `MAX_FILE_SIZE` no formulário HTML.';
-                break;
-            case UPLOAD_ERR_PARTIAL:
-                $message = 'O upload do arquivo foi feito parcialmente.';
-                break;
-            case UPLOAD_ERR_NO_FILE:
-                $message = 'Nenhum arquivo foi enviado.';
-                break;
-            case UPLOAD_ERR_NO_TMP_DIR:
-                $message = 'Pasta temporária ausênte.';
-                break;
-            case UPLOAD_ERR_CANT_WRITE:
-                $message = 'Falha em escrever o arquivo em disco.';
-                break;
-            case UPLOAD_ERR_EXTENSION:
-                $message = 'Uma extensão do PHP interrompeu o upload do arquivo.';
-                break;
-
-            default:
-                $message = '';
-                break;
-        }
-
-        return $message;
     }
 }
 
@@ -596,39 +298,6 @@ if (!function_exists('upload_archive')) {
     function upload_archive($file, $directory, $name = null)
     {
         return upload($file, $directory, $name);
-    }
-}
-
-if (!function_exists('delete_recursive_directory')) {
-    /**
-     * Remove os arquivos e os diretórios do path passado.
-     *
-     * @param string $path
-     */
-    function delete_recursive_directory($path)
-    {
-        if (file_exists($path)) {
-            $interator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
-
-            $interator->rewind();
-
-            while ($interator->valid()) {
-                if (!$interator->isDot()) {
-                    if ($interator->isFile()) {
-                        unlink($interator->getPathname());
-                    } else {
-                        rmdir($interator->getPathname());
-                    }
-                }
-
-                $interator->next();
-            }
-
-            rmdir($path);
-        }
     }
 }
 
@@ -707,69 +376,6 @@ if (!function_exists('date_for_human')) {
     }
 }
 
-if (!function_exists('preg_replace_space')) {
-    /**
-     * Remove tags e espaços vázios.
-     *
-     * @param string $string
-     *
-     * @return string
-     */
-    function preg_replace_space($string)
-    {
-        // Remove comentários
-        $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
-
-        // Remove espaço com mais de um espaço
-        $string = preg_replace('/\r\n|\r|\n|\t/m', '', $string);
-        $string = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $string);
-
-        // Adiciona espaço apos o . (dot)
-        $string = preg_replace('/(?<=\.)(?=[a-zA-Z])/m', ' ', $string);
-
-        // Remove tag `p` vázia
-        return preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
-
-        // Remove todas tags vázia
-        //$string = preg_replace('/<[\w]*[^>]*>[\s\s|&nbsp;]*<\/[\w]*>/m', '', $string);
-    }
-}
-
-if (!function_exists('database_format_float')) {
-    /**
-     * @param string|int|float $value
-     *
-     * @return mixed
-     */
-    function database_format_float($value)
-    {
-        if (false !== strpos($value, ',')) {
-            $value = str_replace(',', '.', str_replace('.', '', $value));
-        }
-
-        return (float)$value;
-    }
-}
-
-if (!function_exists('database_format_datetime')) {
-    /**
-     * @param string|null $dateTime
-     * @param string      $type
-     *
-     * @return string
-     */
-    function database_format_datetime($dateTime = 'now', $type = 'full')
-    {
-        $dateFormat = 'Y-m-d';
-        $timeFormat = 'H:i:s';
-        $dateTimeFormat = "{$dateFormat} {$timeFormat}";
-
-        return (new Date($dateTime))->format(
-            ('time' == $type ? $timeFormat : ('date' == $type ? $dateFormat : $dateTimeFormat))
-        );
-    }
-}
-
 if (!function_exists('in_web')) {
     /**
      * Verifica se está no site.
@@ -781,7 +387,7 @@ if (!function_exists('in_web')) {
         /** @var \Slim\Http\Request $request */
         $request = App::getInstance()->resolve('request');
 
-        if (!empty($request->getHeaderLine('X-Csrf-Token')) || !empty(request_params('_csrfToken'))) {
+        if (!empty($request->getHeaderLine('X-Csrf-Token')) || !empty($request->getParam('_csrfToken', null))) {
             return true;
         }
 
@@ -888,6 +494,9 @@ if (!function_exists('imagem')) {
                     break;
             }
 
+            // Fix rotate
+            $srcImage = Upload::fixImageRotate($src, $srcImage);
+
             // ajusta a cor
             if (function_exists('imagecreatetruecolor')) {
                 $destImage = imagecreatetruecolor($destSize[0], $destSize[1]);
@@ -970,6 +579,9 @@ if (!function_exists('imagemTamExato')) {
                     return false;
                     break;
             }
+
+            // Fix rotate
+            Upload::fixImageRotate($imgSrc, $myImage);
 
             $ratio_orig = $width_orig / $height_orig;
 

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 21/06/2019 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -37,31 +37,30 @@ class User extends Model
      */
     protected function _data(array &$data, $validate)
     {
-        // Validation data
+        // Where
+        $where = !empty($this->getPrimaryValue())
+            ? sprintf('AND %s.%s != "%s"', $this->table, $this->primaryKey, $this->getPrimaryValue())
+            : null;
+
+        // Validate
         if ($validate) {
-            validate_params($data, [
-                'name' => 'Nome não pode ser vázio.',
-                'email' => 'E-mail não pode ser vázio.',
+            Validate::rules($data, [
+                'name!!' => ['required' => 'Nome não pode ser vázio.'],
+                'email!!' => [
+                    'required' => 'E-mail não pode ser vázio.',
+                    'email' => 'O E-mail informado não é válido.',
+                    'databaseNotExists' => [
+                        'message' => 'O e-mail digitado já foi registrado.',
+                        'params' => [$this->table, 'email', $where],
+                    ],
+                ],
                 'password' => [
-                    'message' => 'Senha não pode ser vázio.',
-                    'force' => empty($data['id']),
+                    'required' => [
+                        'message' => 'Senha não pode ser vázio.',
+                        'check' => empty($data['id']),
+                    ],
                 ],
             ]);
-        }
-
-        // E-mail
-        if (!empty($data['email'])) {
-            if (!Validate::mail($data['email'])) {
-                throw new \InvalidArgumentException(
-                    'O E-mail informado não é válido.', E_USER_WARNING
-                );
-            }
-
-            if ($this->where("AND {$this->table}.email = '{$data['email']}'")->count() > 0) {
-                throw new \InvalidArgumentException(
-                    'O e-mail digitado já foi registrado.', E_USER_WARNING
-                );
-            }
         }
 
         // Password

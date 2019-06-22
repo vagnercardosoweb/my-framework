@@ -10,7 +10,7 @@
 
 namespace Core\Curl;
 
-use Core\Helpers\Helper;
+use Core\Helpers\Validate;
 
 /**
  * Class Response.
@@ -123,7 +123,7 @@ class Response
      */
     private function buildBody(string $body)
     {
-        return Helper::isJson($body) ?? Helper::isXml($body) ?? ($body ?: null);
+        return Validate::json($body) ?? Validate::xml($body) ?? ($body ?: null);
     }
 
     /**

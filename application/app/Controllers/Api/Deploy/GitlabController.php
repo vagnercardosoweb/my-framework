@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 21/06/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
@@ -62,12 +62,12 @@ class GitlabController extends Controller
                     throw new \Exception('Branch undefined.', E_USER_ERROR);
             }
 
-            return json([
+            return $this->json([
                 'error' => false,
                 'message' => 'Deploy gitlab successfully.',
             ], StatusCode::HTTP_OK);
         } catch (\Exception $e) {
-            return json_error(
+            return $this->jsonError(
                 $e, [], StatusCode::HTTP_BAD_REQUEST
             );
         }

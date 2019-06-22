@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 21/06/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
@@ -29,7 +29,7 @@ class BitbucketController extends Controller
     {
         try {
             // Token
-            $token = request_params('token');
+            $token = $this->getParams('token');
 
             if ($token !== env('DEPLOY_KEY')) {
                 throw new \Exception('Token inválid.', E_USER_ERROR);
@@ -69,12 +69,12 @@ class BitbucketController extends Controller
                 throw new \Exception('Count change less than 0.', E_USER_ERROR);
             }
 
-            return json([
+            return $this->json([
                 'error' => false,
                 'message' => 'Deploy bitbucket successfully.',
             ], StatusCode::HTTP_OK);
         } catch (\Exception $e) {
-            return json_error(
+            return $this->jsonError(
                 $e, [], StatusCode::HTTP_BAD_REQUEST
             );
         }

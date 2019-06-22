@@ -10,9 +10,9 @@
 
 namespace App\Middlewares;
 
-use Core\App;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Container;
 
 /**
  * Class Middleware.
@@ -39,22 +39,16 @@ use Psr\Http\Message\ResponseInterface;
 abstract class Middleware
 {
     /**
-     * @var \Core\App
-     */
-    protected $app;
-
-    /**
      * @var \Slim\Container
      */
     protected $container;
 
     /**
-     * @param \Core\App $app
+     * @param \Slim\Container $container
      */
-    public function __construct(App $app)
+    public function __construct(Container $container)
     {
-        $this->app = $app;
-        $this->container = $app->getContainer();
+        $this->container = $container;
     }
 
     /**
@@ -73,6 +67,10 @@ abstract class Middleware
      */
     public function __get(string $name)
     {
-        return $this->app->resolve($name);
+        if ($this->container->has($name)) {
+            return $this->container->{$name};
+        }
+
+        return false;
     }
 }

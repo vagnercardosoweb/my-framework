@@ -117,7 +117,7 @@ class Loader
 
         foreach ($middlewares as $name => $middleware) {
             if (class_exists($middleware)) {
-                $app->add(new $middleware($app));
+                $app->add(new $middleware($app->getContainer()));
             }
         }
     }

@@ -2,18 +2,18 @@
 $socialColors: () !default;
 
 $socialColors: map_merge(
-    (
-      'facebook':'#3b5998',
-      'instagram':'#517fa4',
-      'twitter':'#00aced',
-      'google':'#dd4b39',
-      'youtube':'#bb0000',
-      'skype':'#00aff0',
-      'whatsapp':'#34af23',
-      'linkdin':'#007bb6',
-      'dropbox':'#007ee5'
-    ),
-    $socialColors
+  (
+    'facebook': '#3b5998',
+    'instagram': '#517fa4',
+    'twitter': '#00aced',
+    'google': '#dd4b39',
+    'youtube': '#bb0000',
+    'skype': '#00aff0',
+    'whatsapp': '#34af23',
+    'linkdin': '#007bb6',
+    'dropbox': '#007ee5'
+  ),
+  $socialColors
 );
 
 /* Functions */
@@ -32,25 +32,25 @@ $socialColors: map_merge(
   .text-#{$color} {
     color: #{$value} !important;
   }
-  
+
   /* backgrounds */
   .bg-#{$color} {
     background-color: #{$value} !important;
   }
-  
+
   /* buttons */
   .btn-outline-#{$color} {
     color: #{$value};
     background: transparent none;
     border-color: #{$value};
-    
+
     &:hover {
       color: #ffffff;
       background-color: #{$value};
       border-color: #{$value};
     }
   }
-  
+
   /* pagination */
   .pagination-#{$color} {
     .page-item {
@@ -58,7 +58,7 @@ $socialColors: map_merge(
         color: #{$value};
         border-color: #{$value};
       }
-      
+
       &.active {
         .page-link {
           color: #ffffff;
@@ -70,31 +70,53 @@ $socialColors: map_merge(
   }
 }
 
+/* FORM REQUIRED ERROR */
+.vc-error {
+  position: relative;
+
+  .vc-error-field {
+    border-color: #a94442;
+  }
+
+  .vc-error-box {
+    background: #a94442;
+    color: #fff;
+    padding: 3px 5px;
+    font-size: 10px;
+  }
+}
+
 /* BOX SHADOWS */
 .shadow-0 {
   box-shadow: none !important;
 }
 
 .shadow-1 {
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2);
 }
 
 .shadow-1-1 {
-  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12),
+    0 3px 1px -1px rgba(0, 0, 0, 0.2);
 }
 
 .shadow-2 {
-  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3);
 }
 
 .shadow-3 {
-  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12), 0 3px 5px -1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 1px 18px 0 rgba(0, 0, 0, 0.12),
+    0 3px 5px -1px rgba(0, 0, 0, 0.3);
 }
 
 .shadow-4 {
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.3);
 }
 
 .shadow-5 {
-  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14),
+    0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3);
 }
