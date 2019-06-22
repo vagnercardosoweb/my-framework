@@ -8,13 +8,11 @@
  * @copyright 18/06/2019 Vagner Cardoso
  */
 
-use Core\App;
 use Core\Helpers\Arr;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Dotenv\Environment\DotenvFactory;
-use Slim\Http\StatusCode;
 
 // Constants
 if (!defined('E_USER_SUCCESS')) {
@@ -151,93 +149,6 @@ if (!function_exists('config')) {
         return Arr::get(
             $config, $name, $default
         );
-    }
-}
-
-if (!function_exists('error_code_type')) {
-    /**
-     * @param string|int $type
-     *
-     * @return string
-     */
-    function error_code_type($type)
-    {
-        if (is_string($type) && E_USER_SUCCESS !== $type) {
-            $type = E_USER_ERROR;
-        }
-
-        switch ($type) {
-            case E_USER_NOTICE:
-            case E_NOTICE:
-                $result = 'info';
-                break;
-
-            case E_USER_WARNING:
-            case E_WARNING:
-                $result = 'warning';
-                break;
-
-            case E_USER_ERROR:
-            case E_ERROR:
-            case '0':
-                $result = 'danger';
-                break;
-
-            case E_USER_SUCCESS:
-                $result = 'success';
-                break;
-
-            default:
-                $result = 'danger';
-        }
-
-        return $result;
-    }
-}
-
-if (!function_exists('json')) {
-    /**
-     * @param mixed $data
-     * @param int   $status
-     * @param int   $options
-     *
-     * @return \Slim\Http\Response
-     */
-    function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
-    {
-        return App::getInstance()
-            ->resolve('response')
-            ->withJson(
-                $data, $status, $options
-            )
-        ;
-    }
-}
-
-if (!function_exists('json_error')) {
-    /**
-     * @param \Exception|\Throwable $exception
-     * @param array                 $data
-     * @param int                   $status
-     *
-     * @return \Slim\Http\Response
-     */
-    function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
-    {
-        return json(array_merge([
-            'error' => [
-                'code' => $exception->getCode(),
-                'status' => $status,
-                'type' => error_code_type($exception->getCode()),
-                'file' => str_replace([
-                    APP_FOLDER,
-                    PUBLIC_FOLDER,
-                    RESOURCE_FOLDER,
-                ], '', $exception->getFile()),
-                'line' => $exception->getLine(),
-                'message' => $exception->getMessage(),
-            ],
-        ], $data), $status);
     }
 }
 

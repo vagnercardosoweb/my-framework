@@ -36,11 +36,11 @@ function showMessage(json, elementMessage) {
 
   /* Verifica o retorno do json */
   if (json.trigger) {
-    message = json.trigger[1];
-    type = json.trigger[0];
+    type = json.trigger.type || json.trigger[0];
+    message = json.trigger.message || json.trigger[1];
   } else if (json.error) {
-    message = json.error.message;
     type = json.error.type || 'danger';
+    message = json.error.message;
   }
 
   /* Printa ou alerta a mensagem */

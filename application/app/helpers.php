@@ -13,68 +13,162 @@ use Core\Date;
 use Core\Helpers\Helper;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
-use Core\Router;
 use Slim\Http\StatusCode;
+
+if (!function_exists('error_code_type')) {
+    /**
+     * @param string|int $type
+     *
+     * @return string
+     */
+    function error_code_type($type)
+    {
+        if (is_string($type) && E_USER_SUCCESS !== $type) {
+            $type = E_USER_ERROR;
+        }
+
+        switch ($type) {
+            case E_USER_NOTICE:
+            case E_NOTICE:
+                $result = 'info';
+                break;
+
+            case E_USER_WARNING:
+            case E_WARNING:
+                $result = 'warning';
+                break;
+
+            case E_USER_ERROR:
+            case E_ERROR:
+            case '0':
+                $result = 'danger';
+                break;
+
+            case E_USER_SUCCESS:
+                $result = 'success';
+                break;
+
+            default:
+                $result = 'danger';
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('json')) {
+    /**
+     * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
+     * @return \Slim\Http\Response
+     */
+    function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
+    {
+        return App::getInstance()
+            ->resolve('response')
+            ->withJson(
+                $data, $status, $options
+            )
+        ;
+    }
+}
+
+if (!function_exists('json_error')) {
+    /**
+     * @param \Exception|\Throwable $exception
+     * @param array                 $data
+     * @param int                   $status
+     *
+     * @return \Slim\Http\Response
+     */
+    function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
+    {
+        return json(array_merge([
+            'error' => [
+                'code' => $exception->getCode(),
+                'status' => $status,
+                'type' => error_code_type($exception->getCode()),
+                'file' => str_replace([
+                    APP_FOLDER,
+                    PUBLIC_FOLDER,
+                    RESOURCE_FOLDER,
+                ], '', $exception->getFile()),
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage(),
+            ],
+        ], $data), $status);
+    }
+}
 
 if (!function_exists('json_trigger')) {
     /**
      * @param string     $message
      * @param string|int $type
-     * @param array      $params
+     * @param array      $data
      * @param int        $status
      *
      * @return \Slim\Http\Response
      */
-    function json_trigger($message, $type = 'success', array $params = [], $status = StatusCode::HTTP_OK)
+    function json_trigger(string $message, $type = E_USER_SUCCESS, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
     {
         return json(array_merge([
-            'trigger' => [error_code_type($type), $message],
-        ], $params), $status);
+            'trigger' => [
+                'type' => error_code_type($type),
+                'message' => $message,
+            ],
+        ], $data), $status);
     }
 }
 
 if (!function_exists('json_success')) {
     /**
      * @param string $message
-     * @param array  $params
+     * @param array  $data
      * @param int    $status
      *
      * @return \Slim\Http\Response
      */
-    function json_success($message, array $params = [], $status = StatusCode::HTTP_OK)
+    function json_success(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
     {
-        if (in_web()) {
+        $inApi = !empty($data['api']);
+        unset($data['api']);
+
+        if (!$inApi) {
             if (empty($message)) {
-                return json($params, $status);
+                return json($data, $status);
             }
+
+            $type = !empty($data['type']) ? $data['type'] : E_USER_SUCCESS;
+            unset($data['type']);
 
             return json_trigger(
                 $message,
-                (!empty($params['messageType']) ? $params['messageType'] : 'success'),
-                $params,
+                $type,
+                $data,
                 $status
             );
         }
 
-        $params = array_filter($params, function ($param) {
-            if (!in_array($param, [
-                'storage',
-                'object',
-                'clear',
-                'trigger',
-                'switch',
-                'location',
-                'reload',
-                'messageType',
-            ])) {
-                return $param;
+        foreach ([
+            'storage',
+            'object',
+            'clear',
+            'trigger',
+            'switch',
+            'location',
+            'reload',
+        ] as $excluded) {
+            if (isset($data[$excluded])) {
+                unset($data[$excluded]);
             }
-        }, ARRAY_FILTER_USE_KEY);
+        }
 
         return json(array_merge([
             'error' => false,
             'message' => $message,
-        ], $params), $status);
+        ], $data), $status);
     }
 }
 
@@ -210,16 +304,16 @@ if (!function_exists('upload')) {
             }
 
             // Cria pasta
-            if (!file_exists(PUBLIC_FOLDER.$directory)) {
-                mkdir(PUBLIC_FOLDER.$directory, 0755, true);
+            if (!file_exists($directory)) {
+                mkdir($directory, 0755, true);
             }
 
             // Verifica arquivo
             foreach ($extensions as $ext) {
                 $deleted = str_replace(".{$extension}", ".{$ext}", $path);
 
-                if (file_exists(PUBLIC_FOLDER."{$deleted}")) {
-                    unlink(PUBLIC_FOLDER."{$deleted}");
+                if (file_exists($deleted)) {
+                    unlink($deleted);
                 }
             }
 
@@ -227,8 +321,10 @@ if (!function_exists('upload')) {
             $uploadError = Upload::getStringError($value['error'], false);
 
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
-                if (!move_uploaded_file($value['tmp_name'], PUBLIC_FOLDER.$path)) {
-                    throw new \Exception("<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
+                if (!move_uploaded_file($value['tmp_name'], $path)) {
+                    throw new \Exception(
+                        "<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
+                    );
                 }
             } else {
                 // Verifica se é o tamanho exato da imagem
@@ -243,17 +339,23 @@ if (!function_exists('upload')) {
                     $height = ($height > $heightOri ? $heightOri : $height);
                 }
 
-                if (!$fnImg($value['tmp_name'], PUBLIC_FOLDER.$path, $width, $height, 90)) {
-                    throw new \Exception("<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
+                if (!$fnImg($value['tmp_name'], $path, $width, $height, 90)) {
+                    throw new \Exception(
+                        "<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
+                    );
                 }
             }
 
             $uploads[] = [
                 'name' => $name,
-                'path' => $path,
+                'path' => str_replace([
+                    PUBLIC_FOLDER,
+                    APP_FOLDER,
+                    RESOURCE_FOLDER,
+                ], '', $path),
                 'extension' => $extension,
                 'size' => $value['size'],
-                'md5' => md5_file(PUBLIC_FOLDER.$path),
+                'md5' => md5_file($path),
             ];
         }
 
@@ -373,29 +475,6 @@ if (!function_exists('date_for_human')) {
         }
 
         return $output;
-    }
-}
-
-if (!function_exists('in_web')) {
-    /**
-     * Verifica se está no site.
-     *
-     * return bool
-     */
-    function in_web()
-    {
-        /** @var \Slim\Http\Request $request */
-        $request = App::getInstance()->resolve('request');
-
-        if (!empty($request->getHeaderLine('X-Csrf-Token')) || !empty($request->getParam('_csrfToken', null))) {
-            return true;
-        }
-
-        if ((empty($_SERVER['HTTP_REFERER']) && empty($_SERVER['HTTP_ORIGIN'])) && Router::hasCurrent('/api/')) {
-            return false;
-        }
-
-        return true;
     }
 }
 
@@ -628,5 +707,17 @@ if (!function_exists('imagemTamExato')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('placeholder')) {
+    /**
+     * @param string $uri
+     *
+     * @return string
+     */
+    function placeholder(string $uri = '500x500')
+    {
+        return "https://via.placeholder.com/{$uri}";
     }
 }

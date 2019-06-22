@@ -120,13 +120,16 @@ abstract class Model
      */
     public function __get($name)
     {
+        if ($provider = App::getInstance()
+            ->resolve($name)) {
+            return $provider;
+        }
+
         if (isset($this->data->{$name})) {
             return $this->data->{$name};
         }
 
-        return App::getInstance()
-            ->resolve($name)
-        ;
+        return null;
     }
 
     /**
@@ -695,9 +698,9 @@ abstract class Model
     }
 
     /**
-     * @return void
+     * @return $this
      */
-    protected function clear(): void
+    protected function clear(): self
     {
         try {
             $reflection = new \ReflectionClass(get_class($this));
@@ -708,6 +711,7 @@ abstract class Model
                     'driver',
                     'table',
                     'primaryKey',
+                    'data',
                 ])) {
                     $value = null;
 
@@ -720,6 +724,8 @@ abstract class Model
             }
         } catch (\ReflectionException $e) {
         }
+
+        return $this;
     }
 
     /**

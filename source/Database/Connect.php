@@ -58,6 +58,8 @@ class Connect
     /**
      * @param string $driver
      *
+     * @throws \Exception
+     *
      * @return \Core\Database\Database
      */
     public function connection(?string $driver = null): Database

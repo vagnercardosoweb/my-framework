@@ -83,6 +83,17 @@ abstract class Controller
     /**
      * @param string $template
      * @param array  $context
+     *
+     * @return string
+     */
+    public function viewFetch(string $template, array $context = []): string
+    {
+        return $this->view->fetch($template, $context);
+    }
+
+    /**
+     * @param string $template
+     * @param array  $context
      * @param int    $status
      *
      * @return \Slim\Http\Response
@@ -102,6 +113,18 @@ abstract class Controller
     public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
     {
         return json($data, $status, $options);
+    }
+
+    /**
+     * @param string|null $message
+     * @param array       $data
+     * @param int         $status
+     *
+     * @return \Slim\Http\Response
+     */
+    public function jsonSuccess(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
+    {
+        return json_success($message, $data, $status);
     }
 
     /**
@@ -135,9 +158,9 @@ abstract class Controller
      * @param array       $queryParams
      * @param string|null $hash
      *
-     * @return string|null
+     * @return \Slim\Http\Response
      */
-    public function redirect(string $name, array $data = [], array $queryParams = [], string $hash = null): ?string
+    public function redirect(string $name, array $data = [], array $queryParams = [], string $hash = null): ?Response
     {
         return Router::redirect($name, $data, $queryParams, $hash);
     }
