@@ -346,49 +346,46 @@ abstract class Model
      *
      * @throws \Exception
      *
-     * @return $this|object
+     * @return $this
      */
-    public function save($data = [], bool $validate = true): object
+    public function save($data = [], bool $validate = true): self
     {
+        $this->reset();
         $this->data($data, $validate);
 
-        $data = $this->data;
-        $where = implode(' ', $this->where);
-        $bindings = $this->bindings;
-        $primaryValue = $this->getPrimaryValue();
+        if ($row = $this->fetchById($this->getPrimaryValue())) {
+            $where = implode(' ', $this->where);
 
-        $this->reset();
-        $this->clear();
-
-        if ($row = $this->fetchById($primaryValue)) {
-            if (!empty($primaryValue)) {
+            if (!empty($this->getPrimaryValue())) {
                 $where = "{$this->table}.{$this->getPrimaryKey()} = :pkid {$where}";
-                $bindings['pkid'] = $primaryValue;
+                $this->bindings['pkid'] = $this->getPrimaryValue();
             }
 
-            $row->data = $this->db->driver($this->driver)
+            $row->data = $this->db
+                ->driver($this->driver)
                 ->update(
-                    $this->table, $data,
-                    'WHERE '.$this->normalizeProperty($where),
-                    $bindings
+                    $this->table, $this->data,
+                    sprintf('WHERE %s', $this->normalizeProperty($where)),
+                    $this->bindings
                 )
             ;
 
             return $row;
         }
 
-        $lastInsertId = $this->db->driver($this->driver)
-            ->create($this->table, $data)
+        $lastInsertId = $this->db
+            ->driver($this->driver)
+            ->create($this->table, $this->data)
         ;
 
         if (!empty($lastInsertId)) {
-            return $this->reset()
-                ->where($where, $bindings)
-                ->fetchById($lastInsertId)
-            ;
+            return $this->fetchById($lastInsertId);
         }
 
-        return Obj::fromArray($data);
+        // Clear conditions query
+        $this->clear();
+
+        return $this;
     }
 
     /**
@@ -573,9 +570,9 @@ abstract class Model
     /**
      * @throws \Exception
      *
-     * @return object|null
+     * @return $this|null
      */
-    public function delete(): ?object
+    public function delete(): ?self
     {
         if (!empty($this->getPrimaryValue())) {
             $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkid ";
@@ -583,9 +580,7 @@ abstract class Model
         }
 
         if (is_array($this->where)) {
-            $this->where = $this->normalizeProperty(
-                implode(' ', $this->where)
-            );
+            $this->where = implode(' ', $this->where);
         }
 
         if (empty($this->where)) {
@@ -595,13 +590,18 @@ abstract class Model
             );
         }
 
-        $deleted = $this->db->driver($this->driver)->delete(
-            $this->table, "WHERE {$this->where}", $this->bindings
-        );
+        $this->data = $this->db
+            ->driver($this->driver)
+            ->delete(
+                $this->table,
+                "WHERE {$this->normalizeProperty($this->where)}",
+                $this->bindings
+            )
+        ;
 
         $this->clear();
 
-        return $deleted;
+        return $this;
     }
 
     /**
