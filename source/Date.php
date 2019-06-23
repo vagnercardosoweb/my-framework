@@ -24,10 +24,10 @@ class Date extends \DateTime
     const FORMAT_DATE_DATABASE = 'Y-m-d H:i:s';
 
     /**
-     * @param string|int         $time
+     * @param string             $time
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct($time = 'now', \DateTimeZone $timezone = null)
+    public function __construct(string $time = 'now', \DateTimeZone $timezone = null)
     {
         try {
             parent::__construct(str_replace('/', '-', $time), $timezone);
@@ -44,7 +44,7 @@ class Date extends \DateTime
      *
      * @return \Core\Date
      */
-    public static function createFromTimestamp(int $timestamp, \DateTimeZone $timezone = null)
+    public static function createFromTimestamp(int $timestamp, \DateTimeZone $timezone = null): Date
     {
         try {
             $date = new self('now', $timezone);
@@ -55,5 +55,27 @@ class Date extends \DateTime
                 $e->getMessage(), $e->getCode(), $e->getPrevious()
             );
         }
+    }
+
+    /**
+     * @param string $time
+     *
+     * @return string
+     */
+    public static function formatFromDateDatabase(string $time = 'now'): string
+    {
+        return (new self($time))->format(
+            explode(' ', self::FORMAT_DATE_DATABASE)[0]
+        );
+    }
+
+    /**
+     * @param string $time
+     *
+     * @return string
+     */
+    public static function formatFromDateTimeDatabase(string $time = 'now'): string
+    {
+        return (new self($time))->format(self::FORMAT_DATE_DATABASE);
     }
 }
