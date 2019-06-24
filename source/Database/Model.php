@@ -568,12 +568,18 @@ abstract class Model
     }
 
     /**
+     * @param int|null $id
+     *
      * @throws \Exception
      *
      * @return $this|null
      */
-    public function delete(): ?self
+    public function delete($id = null): ?self
     {
+        if (!empty($id) && $this->getPrimaryKey()) {
+            $this->data([$this->getPrimaryKey() => $id]);
+        }
+
         if (!empty($this->getPrimaryValue())) {
             $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkid ";
             $this->bindings['pkid'] = $this->getPrimaryValue();
@@ -613,7 +619,7 @@ abstract class Model
     {
         if (empty($this->table)) {
             throw new \InvalidArgumentException(
-                sprintf('[execute] `%s::table` is empty.', get_called_class()),
+                sprintf('[buildSqlStatement] `%s::table` is empty.', get_called_class()),
                 E_USER_ERROR
             );
         }
@@ -668,7 +674,8 @@ abstract class Model
         }
 
         // Execute sql
-        $this->statement = $this->db->driver($this->driver)
+        $this->statement = $this->db
+            ->driver($this->driver)
             ->query($sql, $this->bindings)
         ;
 

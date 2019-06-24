@@ -142,13 +142,12 @@ class Statement extends \PDOStatement
                     $value = (int)$value;
                 }
 
-                if (empty($value) && '0' != $value) {
-                    $value = null;
-                }
+                $value = !empty($value) || '0' == $value
+                    ? filter_var($value, FILTER_DEFAULT)
+                    : null;
 
                 $this->bindValue(
-                    (is_string($key) ? ":{$key}" : ((int)$key + 1)),
-                    filter_var($value, FILTER_DEFAULT),
+                    (is_string($key) ? ":{$key}" : ((int)$key + 1)), $value,
                     (is_int($value) ? \PDO::PARAM_BOOL : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR))
                 );
             }

@@ -20,7 +20,12 @@ use Core\App;
 class Validate
 {
     /**
-     * @param mixed $value
+     * @var array
+     */
+    private static $data = [];
+
+    /**
+     * @param string $value
      *
      * @return bool
      */
@@ -37,7 +42,7 @@ class Validate
     }
 
     /**
-     * @param mixed $value
+     * @param string|int $value
      *
      * @return bool
      */
@@ -75,7 +80,7 @@ class Validate
     }
 
     /**
-     * @param mixed $value
+     * @param string|int $value
      *
      * @return bool
      */
@@ -250,6 +255,18 @@ class Validate
 
     /**
      * @param mixed $value
+     * @param array $array
+     * @param bool  $strict
+     *
+     * @return bool
+     */
+    public static function inArray($value, array $array, bool $strict = false): bool
+    {
+        return in_array($value, $array, $strict);
+    }
+
+    /**
+     * @param mixed $value
      * @param int   $length
      *
      * @return bool
@@ -353,9 +370,14 @@ class Validate
             case '>=':
                 return $value1 > $value2;
             case '=':
-                return $value1 = $value2;
+            case '==':
+                return $value1 == $value2;
+            case '===':
+                return $value1 === $value2;
             case '!=':
                 return $value1 != $value2;
+            case '!==':
+                return $value1 !== $value2;
         }
 
         return false;
@@ -363,13 +385,13 @@ class Validate
 
     /**
      * @param mixed  $value
-     * @param string $regex
+     * @param string $indexData
      *
-     * @return false|int
+     * @return bool
      */
-    public static function notRegex($value, string $regex)
+    public static function equals($value, string $indexData): bool
     {
-        return !self::regex($value, $regex);
+        return self::comparison($value, '=', self::$data[$indexData]);
     }
 
     /**
@@ -389,14 +411,13 @@ class Validate
 
     /**
      * @param mixed  $value
-     * @param string $value2
-     * @param array  $data
+     * @param string $regex
      *
-     * @return bool
+     * @return false|int
      */
-    public static function equals($value, string $value2, array $data): bool
+    public static function notRegex($value, string $regex)
     {
-        return $value == $data[$value2];
+        return !self::regex($value, $regex);
     }
 
     /**
@@ -404,19 +425,25 @@ class Validate
      * @param string      $table
      * @param string      $field
      * @param string|null $where
+     * @param string|null $driver
      *
      * @return bool
      */
-    public static function databaseExists($value, string $table, string $field, ?string $where = null): bool
-    {
+    public static function databaseExists(
+        $value,
+        string $table,
+        string $field,
+        ?string $where = null,
+        ?string $driver = null
+    ): bool {
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
         return 1 == App::getInstance()
             ->resolve('db')
+            ->driver($driver)
             ->query($sql, ['field' => $value])
             ->fetch(\PDO::FETCH_OBJ)
-            ->total
-        ;
+            ->total;
     }
 
     /**
@@ -424,92 +451,29 @@ class Validate
      * @param string      $table
      * @param string      $field
      * @param string|null $where
+     * @param string      $driver
      *
      * @return bool
      */
-    public static function databaseNotExists($value, string $table, string $field, ?string $where = null): bool
-    {
-        return !self::databaseExists($value, $table, $field, $where);
+    public static function databaseNotExists(
+        $value,
+        string $table,
+        string $field,
+        ?string $where = null,
+        ?string $driver = null
+    ): bool {
+        return !self::databaseExists($value, $table, $field, $where, $driver);
     }
 
     /**
-     * @param array|object $data
-     * @param array        $conditions
-     * @param bool         $exception
+     * @param mixed      $value
+     * @param mixed|null $options
      *
-     * @throws \Exception
-     *
-     * @return array
+     * @return bool
      */
-    public static function rules($data, array $conditions, bool $exception = true): array
+    public static function url($value, $options = null): bool
     {
-        $data = Obj::toArray($data);
-        $errors = [];
-
-        foreach ($conditions as $field => $rules) {
-            foreach ($rules as $rule => $item) {
-                $validate = [
-                    'force' => false,
-                    'check' => true,
-                    'message' => null,
-                    'code' => E_USER_WARNING,
-                    'params' => [],
-                ];
-
-                // Check params
-                if (isset($item['params'])) {
-                    !is_array($item['params']) ? $item['params'] = [$item['params']] : null;
-                    array_push($validate['params'], ...$item['params']);
-                    unset($item['params']);
-                }
-
-                // Check message and merge rules
-                if (is_string($item)) {
-                    $validate['message'] = $item;
-                } else {
-                    $validate = array_merge($validate, $item);
-                }
-
-                if (!$validate['check']) {
-                    continue;
-                }
-
-                // Check force field
-                if (preg_match('/(.*)!!$/im', $field, $matches)) {
-                    $field = $matches[1];
-                    $validate['force'] = true;
-                }
-
-                if ($validate['force'] && !isset($data[$field])) {
-                    $data[$field] = null;
-                }
-
-                // Run validate
-                if (array_key_exists($field, $data)) {
-                    array_unshift($validate['params'], $data[$field]);
-                    array_push($validate['params'], $data);
-
-                    if (!self::runValidateMethod($rule, $validate['params'])) {
-                        $validate['message'] = $validate['message'] ?? 'There is validation with undefined message return.';
-
-                        if ($exception) {
-                            throw new \Exception(
-                                $validate['message'], $validate['code']
-                            );
-                        }
-
-                        $errors[$field] = [
-                            'code' => $validate['code'],
-                            'message' => $validate['message'],
-                        ];
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $errors;
+        return false !== filter_var($value, FILTER_VALIDATE_URL, $options);
     }
 
     /**
@@ -532,6 +496,88 @@ class Validate
         }
 
         return false;
+    }
+
+    /**
+     * @param array|object $data
+     * @param array        $conditions
+     * @param bool         $exception
+     *
+     * @throws \Exception
+     *
+     * @return array
+     */
+    public static function rules($data, array $conditions, bool $exception = true): array
+    {
+        $errors = [];
+        self::$data = Obj::toArray($data);
+
+        foreach ($conditions as $field => $rules) {
+            foreach ($rules as $rule => $item) {
+                $validate = [
+                    'force' => false,
+                    'check' => true,
+                    'message' => null,
+                    'code' => E_USER_WARNING,
+                    'params' => [],
+                ];
+
+                // Check params
+                if (isset($item['params'])) {
+                    foreach ((array)$item['params'] as $value) {
+                        $validate['params'][] = $value;
+                    }
+
+                    unset($item['params']);
+                }
+
+                // Check message and merge rules
+                if (is_string($item)) {
+                    $validate['message'] = $item;
+                } else {
+                    $validate = array_merge($validate, $item);
+                }
+
+                if (!$validate['check']) {
+                    continue;
+                }
+
+                // Check force field
+                if (preg_match('/(.*)!!$/im', $field, $matches)) {
+                    $field = $matches[1];
+                    $validate['force'] = true;
+                }
+
+                if ($validate['force'] && !isset(self::$data[$field])) {
+                    self::$data[$field] = null;
+                }
+
+                // Run validate
+                if (array_key_exists($field, self::$data)) {
+                    array_unshift($validate['params'], self::$data[$field]);
+
+                    if (!self::runValidateMethod($rule, $validate['params'])) {
+                        $validate['message'] = $validate['message']
+                            ?? 'There is validation with undefined message return.';
+
+                        if ($exception) {
+                            throw new \Exception(
+                                $validate['message'], $validate['code']
+                            );
+                        }
+
+                        $errors[$field] = [
+                            'code' => $validate['code'],
+                            'message' => $validate['message'],
+                        ];
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $errors;
     }
 
     /**
