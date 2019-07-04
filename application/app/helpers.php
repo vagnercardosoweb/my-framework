@@ -144,7 +144,7 @@ if (!function_exists('json_success')) {
             unset($data['type']);
 
             return json_trigger(
-                $message,
+                nl2br($message),
                 $type,
                 $data,
                 $status

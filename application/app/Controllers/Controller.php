@@ -83,24 +83,24 @@ abstract class Controller
     /**
      * @param string $template
      * @param array  $context
+     * @param int    $status
+     *
+     * @return \Slim\Http\Response
+     */
+    public function view(string $template, array $context = [], ?int $status = StatusCode::HTTP_OK)
+    {
+        return $this->view->render($this->response, $template, $context, $status);
+    }
+
+    /**
+     * @param string $template
+     * @param array  $context
      *
      * @return string
      */
     public function viewFetch(string $template, array $context = []): string
     {
         return $this->view->fetch($template, $context);
-    }
-
-    /**
-     * @param string $template
-     * @param array  $context
-     * @param int    $status
-     *
-     * @return \Slim\Http\Response
-     */
-    public function view(string $template, ?array $context = [], ?int $status = StatusCode::HTTP_OK)
-    {
-        return $this->view->render($this->response, $template, $context, $status);
     }
 
     /**

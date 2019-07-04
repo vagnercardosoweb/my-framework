@@ -7,7 +7,7 @@
  * @returns {string}
  */
 function checkElementUrl(element, http) {
-  http = http || 'get';
+  http = (http || 'get');
   var url = element.attr('vc-' + http);
   var href = element.attr('href') || element.data('href') || '';
   var hash = href.substr(0, 1) === '#';
@@ -46,9 +46,7 @@ function showMessage(json, elementMessage) {
   /* Printa ou alerta a mensagem */
   if (message) {
     if (elementMessage !== undefined && elementMessage.length > 0) {
-      elementMessage
-        .html('<div class="alert alert-' + type + '">' + message + '</div>')
-        .fadeIn(0);
+      elementMessage.html('<div class="alert alert-' + type + '">' + message + '</div>').fadeIn(0);
     } else {
       alert(message);
     }
@@ -63,15 +61,9 @@ function showMessage(json, elementMessage) {
  * @return {boolean}
  */
 function checkElementConfirm(element) {
-  if (
-    element.attr('vc-confirm') !== undefined &&
-    (element.attr('vc-confirm') === '' || element.attr('vc-confirm'))
-  ) {
+  if (element.attr('vc-confirm') !== undefined && (element.attr('vc-confirm') === '' || element.attr('vc-confirm'))) {
     var verify = confirm(
-      element.attr('vc-confirm').length > 0
-        ? element.attr('vc-confirm')
-        : 'Essa ação é irreversível.\nDeseja continuar?'
-    );
+      (element.attr('vc-confirm').length > 0) ? element.attr('vc-confirm') : 'Essa ação é irreversível.\nDeseja continuar?');
 
     if (verify === false) {
       return false;
@@ -100,12 +92,7 @@ function checkFormRequired(form) {
 
     // Verifica se e textarea e caso não tenha valor
     // pega o html
-    if (
-      $(element)
-        .prop('tagName')
-        .toLowerCase() === 'textarena' &&
-      !value
-    ) {
+    if ($(element).prop('tagName').toLowerCase() === 'textarena' && !value) {
       value = $(element).html();
     }
 
@@ -122,11 +109,9 @@ function checkFormRequired(form) {
     // Adiciona as classe de erro
     if (!value && value !== '0') {
       errors++;
-      message =
-        $(element).attr('required-text') &&
-        $(element).attr('required-text') !== ''
-          ? $(element).attr('required-text')
-          : 'Campo obrigatório.';
+      message = $(element).attr('required-text') && $(element).attr('required-text') !== ''
+        ? $(element).attr('required-text')
+        : 'Campo obrigatório.';
 
       $(element)
         .addClass('vc-error-field')
@@ -166,10 +151,7 @@ function mountFormData(form, formData) {
     if ($(element).attr('name')) {
       if ($(element).prop('type') === 'checkbox') {
         //if ($(element).prop('checked') !== false) {
-        formData.append(
-          $(element).attr('name'),
-          $(element).prop('checked') !== false ? $(element).val() : ''
-        );
+        formData.append($(element).attr('name'), ($(element).prop('checked') !== false ? $(element).val() : ''));
         //}
       } else if ($(element).prop('type') === 'radio') {
         if ($(element).prop('checked') !== false) {
@@ -187,20 +169,12 @@ function mountFormData(form, formData) {
         var name = $(element).attr('name');
         var value = $(element).val() || '';
 
-        if (
-          $(element)
-            .prop('tagName')
-            .toLowerCase() === 'textarea' &&
-          value === ''
-        ) {
+        if ($(element).prop('tagName').toLowerCase() === 'textarea' && value === '') {
           value = $(element).html();
         }
 
         /* CKEditor */
-        if (
-          typeof CKEDITOR === 'object' &&
-          typeof CKEDITOR.instances[name] === 'object'
-        ) {
+        if (typeof CKEDITOR === 'object' && typeof CKEDITOR.instances[name] === 'object') {
           value = CKEDITOR.instances[name].getData();
         }
 
@@ -219,18 +193,8 @@ function mountFormData(form, formData) {
 function redirectAndReload(json) {
   /* Redireciona para uma nova página */
   if (json.location) {
-    if (
-      typeof loadPage !== 'undefined' &&
-      typeof loadPage === 'function' &&
-      !json.noajaxpage
-    ) {
-      loadPage(
-        (window.history.state && window.history.state.content) ||
-          '#content-ajax',
-        json.location,
-        true,
-        true
-      );
+    if (typeof loadPage !== 'undefined' && typeof loadPage === 'function' && !json.noajaxpage) {
+      loadPage((window.history.state && window.history.state.content) || '#content-ajax', json.location, true, true);
     } else {
       window.location.href = json.location;
     }
@@ -238,18 +202,8 @@ function redirectAndReload(json) {
 
   /* Recarrega a página atual */
   if (json.reload) {
-    if (
-      typeof loadPage !== 'undefined' &&
-      typeof loadPage === 'function' &&
-      !json.noajaxpage
-    ) {
-      loadPage(
-        (window.history.state && window.history.state.content) ||
-          '#content-ajax',
-        '',
-        true,
-        true
-      );
+    if (typeof loadPage !== 'undefined' && typeof loadPage === 'function' && !json.noajaxpage) {
+      loadPage((window.history.state && window.history.state.content) || '#content-ajax', '', true, true);
     } else {
       window.location.reload();
     }
@@ -279,26 +233,19 @@ function vcAjax(element, url, formData, method, form, change, modal) {
 
   /* Variáveis */
   var html = element.html();
-  var loadding =
-    element.attr('vc-loadding') !== undefined
+  var loadding = (element.attr('vc-loadding') !== undefined
+    ? (element.attr('vc-loadding')
       ? element.attr('vc-loadding')
-        ? element.attr('vc-loadding')
-        : 'Aguarde...'
-      : change
-      ? false
-      : html;
+      : 'Aguarde...')
+    : (change ? false : html));
   var message;
   var headers = {};
 
   /* Upload file */
-  var enableUpload = element.attr('vc-upload') !== undefined;
+  var enableUpload = (element.attr('vc-upload') !== undefined);
 
   /* Cancelar requisição */
-  var ajaxAbort = element
-    .parent()
-    .parent()
-    .parent()
-    .find('*[vc-abort]');
+  var ajaxAbort = element.parent().parent().parent().find('*[vc-abort]');
 
   /* Message */
   if (modal) {
@@ -308,11 +255,7 @@ function vcAjax(element, url, formData, method, form, change, modal) {
       message = form.find('#vc-message');
 
       if (message.length <= 0) {
-        message = form
-          .parent()
-          .parent()
-          .parent()
-          .find('#vc-message');
+        message = form.parent().parent().parent().find('#vc-message');
       }
     } else if (element.attr('vc-message')) {
       message = $(document).find(element.attr('vc-message'));
@@ -393,27 +336,23 @@ function vcAjax(element, url, formData, method, form, change, modal) {
       if (enableUpload) {
         var startTime = new Date().getTime();
 
-        xhr.upload.addEventListener(
-          'progress',
-          function(e) {
-            if (e.lengthComputable && enableUpload) {
-              var diffTime = new Date().getTime() - startTime;
-              var uploadPercent = parseInt((e.loaded / e.total) * 100);
-              var durationTime =
-                ((100 - uploadPercent) * diffTime) / uploadPercent;
-              // var calculateTimeFormat = calculateTimeUpload(durationTime);
+        xhr.upload.addEventListener('progress', function(e) {
+          if (e.lengthComputable && enableUpload) {
+            var diffTime = (new Date().getTime() - startTime);
+            var uploadPercent = parseInt((e.loaded / e.total) * 100);
+            var durationTime = (((100 - uploadPercent) * diffTime) / uploadPercent);
+            // var calculateTimeFormat = calculateTimeUpload(durationTime);
 
-              if (uploadPercent === 100) {
-                if (ajaxAbort !== undefined) {
-                  ajaxAbort.fadeOut(0);
-                }
-
-                console.log(diffTime, uploadPercent, durationTime);
+            if (uploadPercent === 100) {
+              if (ajaxAbort !== undefined) {
+                ajaxAbort.fadeOut(0);
               }
+
+              console.log(diffTime, uploadPercent, durationTime);
             }
-          },
-          false
-        );
+          }
+        }, false);
+
       }
 
       return xhr;
@@ -460,13 +399,9 @@ function vcAjax(element, url, formData, method, form, change, modal) {
                 modal.find('#' + key).html(value);
               } else {
                 if ($(document).find('input[id="' + key + '"]').length > 0) {
-                  $(document)
-                    .find('input[id="' + key + '"]')
-                    .val(value);
+                  $(document).find('input[id="' + key + '"]').val(value);
                 } else {
-                  $(document)
-                    .find('#' + key)
-                    .html(value);
+                  $(document).find('#' + key).html(value);
                 }
               }
             });
@@ -506,12 +441,9 @@ function vcAjax(element, url, formData, method, form, change, modal) {
               switch (key) {
                 /* Hide */
                 case 'scrolltop':
-                  $('html,body').animate(
-                    {
-                      scrollTop: $(value).offset().top - 20
-                    },
-                    500
-                  );
+                  $('html,body').animate({
+                    scrollTop: ($(value).offset().top - 20),
+                  }, 500);
                   break;
 
                 /* Hide */
@@ -587,25 +519,22 @@ function vcAjax(element, url, formData, method, form, change, modal) {
         } else if (xhr.status === 0) {
           error = 'Sem conexão com a internet! Favor verifique sua conexão.';
         } else if (xhr.status >= 400 && xhr.status <= 499) {
-          error =
-            '[' + xhr.status + '] Client error! Informe o código ao suporte.';
+          error = '[' + xhr.status + '] Client error! Informe o código ao suporte.';
         } else if (xhr.status >= 500 && xhr.status <= 600) {
-          error =
-            '[' + xhr.status + '] Server error! Informe o código ao suporte.';
+          error = '[' + xhr.status + '] Server error! Informe o código ao suporte.';
         } else {
           if (xhr.responseText) {
             error = xhr.responseText;
           } else {
-            error =
-              'Não conseguimos identificar o erro! Favor entre em contato para que possamos verificar.';
+            error = 'Não conseguimos identificar o erro! Favor entre em contato para que possamos verificar.';
           }
 
           console.log(xhr, exception);
         }
 
-        showMessage({ error: { message: error } }, message);
+        showMessage({ 'error': { 'message': error } }, message);
       }
-    }
+    },
   });
 
   /* Aborta requisição */
@@ -634,7 +563,7 @@ function vcAjax(element, url, formData, method, form, change, modal) {
     /* Aborta conexão */
     ajaxRequest.abort();
   });
-}
+};
 
 /* Carrega o documento */
 $(document).ready(function() {
@@ -654,30 +583,31 @@ $(document).ready(function() {
 
       Object.assign(json, {
         url: checkElementUrl(elementChange, 'change'),
-        method: elementChange.attr('vc-method')
-          ? elementChange.attr('vc-method').toUpperCase()
-          : 'POST',
+        method: elementChange.attr('vc-method') ? elementChange.attr('vc-method').toUpperCase() : 'POST',
         data: undefined,
-        name: elementChange.attr('vc-param')
-          ? elementChange.attr('vc-param')
-          : 'value'
+        name: elementChange.attr('vc-param') ? elementChange.attr('vc-param') : 'value',
       });
     }
 
-    var method = json.method || 'POST';
+    var method = (json.method || 'POST');
 
     if (json.data !== undefined) {
       elementChange.attr('vc-data', JSON.stringify(json.data));
     }
 
     /* FormData */
-    formData.append(
-      json.name || 'value',
-      elementChange.val() !== undefined ? elementChange.val() : ''
-    );
+    formData.append(json.name || 'value', (elementChange.val() !== undefined ? elementChange.val() : ''));
     formData.append('_METHOD', method);
 
-    vcAjax(elementChange, json.url || '', formData, 'POST', {}, true, false);
+    vcAjax(
+      elementChange,
+      json.url || '',
+      formData,
+      'POST',
+      {},
+      true,
+      false,
+    );
   });
 
   /* Dispara o request ao submeter o formulário (submit) */
@@ -708,12 +638,12 @@ $(document).ready(function() {
       /* Dispara a requisição */
       vcAjax(
         elementForm,
-        elementForm.attr('action') || '',
+        (elementForm.attr('action') || ''),
         formData,
-        elementForm.attr('method') || 'POST',
+        (elementForm.attr('method') || 'POST'),
         elementForm,
         false,
-        false
+        false,
       );
     }
   });
@@ -735,30 +665,21 @@ $(document).ready(function() {
     }
 
     /* REQUEST :: FORM */
-    if (
-      elementClicked.attr('vc-form') !== undefined &&
-      (elementClicked.attr('vc-form') === '' || elementClicked.attr('vc-form'))
-    ) {
+    if (elementClicked.attr('vc-form') !== undefined && (elementClicked.attr('vc-form') === '' || elementClicked.attr('vc-form'))) {
       event.preventDefault(event);
       event.stopPropagation(event);
 
       /* Form */
-      var form =
-        elementClicked.attr('vc-form') &&
-        elementClicked.attr('vc-form').length > 0
-          ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
-          : elementClicked.closest('form');
+      var form = (elementClicked.attr('vc-form') && elementClicked.attr('vc-form').length > 0)
+        ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
+        : elementClicked.closest('form');
 
       /* Método */
-      formData.append('_METHOD', form.attr('method') || 'POST');
+      formData.append('_METHOD', (form.attr('method') || 'POST'));
 
       /* Verifica se existe o formulário */
       if (form.length <= 0) {
-        alert(
-          'Formulário com ([name="' +
-            elementClicked.attr('vc-form') +
-            '"]) não foi encontrado em seu documento html.'
-        );
+        alert('Formulário com ([name="' + elementClicked.attr('vc-form') + '"]) não foi encontrado em seu documento html.');
 
         return false;
       }
@@ -774,20 +695,17 @@ $(document).ready(function() {
       /* Dispara a requisição */
       vcAjax(
         elementClicked,
-        form.attr('action') || '',
+        (form.attr('action') || ''),
         formData,
         'POST',
         form,
         false,
-        false
+        false,
       );
     }
 
     /* REQUEST :: Verbos HTTP */
-    $.each(['get', 'post', 'put', 'delete', 'options', 'ajax'], function(
-      index,
-      http
-    ) {
+    $.each(['get', 'post', 'put', 'delete', 'options', 'ajax'], function(index, http) {
       var elementHttp = elementClicked.attr('vc-' + http);
 
       /* Verifica se pode presseguir */
@@ -805,13 +723,13 @@ $(document).ready(function() {
 
           /* Verifica método caso seja ajax padrão */
           if (http === 'ajax') {
-            method = elementClicked.attr('vc-method') || 'POST';
+            method = (elementClicked.attr('vc-method') || 'POST');
           }
 
           Object.assign(elementHttpJson, {
             url: checkElementUrl(elementClicked, http.toString().toLowerCase()),
             method: method,
-            data: undefined
+            data: undefined,
           });
         }
 
@@ -830,17 +748,17 @@ $(document).ready(function() {
         }
 
         /* Método */
-        formData.append('_METHOD', elementHttpJson.method || method);
+        formData.append('_METHOD', (elementHttpJson.method || method));
 
         /* Requisição */
         vcAjax(
           elementClicked,
           elementHttpJson.url,
           formData,
-          elementHttpJson.method !== 'GET' ? 'POST' : 'GET',
+          (elementHttpJson.method !== 'GET' ? 'POST' : 'GET'),
           {},
           false,
-          false
+          false,
         );
       }
     });
@@ -855,10 +773,7 @@ $(window).on('load', function() {
     var formData = new FormData();
 
     /* Método */
-    if (
-      $(element).attr('vc-method') !== undefined &&
-      $(element).attr('vc-method').length > 2
-    ) {
+    if ($(element).attr('vc-method') !== undefined && $(element).attr('vc-method').length > 2) {
       formData.append('_METHOD', element.attr('vc-method').toUpperCase());
     }
 
@@ -870,7 +785,7 @@ $(window).on('load', function() {
       'POST',
       {},
       false,
-      false
+      false,
     );
   });
 });

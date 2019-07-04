@@ -61,6 +61,8 @@ return [
                     ? "<input type='hidden' name='_csrfToken' id='_csrfToken' value='{$token}'/>"
                     : $token;
             },
+            'placeholder' => 'placeholder',
+            'error_code_type' => 'error_code_type',
         ],
 
         'filters' => [

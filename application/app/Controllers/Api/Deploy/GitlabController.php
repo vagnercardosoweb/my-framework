@@ -62,12 +62,12 @@ class GitlabController extends Controller
                     throw new \Exception('Branch undefined.', E_USER_ERROR);
             }
 
-            return $this->json([
+            return json([
                 'error' => false,
                 'message' => 'Deploy gitlab successfully.',
             ], StatusCode::HTTP_OK);
         } catch (\Exception $e) {
-            return $this->jsonError(
+            return json_error(
                 $e, [], StatusCode::HTTP_BAD_REQUEST
             );
         }

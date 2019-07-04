@@ -47,7 +47,6 @@ class User extends Model
             Validate::rules($data, [
                 'name!!' => ['required' => 'Nome não pode ser vázio.'],
                 'email!!' => [
-                    'required' => 'E-mail não pode ser vázio.',
                     'email' => 'O E-mail informado não é válido.',
                     'databaseNotExists' => [
                         'message' => 'O e-mail digitado já foi registrado.',

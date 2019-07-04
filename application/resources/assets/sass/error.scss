@@ -2,11 +2,11 @@
 *, *:before, *:after {
   margin: 0;
   padding: 0;
-
+  
   font-size: 100%;
   font-weight: normal;
   font-family: 'Open Sans', sans-serif;
-
+  
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -20,7 +20,7 @@
   display: flex;
   align-content: center;
   justify-content: center;
-
+  
   .content {
     position: relative;
     width: 600px;
@@ -29,7 +29,7 @@
     word-break: break-all;
     border-radius: 4px;
     box-shadow: 0 10px 20px darken(#ffffff, 5), 0 -5px 20px darken(#ffffff, 5);
-
+    
     .header {
       padding: 15px;
       position: relative;
@@ -37,13 +37,13 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid darken(#ffffff, 10);
-
+      
       > p {
         font-size: 1.5em;
         font-weight: 400;
         color: #555555;
       }
-
+      
       > a {
         display: block;
         padding: 5px 8px;
@@ -55,22 +55,22 @@
         box-shadow: 0 1px 8px darken(#ffffff, 10);
         text-decoration: none;
         text-transform: uppercase;
-
+        
         &:hover {
           box-shadow: 0 1px 12px darken(#ffffff, 20);
         }
       }
     }
-
+    
     .box {
       padding: 20px 10px 10px;
-
+      
       > p {
         font-size: 1em;
         text-align: center;
         display: block;
         font-weight: 300;
-
+        
         &:after {
           content: '';
           display: block;
@@ -79,13 +79,13 @@
           border-bottom: 1px solid darken(#ffffff, 5);
         }
       }
-
+      
       .debug {
         display: block;
         text-align: center;
         padding: 10px 0;
         font-size: 1.2em;
-
+        
         > small {
           color: red;
           font-size: .8em;
@@ -93,20 +93,20 @@
         }
       }
     }
-
+    
     .footer {
       padding: 7.5px;
       border-top: 1px solid darken(#ffffff, 10);
       display: flex;
       align-items: center;
       justify-content: space-between;
-
+      
       p {
         font-size: .875em;
         color: #333333;
         font-weight: 300;
       }
-
+      
       b {
         text-decoration: underline;
         font-weight: 400;
@@ -123,26 +123,26 @@
   justify-content: center;
   height: 100%;
   width: 100%;
-
+  
   .content {
     padding: 50px 0;
     text-align: center;
     background: darken(#ffffff, 2);
     box-shadow: 0 10px 20px darken(#ffffff, 5);
     width: 100%;
-
+    
     h1 {
       font-size: 2em;
       color: lighten(#000000, 20);
     }
-
+    
     p {
       font-size: 1em;
       margin: 20px 0;
       color: red;
       font-weight: bold;
     }
-
+    
     a {
       display: inline-flex;
       text-decoration: none;
