@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 21/06/2019 Vagner Cardoso
+ * @copyright 04/07/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -568,7 +568,7 @@ abstract class Model
     }
 
     /**
-     * @param int|null $id
+     * @param int|null $id Primary key value
      *
      * @throws \Exception
      *

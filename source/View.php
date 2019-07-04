@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 18/06/2019 Vagner Cardoso
+ * @copyright 04/07/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -50,7 +50,7 @@ class View
      *
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function render(ResponseInterface $response, string $template, array $context = [], int $status = StatusCode::HTTP_OK): ResponseInterface
+    public function render(ResponseInterface $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): ResponseInterface
     {
         if ($status) {
             $response = $response->withStatus($status);

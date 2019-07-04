@@ -1,6 +1,19 @@
 <?php
 
+/*
+ * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ *
+ * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @license http://www.opensource.org/licenses/mit-license.html MIT License
+ * @copyright 04/07/2019 Vagner Cardoso
+ */
+
 // require_once __DIR__.'/vendor/autoload.php';
+
+$header = sprintf("VCWeb Networks <https://www.vcwebnetworks.com.br/>\n
+@author Vagner Cardoso <vagnercardosoweb@gmail.com>
+@license http://www.opensource.org/licenses/mit-license.html MIT License
+@copyright %s Vagner Cardoso", date('d/m/Y'));
 
 $finder = PhpCsFixer\Finder::create()
     ->notPath(__DIR__.'/resources')
@@ -50,6 +63,11 @@ return PhpCsFixer\Config::create()
         'ordered_imports' => [
             'sort_algorithm' => 'alpha',
             'imports_order' => ['class', 'const', 'function'],
+        ],
+        'header_comment' => [
+            'header' => $header,
+            'commentType' => 'comment',
+            'location' => 'after_open',
         ],
     ])
   ;
