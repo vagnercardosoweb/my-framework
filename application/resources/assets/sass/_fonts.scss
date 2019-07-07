@@ -1,0 +1,7 @@
+/* Google font */
+@import url('https://fonts.googleapis.com/css?family=Nunito&display=swap');
+
+/* Adiciona a fonte a todos elementos */
+*:not(.fa) {
+  font-family: 'Nunito', sans-serif;
+}

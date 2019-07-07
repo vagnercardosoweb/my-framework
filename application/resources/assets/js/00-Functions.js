@@ -9,18 +9,17 @@
  * @returns {string|*}
  */
 
-function number_format (numero, decimal, decimal_separador, milhar_separador) {
+function number_format(numero, decimal, decimal_separador, milhar_separador) {
   numero = (numero + '').replace(/[^0-9+\-Ee.]/g, '');
-  var n          = !isFinite(+numero) ? 0 : +numero,
-      prec       = !isFinite(+decimal) ? 0 : Math.abs(decimal),
-      sep        = (typeof milhar_separador === 'undefined') ? ',' : milhar_separador,
-      dec        = (typeof decimal_separador === 'undefined') ? '.' : decimal_separador,
-      s          = '',
-
-      toFixedFix = function (n, prec) {
-        var k = Math.pow(10, prec);
-        return '' + Math.round(n * k) / k;
-      };
+  var n = !isFinite(+numero) ? 0 : +numero,
+    prec = !isFinite(+decimal) ? 0 : Math.abs(decimal),
+    sep = typeof milhar_separador === 'undefined' ? ',' : milhar_separador,
+    dec = typeof decimal_separador === 'undefined' ? '.' : decimal_separador,
+    s = '',
+    toFixedFix = function(n, prec) {
+      var k = Math.pow(10, prec);
+      return '' + Math.round(n * k) / k;
+    };
 
   s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
 
@@ -44,8 +43,8 @@ function number_format (numero, decimal, decimal_separador, milhar_separador) {
  * @returns {boolean}
  */
 
-function isNumeric (evt) {
-  var charCode = (evt.which) ? evt.which : event.keyCode;
+function isNumeric(evt) {
+  var charCode = evt.which ? evt.which : event.keyCode;
 
   return !(charCode > 31 && (charCode < 48 || charCode > 57));
 }
@@ -59,13 +58,17 @@ function isNumeric (evt) {
  * @returns {string|jQuery}
  */
 
-function isLength (element, length) {
+function isLength(element, length) {
   if ($(element).val().length >= length) {
-    return $(element).val($(element).val().substr(0, length - 1));
+    return $(element).val(
+      $(element)
+        .val()
+        .substr(0, length - 1)
+    );
   }
 }
 
-(function (window) {
+(function(window) {
   /**
    * Passado pro escopo global do `window` para poder usar
    * o Storage em qualquer lugar
@@ -82,31 +85,30 @@ function isLength (element, length) {
    *  }
    */
   window.Storage = {
-    set: function (key, value) {
+    set: function(key, value) {
       window.localStorage[key] = value;
 
       return window.localStorage[key];
     },
 
-    setObject: function (key, value) {
+    setObject: function(key, value) {
       window.localStorage[key] = JSON.stringify(value);
 
       return this.getObject(key);
     },
 
-    get: function (key) {
+    get: function(key) {
       return window.localStorage[key] || false;
     },
 
-    getObject: function (key) {
+    getObject: function(key) {
       return JSON.parse(window.localStorage[key] || null);
     },
 
-    remove: function (key) {
+    remove: function(key) {
       window.localStorage.removeItem(key);
-    },
+    }
   };
-
 })(window);
 
 /**
@@ -118,7 +120,7 @@ function isLength (element, length) {
  * @returns {*}
  */
 
-function mergeObject (object, source) {
+function mergeObject(object, source) {
   for (var key in source) {
     if (source.hasOwnProperty(key)) {
       object[key] = source[key];
@@ -135,11 +137,11 @@ function mergeObject (object, source) {
  * @param find
  */
 
-function previewImage (input, find) {
+function previewImage(input, find) {
   if (input.files && input.files[0]) {
     var reader = new FileReader();
 
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       $(find).attr('src', e.target.result);
     };
 
@@ -186,15 +188,12 @@ function previewImage (input, find) {
  * @param json
  * @returns {boolean|Object}
  */
-function getJSON (json) {
-  json = typeof json !== 'string'
-    ? JSON.stringify(json)
-    : json;
+function getJSON(json) {
+  json = typeof json !== 'string' ? JSON.stringify(json) : json;
 
   try {
     json = JSON.parse(json);
-  }
-  catch (e) {
+  } catch (e) {
     return false;
   }
 

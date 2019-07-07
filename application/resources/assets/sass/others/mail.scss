@@ -1,8 +1,10 @@
 /* Reset */
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   margin: 0;
   padding: 0;
-  font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   font-size: 12px;
   color: #333333;
@@ -18,7 +20,7 @@ ul {
   list-style: none;
   margin: 0 !important;
   padding: 0 !important;
-  
+
   li {
     margin: 0 !important;
   }
@@ -34,8 +36,10 @@ table td {
 }
 
 /* Tipográfia */
-h1, h2, h3 {
-  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+h1,
+h2,
+h3 {
+  font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande', sans-serif;
   color: #000000;
   font-weight: 400;
 }
@@ -60,17 +64,21 @@ h4 {
 
 p {
   margin-bottom: 10px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
 }
 
-p, ul, ol {
+p,
+ul,
+ol {
   font-weight: normal;
 }
 
-p li, ul li, ol li {
+p li,
+ul li,
+ol li {
   list-style-position: inside;
 }
 
@@ -88,7 +96,7 @@ a {
     content: '';
     display: table;
   }
-  
+
   &::after {
     clear: both;
   }
@@ -102,7 +110,7 @@ a {
   display: block;
   width: 100%;
   /*margin: 0 auto;*/
-  
+
   @include clearfix;
 }
 
@@ -111,9 +119,9 @@ a {
   /*margin: 0 auto;*/
   display: block;
   padding: 10px 0;
-  
+
   @include clearfix;
-  
+
   &-block {
     padding: 10px 0;
   }
@@ -126,13 +134,13 @@ a {
   margin-top: 5px;
   padding-top: 5px;
   border-top: 1px solid #eeeeee;
-  
+
   a {
     display: block;
     color: #474747;
     font-size: 11px !important;
   }
-  
+
   p {
     font-size: 11px !important;
     color: #474747;
@@ -147,16 +155,16 @@ a {
   margin-bottom: 10px;
   border-collapse: collapse;
   text-align: center;
-  
+
   thead tr {
     background: #f7f7f7;
     font-weight: 700;
-    
+
     th {
       padding: 5px;
     }
   }
-  
+
   tbody tr td,
   tfoot tr td {
     padding: 3px;
@@ -174,39 +182,39 @@ $text: (left, right, center, justify, justify-all, start, end, match-parent);
 /* Margin & Padding */
 @each $prop, $abbrev in (margin: m, padding: p) {
   @each $prop2, $abbrev2 in (top: t, left: l, bottom: b, right: r) {
-    @for $i from 0 through 10 {
+    @for $i from 0 through 4 {
       $i: $i * 5;
-      
+
       /* Margin e Padding positivos */
       .#{$abbrev}-#{$i} {
         #{$prop}: #{$i + 'px'} !important;
       }
-      
+
       .#{$abbrev}tb-#{$i} {
         #{$prop}: #{$i + 'px'} 0px !important;
       }
-      
+
       .#{$abbrev}lr-#{$i} {
         #{$prop}: 0px #{$i + 'px'} !important;
       }
-      
+
       .#{$abbrev}#{$abbrev2}-#{$i} {
         #{$prop}-#{$prop2}: #{$i + 'px'} !important;
       }
-      
+
       /* Margin e Padding negativos */
       .#{$abbrev}-n#{$i} {
         #{$prop}: -#{$i + 'px'} !important;
       }
-      
+
       .#{$abbrev}tb-n#{$i} {
         #{$prop}: -#{$i + 'px'} 0px !important;
       }
-      
+
       .#{$abbrev}lr-n#{$i} {
         #{$prop}: 0px -#{$i + 'px'} !important;
       }
-      
+
       .#{$abbrev}#{$abbrev2}-n#{$i} {
         #{$prop}-#{$prop2}: -#{$i + 'px'} !important;
       }
