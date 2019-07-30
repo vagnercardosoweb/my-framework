@@ -5,12 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
 
-use App\Controller\Controller;
+use App\Controller\BaseController;
 use Slim\Http\StatusCode;
 
 /**
@@ -18,7 +18,7 @@ use Slim\Http\StatusCode;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class BitbucketController extends Controller
+class BitbucketController extends BaseController
 {
     /**
      * [POST] /api/deploy/bitbucket.

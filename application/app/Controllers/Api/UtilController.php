@@ -5,12 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api;
 
-use App\Controller\Controller;
+use App\Controller\BaseController;
 use Core\App;
 use Core\Curl\Request;
 use Core\Helpers\Str;
@@ -20,7 +20,7 @@ use Core\Helpers\Str;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class UtilController extends Controller
+class UtilController extends BaseController
 {
     /**
      * @param string $name

@@ -1,3 +1,7 @@
+import { getJSON } from './00-Functions';
+import { initMaskInput } from './09-InitMaskInput';
+import { initSelect2 } from './07-InitSelect2';
+
 /**
  * Recupera o url do elemento
  *
@@ -223,7 +227,7 @@ function redirectAndReload(json) {
  *
  * @return {void}
  */
-function vcAjax(element, url, formData, method, form, change, modal) {
+export function vcAjax(element, url, formData, method, form, change, modal) {
   /* Verifica URL */
   if (!url || url === '') {
     alert('URL Inválida para a requisiçao.');

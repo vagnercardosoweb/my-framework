@@ -1,4 +1,4 @@
-FROM php:7.3-apache
+FROM php:7.3-apache-stretch
 
 # Atualiza e instala dependências
 RUN  apt-get update \
@@ -16,6 +16,8 @@ RUN  apt-get update \
   libxml2-dev \
   libxslt-dev \
   libnotify-bin \
+  libwebp-dev \
+  libxpm-dev \
   unixodbc \
   unixodbc-dev \
   freetds-dev \
@@ -29,7 +31,9 @@ RUN  apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Instala dependencia do php
-# RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
+RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
+    --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir \
+    --enable-gd-native-ttf
 RUN docker-php-ext-configure pdo_dblib --with-libdir=/lib/x86_64-linux-gnu
 RUN docker-php-ext-install \
   gd \
@@ -56,7 +60,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "unlink('composer-setup.php'); unlink('installer.sig');"
 
 # Instala xdebug
-RUN pecl -v install xdebug
+RUN pecl -v install xdebug-beta
 RUN docker-php-ext-enable xdebug
 
 # Instala rar

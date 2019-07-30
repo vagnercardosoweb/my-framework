@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -23,7 +23,7 @@ class Bcrypt extends Password
      *
      * @return string
      */
-    public function hash($password, array $options = []): string
+    public function make($password, array $options = []): string
     {
         $hash = password_hash(
             $password, $this->algorithm(), $this->getOptions($options)

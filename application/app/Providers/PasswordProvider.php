@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -28,7 +28,7 @@ class PasswordProvider extends Provider
      */
     public function register(): void
     {
-        $this->container['password'] = function () {
+        $this->container['hash'] = function () {
             switch (env('APP_PASSWORD_DRIVER', 'bcrypt')) {
                 case 'bcrypt':
                     return new Bcrypt();

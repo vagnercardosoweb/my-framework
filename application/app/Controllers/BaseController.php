@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -18,7 +18,7 @@ use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
 /**
- * Class Controller.
+ * Class BaseController.
  *
  * @property \Slim\Collection        $settings
  * @property \Slim\Http\Environment  $environment
@@ -29,7 +29,7 @@ use Slim\Http\StatusCode;
  * @property \Core\Session\Session   $session
  * @property \Core\Session\Flash     $flash
  * @property \Core\Mailer\Mailer     $mailer
- * @property \Core\Password\Password $password
+ * @property \Core\Password\Password $hash
  * @property \Core\Encryption        $encryption
  * @property \Core\Jwt               $jwt
  * @property \Core\Logger            $logger
@@ -39,7 +39,7 @@ use Slim\Http\StatusCode;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Controller
+abstract class BaseController
 {
     /**
      * @var \Slim\Http\Request

@@ -1,3 +1,5 @@
+import { mergeObject } from './00-Functions';
+
 /**
  * Inicia as configurações do datatable
  *
@@ -13,7 +15,7 @@ var initDatatable = function (datatables) {
     $.each(datatables, function (key, element) {
       var option = $(element).data('option');
       var options = {};
-      
+
       /* Configurações customizadas */
       if (option !== undefined) {
         /* AJAX */
@@ -28,18 +30,18 @@ var initDatatable = function (datatables) {
             },
           };
         }
-        
+
         /* ORDER BY */
         if (option.order !== undefined) {
           options.order = [option.order];
         }
-        
+
         /* Ativar ORDENAÇÃO */
         if (option.ordering !== undefined) {
           options.ordering = option.ordering;
         }
       }
-      
+
       /* Inicia o datatable */
       $(element).DataTable(mergeObject({
         'destroy': true,

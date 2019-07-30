@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -23,7 +23,7 @@ class Argon extends Password
      *
      * @return string
      */
-    public function hash($value, array $options = []): string
+    public function make($value, array $options = []): string
     {
         $hash = password_hash(
             $value, $this->algorithm(), $this->getOptions()

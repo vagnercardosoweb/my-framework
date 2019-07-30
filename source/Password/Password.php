@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -48,7 +48,7 @@ abstract class Password
      *
      * @return string
      */
-    abstract public function hash($password, array $options = []): string;
+    abstract public function make($password, array $options = []): string;
 
     /**
      * @param string $hash

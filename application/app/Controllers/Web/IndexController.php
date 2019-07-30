@@ -5,19 +5,19 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 30/07/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Web;
 
-use App\Controller\Controller;
+use App\Controller\BaseController;
 
 /**
  * Class IndexController.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class IndexController extends Controller
+class IndexController extends BaseController
 {
     /**
      * [GET] /.
