@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 return [
@@ -14,7 +14,7 @@ return [
     'auth' => env('MAIL_AUTH', true),
     'secure' => env('MAIL_SECURE', 'tls'), // ssl | tls
     'host' => env('MAIL_HOST', null),
-    'post' => env('MAIL_PORT', 587),
+    'port' => env('MAIL_PORT', 587),
     'username' => env('MAIL_USER', null),
     'password' => env('MAIL_PASS', null),
     'from' => [

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -15,6 +15,7 @@ use Core\Helpers\Helper;
 use Core\Router;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Http\StatusCode;
 
 /**
  * Class ErrorProvider.
@@ -30,7 +31,6 @@ class ErrorProvider extends Provider
      */
     public function register(): void
     {
-        // @return \Closure
         $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
             /*
              * @param \Slim\Http\Request  $request
@@ -60,19 +60,18 @@ class ErrorProvider extends Provider
                 }
 
                 if (Helper::isPhpCli() || ($request->isXhr() || Router::hasCurrent('/api/'))) {
-                    return $response->withJson($errors, 500);
+                    return $response->withJson($errors, StatusCode::HTTP_INTERNAL_SERVER_ERROR);
                 }
 
                 return $this->view->render(
                     $response,
                     '@error.500',
                     $errors,
-                    500
+                    StatusCode::HTTP_INTERNAL_SERVER_ERROR
                 );
             };
         };
 
-        // @return \Closure
         $this->container['notFoundHandler'] = function () {
             /*
              * @param \Slim\Http\Request  $request
@@ -89,19 +88,18 @@ class ErrorProvider extends Provider
                             'url' => $uri,
                             'message' => 'Error 404 (Not Found)',
                         ],
-                    ], 404);
+                    ], StatusCode::HTTP_NOT_FOUND);
                 }
 
                 return $this->view->render(
                     $response,
                     '@error.404',
                     ['url' => $uri],
-                    404
+                    StatusCode::HTTP_NOT_FOUND
                 );
             };
         };
 
-        // @return \Closure
         $this->container['notAllowedHandler'] = function () {
             /*
              * @param \Slim\Http\Request  $request
@@ -122,14 +120,14 @@ class ErrorProvider extends Provider
                             'methods' => implode(', ', $methods),
                             'message' => 'Error 405 (Method not Allowed)',
                         ],
-                    ], 405);
+                    ], StatusCode::HTTP_METHOD_NOT_ALLOWED);
                 }
 
                 return $this->view->render($response, '@error.405', [
                     'url' => $uri,
                     'method' => $method,
                     'methods' => implode(', ', $methods),
-                ], 405);
+                ], StatusCode::HTTP_METHOD_NOT_ALLOWED);
             };
         };
     }

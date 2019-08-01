@@ -5,18 +5,36 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
+use Core\App;
 use Core\Helpers\Arr;
+use Core\Helpers\Helper;
+use Core\Helpers\Validate;
+use Core\Router;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\PutenvAdapter;
 use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Dotenv\Environment\DotenvFactory;
+use Slim\Http\StatusCode;
 
-// Constants
+// CONSTANTS
+
 if (!defined('E_USER_SUCCESS')) {
     define('E_USER_SUCCESS', 'success');
+}
+
+if (!defined('DATE_BR')) {
+    define('DATE_BR', 'd/m/Y');
+}
+
+if (!defined('DATE_TIME_BR')) {
+    define('DATE_TIME_BR', 'd/m/Y H:i:s');
+}
+
+if (!defined('DATE_DATABASE')) {
+    define('DATE_DATABASE', 'Y-m-d H:i:s');
 }
 
 if (!function_exists('env')) {
@@ -118,6 +136,41 @@ if (!function_exists('asset_source')) {
     }
 }
 
+if (!function_exists('glob_recursive')) {
+    /**
+     * @param string $pattern
+     * @param int    $flags
+     *
+     * @return array
+     */
+    function glob_recursive($pattern, $flags = 0)
+    {
+        $files = glob($pattern, $flags);
+
+        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+            $files = array_merge($files, glob_recursive($dir.'/'.basename($pattern), $flags));
+        }
+
+        return $files;
+    }
+}
+
+if (!function_exists('onlyNumber')) {
+    /**
+     * @param string $value
+     *
+     * @return int|string
+     */
+    function onlyNumber($value)
+    {
+        if (!empty($value)) {
+            return preg_replace(
+                '/[^0-9]/', '', $value
+            );
+        }
+    }
+}
+
 if (!function_exists('config')) {
     /**
      * @param string $name
@@ -132,7 +185,8 @@ if (!function_exists('config')) {
         if (empty($config)) {
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator(
-                    APP_FOLDER.'/config', FilesystemIterator::SKIP_DOTS
+                    APP_FOLDER.'/config',
+                    FilesystemIterator::SKIP_DOTS
                 )
             );
 
@@ -149,6 +203,89 @@ if (!function_exists('config')) {
         return Arr::get(
             $config, $name, $default
         );
+    }
+}
+
+if (!function_exists('logger')) {
+    /**
+     * @param string $message
+     * @param array  $context
+     * @param string $type
+     * @param string $file
+     *
+     * @return bool|\Monolog\Logger
+     */
+    function logger($message, array $context = [], $type = 'info', $file = null)
+    {
+        return App::getInstance()
+            ->resolve('logger')
+            ->filename($file)
+            ->{$type}(
+                $message,
+                $context
+            );
+    }
+}
+
+if (!function_exists('view')) {
+    /**
+     * @param string $template
+     * @param array  $context
+     * @param int    $status
+     *
+     * @return mixed
+     */
+    function view($template, array $context = [], $status = StatusCode::HTTP_OK)
+    {
+        $response = App::getInstance()->resolve('response');
+
+        return App::getInstance()
+            ->resolve('view')
+            ->render(
+                $response,
+                $template,
+                $context,
+                $status
+            )
+        ;
+    }
+}
+
+if (!function_exists('view_fetch')) {
+    /**
+     * @param string $template
+     * @param array  $context
+     *
+     * @return mixed
+     */
+    function view_fetch($template, array $context = [])
+    {
+        return App::getInstance()
+            ->resolve('view')
+            ->fetch(
+                $template,
+                $context
+            )
+        ;
+    }
+}
+
+if (!function_exists('json')) {
+    /**
+     * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
+     * @return \Slim\Http\Response
+     */
+    function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
+    {
+        return App::getInstance()
+            ->resolve('response')
+            ->withJson(
+                $data, $status, $options
+            )
+        ;
     }
 }
 
@@ -190,13 +327,48 @@ if (!function_exists('htmlentities_recursive')) {
     }
 }
 
-if (!function_exists('filter_values')) {
+if (!function_exists('empty_recursive')) {
+    /**
+     * @param array|object $data
+     *
+     * @return bool
+     */
+    function empty_recursive($data)
+    {
+        return Validate::emptyArrayRecursive($data);
+    }
+}
+
+if (!function_exists('params')) {
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    function params(?string $name = null)
+    {
+        $params = App::getInstance()->resolve('request')->getParams();
+        $params = filter_params($params);
+
+        if (empty($name)) {
+            return $params;
+        }
+
+        if (array_key_exists($name, $params)) {
+            return $params[$name];
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('filter_params')) {
     /**
      * @param mixed $values
      *
      * @return array
      */
-    function filter_values($values)
+    function filter_params($values)
     {
         $result = [];
 
@@ -206,7 +378,7 @@ if (!function_exists('filter_values')) {
 
         foreach ($values as $key => $value) {
             if (is_array($value)) {
-                $result[$key] = filter_values($value);
+                $result[$key] = filter_params($value);
             } else {
                 if (is_int($value)) {
                     $filter = FILTER_SANITIZE_NUMBER_INT;
@@ -228,129 +400,81 @@ if (!function_exists('filter_values')) {
     }
 }
 
-if (!function_exists('preg_replace_space')) {
+if (!function_exists('path_for')) {
     /**
-     * @param string $string
-     * @param bool   $removeEmptyTagParagraph
-     * @param bool   $removeAllEmptyTags
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param string $hash
      *
      * @return string
      */
-    function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
+    function path_for(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
     {
-        // Remove comments
-        $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
-
-        // Remove space with more than one space
-        $string = preg_replace('/\r\n|\r|\n|\t/m', '', $string);
-        $string = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $string);
-
-        // Adds space after. (dot)
-        $string = preg_replace('/(?<=\.)(?=[a-zA-Z])/m', ' ', $string);
-
-        // Remove empty tag paragraph
-        if ($removeEmptyTagParagraph) {
-            $string = preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
-        }
-
-        // Remove all empty tags
-        if ($removeAllEmptyTags) {
-            $string = preg_replace('/<[\w]*[^>]*>[\s\s|&nbsp;]*<\/[\w]*>/m', '', $string);
-        }
-
-        return $string;
+        return Router::pathFor($name, $data, $queryParams, $hash);
     }
 }
 
-if (!function_exists('delete_recursive_directory')) {
+if (!function_exists('header_location')) {
     /**
-     * @param string $path
-     * @param int    $mode
-     *
-     * @return void
+     * @param string $route
+     * @param int    $status
+     * @param bool   $replace
      */
-    function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
+    function header_location(string $route, bool $replace = true, int $status = StatusCode::HTTP_MOVED_PERMANENTLY)
     {
-        if (file_exists($path)) {
-            $interator = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($path),
-                $mode
-            );
+        header("Location: {$route}", $replace, $status);
 
-            $interator->rewind();
-
-            while ($interator->valid()) {
-                if (!$interator->isDot()) {
-                    if ($interator->isFile()) {
-                        @unlink($interator->getPathname());
-                    } else {
-                        @rmdir($interator->getPathname());
-                    }
-                }
-
-                $interator->next();
-            }
-
-            @rmdir($path);
-        }
+        exit;
     }
 }
 
-if (!function_exists('get_month_string')) {
+if (!function_exists('redirect')) {
     /**
-     * @param string $month
-     * @param bool   $english
+     * @param string      $name
+     * @param array       $data
+     * @param array       $queryParams
+     * @param string|null $hash
+     * @param int         $status
      *
-     * @return string
+     * @return \Slim\Http\Response
      */
-    function get_month_string($month, bool $english = false)
+    function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, ?string $hash = null)
     {
-        $months = [
-            '01' => $english ? 'January' : 'Janeiro',
-            '02' => $english ? 'February' : 'Fevereiro',
-            '03' => $english ? 'March' : 'Março',
-            '04' => $english ? 'April' : 'Abril',
-            '05' => $english ? 'May' : 'Maio',
-            '06' => $english ? 'June' : 'Junho',
-            '07' => $english ? 'July' : 'Julho',
-            '08' => $english ? 'August' : 'Agosto',
-            '09' => $english ? 'September' : 'Setembro',
-            '10' => $english ? 'October' : 'Outubro',
-            '11' => $english ? 'November' : 'Novembro',
-            '12' => $english ? 'December' : 'Dezembro',
-        ];
-
-        if (array_key_exists($month, $months)) {
-            return $months[$month];
-        }
-
-        return '';
+        return Router::redirect($name, $data, $queryParams, $status, $hash);
     }
 }
 
-if (!function_exists('get_day_string')) {
+if (!function_exists('is_route')) {
     /**
-     * @param string $day
-     * @param bool   $english
+     * @param string $name
      *
-     * @return string
+     * @return bool|string
      */
-    function get_day_string($day, bool $english = false)
+    function is_route(string $name)
     {
-        $days = [
-            '0' => $english ? 'Sunday' : 'Domingo',
-            '1' => $english ? 'Second Fair' : 'Segunda Feira',
-            '2' => $english ? 'Tuesday' : 'Terça Feira',
-            '3' => $english ? 'Wednesday Fair' : 'Quarta Feira',
-            '4' => $english ? 'Thursday Fair' : 'Quinta Feira',
-            '5' => $english ? 'Friday Fair' : 'Sexta Feira',
-            '6' => $english ? 'Saturday' : 'Sábado',
-        ];
+        Router::isCurrent($name);
+    }
+}
 
-        if (array_key_exists($day, $days)) {
-            return $days[$day];
-        }
+if (!function_exists('has_route')) {
+    /**
+     * @param mixed $routes
+     *
+     * @return bool
+     */
+    function has_route($routes)
+    {
+        return Router::hasCurrent($routes);
+    }
+}
 
-        return '';
+if (!function_exists('is_php_cli')) {
+    /**
+     * @return bool
+     */
+    function is_php_cli()
+    {
+        return Helper::isPhpCli();
     }
 }

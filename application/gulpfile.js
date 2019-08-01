@@ -13,7 +13,7 @@ const babel = require('gulp-babel');
 const browsersync = require('browser-sync').create();
 const plumber = require('gulp-plumber');
 
-// Loader
+// Config
 const config = JSON.parse(
   fs.readFileSync('./resources/assets/config.json', 'UTF8')
 ) || {};

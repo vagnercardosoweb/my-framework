@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -17,12 +17,6 @@ namespace Core;
  */
 class Date extends \DateTime
 {
-    const FORMAT_DATE_BR = 'd/m/Y';
-
-    const FORMAT_DATE_TIME_BR = 'd/m/Y H:i:s';
-
-    const FORMAT_DATE_DATABASE = 'Y-m-d H:i:s';
-
     /**
      * @param string             $time
      * @param \DateTimeZone|null $timezone
@@ -65,7 +59,7 @@ class Date extends \DateTime
     public static function formatFromDateDatabase(string $time = 'now'): string
     {
         return (new self($time))->format(
-            explode(' ', self::FORMAT_DATE_DATABASE)[0]
+            explode(' ', DATE_DATABASE)[0]
         );
     }
 
@@ -76,6 +70,6 @@ class Date extends \DateTime
      */
     public static function formatFromDateTimeDatabase(string $time = 'now'): string
     {
-        return (new self($time))->format(self::FORMAT_DATE_DATABASE);
+        return (new self($time))->format(DATE_DATABASE);
     }
 }

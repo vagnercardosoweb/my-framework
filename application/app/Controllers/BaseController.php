@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -13,6 +13,7 @@ namespace App\Controller;
 use Core\App;
 use Core\Router;
 use Slim\Container;
+use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
@@ -104,6 +105,32 @@ abstract class BaseController
     }
 
     /**
+     * @param string $name
+     * @param string $default
+     *
+     * @return mixed
+     */
+    public function config(string $name = null, $default = null)
+    {
+        return config(
+            $name, $default
+        );
+    }
+
+    /**
+     * @param string $message
+     * @param array  $context
+     * @param string $file
+     * @param string $type
+     *
+     * @return mixed
+     */
+    public function logger(string $message, array $context = [], string $file = null, string $type = 'info')
+    {
+        return logger($message, $context, $type, $file);
+    }
+
+    /**
      * @param mixed $data
      * @param int   $status
      * @param int   $options
@@ -178,7 +205,7 @@ abstract class BaseController
             : $this->request->getParsedBodyParam($key);
 
         if ($filtered) {
-            $result = filter_values($result);
+            $result = filter_params($result);
             $result = empty($key) ? $result : $result[0];
         }
 
@@ -208,7 +235,7 @@ abstract class BaseController
             : $this->request->getQueryParam($key);
 
         if ($filtered) {
-            $result = filter_values($result);
+            $result = filter_params($result);
             $result = empty($key) ? $result : $result[0];
         }
 
@@ -238,7 +265,7 @@ abstract class BaseController
             : $this->request->getParam($key);
 
         if ($filtered) {
-            $result = filter_values($result);
+            $result = filter_params($result);
             $result = empty($key) ? $result : $result[0];
         }
 
@@ -253,6 +280,16 @@ abstract class BaseController
     public function getParamsFiltered(?string $key = null)
     {
         return $this->getParams($key, true);
+    }
+
+    /**
+     * @throws \Slim\Exception\NotFoundException
+     */
+    public function notFound()
+    {
+        throw new NotFoundException(
+            $this->request, $this->response
+        );
     }
 
     /**

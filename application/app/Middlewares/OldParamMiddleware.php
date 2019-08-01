@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -30,7 +30,7 @@ class OldParamMiddleware extends Middleware
     public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
         if (!$request->isXhr()) {
-            $this->view->addGlobal('oldParam', filter_values($request->getParams()));
+            $this->view->addGlobal('oldParam', filter_params($request->getParams()));
         }
 
         return $next($request, $response);

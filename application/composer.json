@@ -24,6 +24,7 @@
     "ext-curl": "*",
     "ext-libxml": "*",
     "ext-openssl": "*",
+    "ext-mbstring": "*",
     "ext-simplexml": "*",
     "illuminate/support": "^5.8",
     "monolog/monolog": "^1.24",

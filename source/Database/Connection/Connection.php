@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -37,7 +37,7 @@ abstract class Connection
      */
     public function getSupportedDrivers(): array
     {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class Connection
     {
         return array_intersect(
             $this->getSupportedDrivers(),
-            str_replace(['dblib', 'pdo_dblib'], 'sqlsrv', \PDO::getAvailableDrivers())
+            str_replace(['pdo_dblib'], 'dblib', \PDO::getAvailableDrivers())
         );
     }
 

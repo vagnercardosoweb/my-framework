@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -78,6 +78,6 @@ class Str extends \Illuminate\Support\Str
             $hashed = bin2hex(openssl_random_pseudo_bytes($lenght));
         }
 
-        return mb_substr(Helper::base64Encode($hashed), 0, $lenght);
+        return mb_substr(Base64::encode($hashed), 0, $lenght);
     }
 }

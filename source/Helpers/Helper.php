@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -115,40 +115,6 @@ class Helper
     }
 
     /**
-     * @param string $data
-     *
-     * @return string
-     */
-    public static function base64Encode(string $data): string
-    {
-        return str_replace(
-            '=', '', strtr(
-                base64_encode($data), '+/', '-_'
-            )
-        );
-    }
-
-    /**
-     * @param string    $data
-     * @param bool|null $strict
-     *
-     * @return bool|string
-     */
-    public static function base64Decode(string $data, ?bool $strict = null)
-    {
-        $remainder = strlen($data) % 4;
-
-        if ($remainder) {
-            $padlen = 4 - $remainder;
-            $data .= str_repeat('=', $padlen);
-        }
-
-        return base64_decode(
-            strtr($data, '-_', '+/'), $strict
-        );
-    }
-
-    /**
      * @param array  $array
      * @param string $prefix
      *
@@ -224,7 +190,7 @@ class Helper
      *
      * @return mixed
      */
-    public static function formatFloat($value)
+    public static function formatNumberFloat($value)
     {
         if (false !== strpos($value, ',')) {
             $value = str_replace(',', '.', str_replace('.', '', $value));

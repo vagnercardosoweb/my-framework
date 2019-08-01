@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -21,6 +21,16 @@ ob_start(function ($buffer) {
 
     return $buffer;
 });
+
+// Cli server
+if (PHP_SAPI == 'cli-server') {
+    $url = parse_url($_SERVER['REQUEST_URI']);
+    $file = __DIR__.$url['path'];
+
+    if (is_file($file)) {
+        return false;
+    }
+}
 
 // Autoload.
 $authload = APP_FOLDER.'/vendor/autoload.php';

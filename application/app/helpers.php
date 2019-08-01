@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -14,66 +14,6 @@ use Core\Helpers\Helper;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
 use Slim\Http\StatusCode;
-
-if (!function_exists('error_code_type')) {
-    /**
-     * @param string|int $type
-     *
-     * @return string
-     */
-    function error_code_type($type)
-    {
-        if (is_string($type) && E_USER_SUCCESS !== $type) {
-            $type = E_USER_ERROR;
-        }
-
-        switch ($type) {
-            case E_USER_NOTICE:
-            case E_NOTICE:
-                $result = 'info';
-                break;
-
-            case E_USER_WARNING:
-            case E_WARNING:
-                $result = 'warning';
-                break;
-
-            case E_USER_ERROR:
-            case E_ERROR:
-            case '0':
-                $result = 'danger';
-                break;
-
-            case E_USER_SUCCESS:
-                $result = 'success';
-                break;
-
-            default:
-                $result = 'danger';
-        }
-
-        return $result;
-    }
-}
-
-if (!function_exists('json')) {
-    /**
-     * @param mixed $data
-     * @param int   $status
-     * @param int   $options
-     *
-     * @return \Slim\Http\Response
-     */
-    function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
-    {
-        return App::getInstance()
-            ->resolve('response')
-            ->withJson(
-                $data, $status, $options
-            )
-        ;
-    }
-}
 
 if (!function_exists('json_error')) {
     /**
@@ -172,6 +112,68 @@ if (!function_exists('json_success')) {
     }
 }
 
+if (!function_exists('error_code_type')) {
+    /**
+     * @param string|int $type
+     *
+     * @return string
+     */
+    function error_code_type($type)
+    {
+        if (is_string($type) && E_USER_SUCCESS !== $type) {
+            $type = E_USER_ERROR;
+        }
+
+        switch ($type) {
+            case E_USER_NOTICE:
+            case E_NOTICE:
+                $result = 'info';
+                break;
+
+            case E_USER_WARNING:
+            case E_WARNING:
+                $result = 'warning';
+                break;
+
+            case E_USER_ERROR:
+            case E_ERROR:
+            case '0':
+                $result = 'danger';
+                break;
+
+            case E_USER_SUCCESS:
+                $result = 'success';
+                break;
+
+            default:
+                $result = 'danger';
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('flash')) {
+    /**
+     * @param string          $name
+     * @param mixed           $value
+     * @param string|int|null $error
+     */
+    function flash(string $name, $value, $error = null)
+    {
+        if ($flash = App::getInstance()->resolve('flash')) {
+            if (!empty($error)) {
+                $value = [
+                    'type' => error_code_type($error),
+                    'message' => $value,
+                ];
+            }
+
+            $flash->add($name, $value);
+        }
+    }
+}
+
 if (!function_exists('get_image')) {
     /**
      * Recupera a imagem do asset.
@@ -242,10 +244,333 @@ if (!function_exists('get_galeria')) {
     }
 }
 
+if (!function_exists('format_number_float')) {
+    /**
+     * @param string|int|float $value
+     *
+     * @return mixed
+     */
+    function format_number_float($value)
+    {
+        return Helper::formatNumberFloat($value);
+    }
+}
+
+if (!function_exists('database_format_money')) {
+    /**
+     * @param string|int|float $money
+     *
+     * @return mixed
+     */
+    function database_format_money($money)
+    {
+        return format_number_float($money);
+    }
+}
+
+if (!function_exists('database_format_datetime')) {
+    /**
+     * @param string|null $dateTime
+     * @param string      $type
+     *
+     * @return string
+     */
+    function database_format_datetime($dateTime = 'now', $type = 'full')
+    {
+        $dateFormat = 'Y-m-d';
+        $timeFormat = 'H:i:s';
+        $dateTimeFormat = "{$dateFormat} {$timeFormat}";
+
+        return datetime($dateTime)->format(
+            ('time' == $type ? $timeFormat : ('date' == $type ? $dateFormat : $dateTimeFormat))
+        );
+    }
+}
+
+if (!function_exists('datetime')) {
+    /**
+     * @param string|\DateTime   $dateTime
+     * @param \DateTimeZone|null $timeZone
+     *
+     * @return \DateTime
+     */
+    function datetime($dateTime = 'now', DateTimeZone $timeZone = null)
+    {
+        if (empty($dateTime)) {
+            return null;
+        }
+
+        if (!$dateTime instanceof \DateTimeInterface) {
+            if (is_int($dateTime)) {
+                $dateTime = Date::createFromTimestamp($dateTime);
+            } else {
+                $dateTime = new Date($dateTime, $timeZone);
+            }
+        }
+
+        return $dateTime;
+    }
+}
+
+if (!function_exists('date_for_human')) {
+    /**
+     * @param string $dateTime
+     * @param int    $precision
+     *
+     * @return string
+     */
+    function date_for_human($dateTime, $precision = 2)
+    {
+        if (empty($dateTime)) {
+            return '-';
+        }
+
+        // Variáveis
+        $minute = 60;
+        $hour = 3600;
+        $day = 86400;
+        $week = 604800;
+        $month = 2629743;
+        $year = 31556926;
+        $century = $year * 10;
+        $decade = $century * 10;
+
+        // Tempos
+        $periods = [
+            $decade => ['decada', 'decadas'],
+            $century => ['seculo', 'seculos'],
+            $year => ['ano', 'anos'],
+            $month => ['mês', 'mêses'],
+            $week => ['semana', 'semanas'],
+            $day => ['dia', 'dias'],
+            $hour => ['hora', 'horas'],
+            $minute => ['minuto', 'minutos'],
+            1 => ['segundo', 'segundos'],
+        ];
+
+        // Time atual
+        $currentTime = (new Date())->getTimestamp();
+        $dateTime = (new Date($dateTime))->getTimestamp();
+
+        // Quanto tempo já passou da data atual - a data passada
+        if ($dateTime > $currentTime) {
+            $passed = $dateTime - $currentTime;
+        } else {
+            $passed = $currentTime - $dateTime;
+        }
+
+        // Monta o resultado
+        if ($passed < 5) {
+            $output = '5 segundos';
+        } else {
+            $output = [];
+            $exit = 0;
+
+            foreach ($periods as $period => $name) {
+                if ($exit >= $precision || $exit > 0 && $period < 1) {
+                    break;
+                }
+
+                $result = floor($passed / $period);
+
+                if ($result > 0) {
+                    $output[] = $result.' '.(1 == $result ? $name[0] : $name[1]);
+                    $passed -= $result * $period;
+                    $exit++;
+                }
+            }
+
+            $output = implode(' e ', $output);
+        }
+
+        return $output;
+    }
+}
+
+if (!function_exists('get_code_video_youtube')) {
+    /**
+     * @param string $url
+     *
+     * @return string|bool
+     */
+    function get_code_video_youtube(string $url)
+    {
+        if (strpos($url, 'youtu.be/')) {
+            preg_match('/(https:|http:|)(\/\/www\.|\/\/|)(.*?)\/(.{11})/i', $url, $matches);
+
+            return $matches[4];
+        }
+        if (strstr($url, '/v/')) {
+            $aux = explode('v/', $url);
+            $aux2 = explode('?', $aux[1]);
+
+            return $aux2[0];
+        }
+        if (strstr($url, 'v=')) {
+            $aux = explode('v=', $url);
+            $aux2 = explode('&', $aux[1]);
+
+            return $aux2[0];
+        }
+        if (strstr($url, '/embed/')) {
+            $aux = explode('/embed/', $url);
+
+            return $aux[1];
+        }
+        if (strstr($url, 'be/')) {
+            $aux = explode('be/', $url);
+
+            return $aux[1];
+        }
+
+        return false;
+    }
+}
+
+if (!function_exists('placeholder')) {
+    /**
+     * @param string|int $dimension
+     * @param array      $params
+     *
+     * @return string
+     */
+    function placeholder($dimension = '500x500', $params = [])
+    {
+        $params = http_build_query($params);
+
+        return "https://via.placeholder.com/{$dimension}?{$params}";
+    }
+}
+
+if (!function_exists('preg_replace_space')) {
+    /**
+     * @param string $string
+     * @param bool   $removeEmptyTagParagraph
+     * @param bool   $removeAllEmptyTags
+     *
+     * @return string
+     */
+    function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
+    {
+        // Remove comments
+        $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
+
+        // Remove space with more than one space
+        $string = preg_replace('/\r\n|\r|\n|\t/m', '', $string);
+        $string = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $string);
+
+        // Adds space after. (dot)
+        $string = preg_replace('/(?<=\.)(?=[a-zA-Z])/m', ' ', $string);
+
+        // Remove empty tag paragraph
+        if ($removeEmptyTagParagraph) {
+            $string = preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
+        }
+
+        // Remove all empty tags
+        if ($removeAllEmptyTags) {
+            $string = preg_replace('/<[\w]*[^>]*>[\s\s|&nbsp;]*<\/[\w]*>/m', '', $string);
+        }
+
+        return $string;
+    }
+}
+
+if (!function_exists('delete_recursive_directory')) {
+    /**
+     * @param string $path
+     * @param int    $mode
+     *
+     * @return void
+     */
+    function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
+    {
+        if (file_exists($path)) {
+            $interator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path),
+                $mode
+            );
+
+            $interator->rewind();
+
+            while ($interator->valid()) {
+                if (!$interator->isDot()) {
+                    if ($interator->isFile()) {
+                        @unlink($interator->getPathname());
+                    } else {
+                        @rmdir($interator->getPathname());
+                    }
+                }
+
+                $interator->next();
+            }
+
+            @rmdir($path);
+        }
+    }
+}
+
+if (!function_exists('get_month_string')) {
+    /**
+     * @param string $month
+     * @param bool   $english
+     *
+     * @return string
+     */
+    function get_month_string($month, bool $english = false)
+    {
+        $months = [
+            '01' => $english ? 'January' : 'Janeiro',
+            '02' => $english ? 'February' : 'Fevereiro',
+            '03' => $english ? 'March' : 'Março',
+            '04' => $english ? 'April' : 'Abril',
+            '05' => $english ? 'May' : 'Maio',
+            '06' => $english ? 'June' : 'Junho',
+            '07' => $english ? 'July' : 'Julho',
+            '08' => $english ? 'August' : 'Agosto',
+            '09' => $english ? 'September' : 'Setembro',
+            '10' => $english ? 'October' : 'Outubro',
+            '11' => $english ? 'November' : 'Novembro',
+            '12' => $english ? 'December' : 'Dezembro',
+        ];
+
+        if (array_key_exists($month, $months)) {
+            return $months[$month];
+        }
+
+        return '';
+    }
+}
+
+if (!function_exists('get_day_string')) {
+    /**
+     * @param string $day
+     * @param bool   $english
+     *
+     * @return string
+     */
+    function get_day_string($day, bool $english = false)
+    {
+        $days = [
+            '0' => $english ? 'Sunday' : 'Domingo',
+            '1' => $english ? 'Second Fair' : 'Segunda Feira',
+            '2' => $english ? 'Tuesday' : 'Terça Feira',
+            '3' => $english ? 'Wednesday Fair' : 'Quarta Feira',
+            '4' => $english ? 'Thursday Fair' : 'Quinta Feira',
+            '5' => $english ? 'Friday Fair' : 'Sexta Feira',
+            '6' => $english ? 'Saturday' : 'Sábado',
+        ];
+
+        if (array_key_exists($day, $days)) {
+            return $days[$day];
+        }
+
+        return '';
+    }
+}
+
 if (!function_exists('upload')) {
     /**
-     * Upload de arquivos/images.
-     *
      * @param array  $file
      * @param string $directory
      * @param string $name
@@ -387,8 +712,6 @@ if (!function_exists('upload_image')) {
 
 if (!function_exists('upload_archive')) {
     /**
-     * Upload de arquivo.
-     *
      * @param array  $file
      * @param string $directory
      * @param string $name
@@ -403,118 +726,51 @@ if (!function_exists('upload_archive')) {
     }
 }
 
-if (!function_exists('date_for_human')) {
+if (!function_exists('upload_error')) {
     /**
-     * @param string $dateTime
-     * @param int    $precision
+     * @param int  $code
+     * @param bool $english
      *
      * @return string
      */
-    function date_for_human($dateTime, $precision = 2)
+    function upload_error($code, $english = false)
     {
-        if (empty($dateTime)) {
-            return '-';
-        }
-
-        // Variáveis
-        $minute = 60;
-        $hour = 3600;
-        $day = 86400;
-        $week = 604800;
-        $month = 2629743;
-        $year = 31556926;
-        $century = $year * 10;
-        $decade = $century * 10;
-
-        // Tempos
-        $periods = [
-            $decade => ['decada', 'decadas'],
-            $century => ['seculo', 'seculos'],
-            $year => ['ano', 'anos'],
-            $month => ['mês', 'mêses'],
-            $week => ['semana', 'semanas'],
-            $day => ['dia', 'dias'],
-            $hour => ['hora', 'horas'],
-            $minute => ['minuto', 'minutos'],
-            1 => ['segundo', 'segundos'],
-        ];
-
-        // Time atual
-        $currentTime = (new Date())->getTimestamp();
-        $dateTime = (new Date($dateTime))->getTimestamp();
-
-        // Quanto tempo já passou da data atual - a data passada
-        if ($dateTime > $currentTime) {
-            $passed = $dateTime - $currentTime;
-        } else {
-            $passed = $currentTime - $dateTime;
-        }
-
-        // Monta o resultado
-        if ($passed < 5) {
-            $output = '5 segundos';
-        } else {
-            $output = [];
-            $exit = 0;
-
-            foreach ($periods as $period => $name) {
-                if ($exit >= $precision || $exit > 0 && $period < 1) {
-                    break;
-                }
-
-                $result = floor($passed / $period);
-
-                if ($result > 0) {
-                    $output[] = $result.' '.(1 == $result ? $name[0] : $name[1]);
-                    $passed -= $result * $period;
-                    $exit++;
-                }
-            }
-
-            $output = implode(' e ', $output);
-        }
-
-        return $output;
+        return Upload::getStringError($code, $english);
     }
 }
 
-if (!function_exists('get_code_video_youtube')) {
+if (!function_exists('upload_fix_orientation')) {
     /**
-     * @param string $url
+     * @param string   $imagePath
+     * @param resource $image
      *
-     * @return string|bool
+     * @return false|resource
      */
-    function get_code_video_youtube(string $url)
+    function upload_fix_orientation($imagePath, $image)
     {
-        if (strpos($url, 'youtu.be/')) {
-            preg_match('/(https:|http:|)(\/\/www\.|\/\/|)(.*?)\/(.{11})/i', $url, $matches);
+        return Upload::fixImageRotate($imagePath, $image);
+    }
+}
 
-            return $matches[4];
-        }
-        if (strstr($url, '/v/')) {
-            $aux = explode('v/', $url);
-            $aux2 = explode('?', $aux[1]);
+if (!function_exists('upload_organize_multiple_files')) {
+    /**
+     * @param array $files
+     *
+     * @return array
+     */
+    function upload_organize_multiple_files(array $files)
+    {
+        return Upload::organizeMultipleFiles($files);
+    }
+}
 
-            return $aux2[0];
-        }
-        if (strstr($url, 'v=')) {
-            $aux = explode('v=', $url);
-            $aux2 = explode('&', $aux[1]);
-
-            return $aux2[0];
-        }
-        if (strstr($url, '/embed/')) {
-            $aux = explode('/embed/', $url);
-
-            return $aux[1];
-        }
-        if (strstr($url, 'be/')) {
-            $aux = explode('be/', $url);
-
-            return $aux[1];
-        }
-
-        return false;
+if (!function_exists('upload_max_filesize')) {
+    /**
+     * @return float|int
+     */
+    function upload_max_filesize()
+    {
+        return Upload::getPhpMaxFilesize();
     }
 }
 
@@ -660,7 +916,7 @@ if (!function_exists('imagemTamExato')) {
             }
 
             // Fix rotate
-            Upload::fixImageRotate($imgSrc, $myImage);
+            $myImage = Upload::fixImageRotate($imgSrc, $myImage);
 
             $ratio_orig = $width_orig / $height_orig;
 
@@ -707,17 +963,5 @@ if (!function_exists('imagemTamExato')) {
         }
 
         return false;
-    }
-}
-
-if (!function_exists('placeholder')) {
-    /**
-     * @param string $uri
-     *
-     * @return string
-     */
-    function placeholder(string $uri = '500x500')
-    {
-        return "https://via.placeholder.com/{$uri}";
     }
 }

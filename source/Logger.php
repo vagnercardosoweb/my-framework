@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -76,8 +76,12 @@ class Logger extends Monolog
      *
      * @return \Core\Logger
      */
-    public function filename($filename): Logger
+    public function filename($filename = null): Logger
     {
+        if (empty($filename)) {
+            return $this;
+        }
+
         $new = clone $this;
         $new->filename = (string)$filename;
         $new->initProcessor();

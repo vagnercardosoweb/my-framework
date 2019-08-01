@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -43,11 +43,13 @@ return [
     'registers' => [
         'functions' => [
             'asset' => 'asset',
-            'asset_source' => 'asset_source',
             'config' => 'config',
-            'path_for' => '\Core\Router::pathFor',
-            'is_current_router' => '\Core\Router::isCurrent',
-            'has_current_router' => '\Core\Router::hasCurrent',
+            'is_route' => 'is_route',
+            'path_for' => 'path_for',
+            'has_route' => 'has_route',
+            'asset_source' => 'asset_source',
+            'placeholder' => 'placeholder',
+            'error_code_type' => 'error_code_type',
             'has_container' => function ($name, $params = []) {
                 return App::getInstance()->resolve($name, $params);
             },
@@ -61,15 +63,13 @@ return [
                     ? "<input type='hidden' name='_csrfToken' id='_csrfToken' value='{$token}'/>"
                     : $token;
             },
-            'placeholder' => 'placeholder',
-            'error_code_type' => 'error_code_type',
         ],
 
         'filters' => [
             'is_string' => 'is_string',
             'is_array' => 'is_array',
-            'get_day' => 'get_day_string',
-            'get_month' => 'get_month_string',
+            'get_day_string' => 'get_day_string',
+            'get_month_string' => 'get_month_string',
         ],
     ],
 ];

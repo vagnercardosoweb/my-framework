@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -123,6 +123,66 @@ class Validate
     }
 
     /**
+     * @param string|int $titleVoter
+     *
+     * @return bool
+     */
+    public static function titleVoter($titleVoter): bool
+    {
+        $titleVoter = str_pad(preg_replace('[^0-9]', '', $titleVoter), 12, '0', STR_PAD_LEFT);
+        $uf = intval(substr($titleVoter, 8, 2));
+
+        if (12 != strlen($titleVoter) || $uf < 1 || $uf > 28) {
+            return false;
+        }
+        $d = 0;
+
+        for ($i = 0; $i < 8; $i++) {
+            $d += $titleVoter[$i] * (9 - $i);
+        }
+
+        $d %= 11;
+
+        if ($d < 2) {
+            if ($uf < 3) {
+                $d = 1 - $d;
+            } else {
+                $d = 0;
+            }
+        } else {
+            $d = 11 - $d;
+        }
+
+        if ($titleVoter[10] != $d) {
+            return false;
+        }
+
+        $d *= 2;
+
+        for ($i = 8; $i < 10; $i++) {
+            $d += $titleVoter[$i] * (12 - $i);
+        }
+
+        $d %= 11;
+
+        if ($d < 2) {
+            if ($uf < 3) {
+                $d = 1 - $d;
+            } else {
+                $d = 0;
+            }
+        } else {
+            $d = 11 - $d;
+        }
+
+        if ($titleVoter[11] != $d) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @param mixed $value
      *
      * @return bool
@@ -198,19 +258,19 @@ class Validate
     }
 
     /**
-     * @param array|object $array
+     * @param array|object $data
      *
      * @return bool
      */
-    public static function emptyArrayRecursive($array): bool
+    public static function emptyArrayRecursive($data): bool
     {
-        $array = Obj::toArray($array);
+        $data = Obj::toArray($data);
 
-        if (empty($array)) {
+        if (empty($data)) {
             return true;
         }
 
-        foreach ((array)$array as $key => $value) {
+        foreach ((array)$data as $key => $value) {
             if (is_array($value)) {
                 return self::emptyArrayRecursive($value);
             }

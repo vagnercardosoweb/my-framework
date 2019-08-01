@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -41,6 +41,11 @@ abstract class Model
     /**
      * @var string
      */
+    protected $driver;
+
+    /**
+     * @var string
+     */
     protected $table;
 
     /**
@@ -49,14 +54,14 @@ abstract class Model
     protected $primaryKey = 'id';
 
     /**
+     * @var int
+     */
+    protected $fetchStyle;
+
+    /**
      * @var \Core\Database\Connection\Statement
      */
     protected $statement;
-
-    /**
-     * @var string
-     */
-    protected $driver;
 
     /**
      * @var array
@@ -316,6 +321,18 @@ abstract class Model
     }
 
     /**
+     * @param string|array $bindings
+     *
+     * @return $this
+     */
+    public function bindings($bindings)
+    {
+        Helper::parseStr($bindings, $this->bindings);
+
+        return $this;
+    }
+
+    /**
      * @param \Closure $callback
      *
      * @throws \Exception
@@ -350,27 +367,26 @@ abstract class Model
      */
     public function save($data = [], bool $validate = true): self
     {
-        $this->reset();
+        $where = implode(' ', $this->where);
+        $bindings = $this->bindings;
         $this->data($data, $validate);
+        $this->reset();
 
-        if ($row = $this->fetchById($this->getPrimaryValue())) {
-            $where = implode(' ', $this->where);
-
+        if ($this->fetchById($this->getPrimaryValue())) {
             if (!empty($this->getPrimaryValue())) {
                 $where = "{$this->table}.{$this->getPrimaryKey()} = :pkid {$where}";
-                $this->bindings['pkid'] = $this->getPrimaryValue();
+                $bindings['pkid'] = $this->getPrimaryValue();
             }
 
-            $row->data = $this->db
+            $this->data($this->db
                 ->driver($this->driver)
                 ->update(
                     $this->table, $this->data,
                     sprintf('WHERE %s', $this->normalizeProperty($where)),
-                    $this->bindings
-                )
-            ;
+                    $bindings
+                ));
 
-            return $row;
+            return $this;
         }
 
         $lastInsertId = $this->db
@@ -382,50 +398,9 @@ abstract class Model
             return $this->fetchById($lastInsertId);
         }
 
-        // Clear conditions query
         $this->clear();
 
         return $this;
-    }
-
-    /**
-     * @param array|object $data
-     * @param bool         $validate
-     *
-     * @return $this
-     */
-    public function data($data, bool $validate = true): self
-    {
-        $data = array_merge(
-            Obj::toArray($this->data),
-            Obj::toArray($data)
-        );
-
-        if (method_exists($this, '_data')) {
-            $this->_data($data, $validate);
-        }
-
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryValue()
-    {
-        return $this->{$this->getPrimaryKey()};
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
     }
 
     /**
@@ -462,13 +437,38 @@ abstract class Model
     }
 
     /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @return $this
+     */
+    public function data($data, bool $validate = true): self
+    {
+        $data = array_merge(
+            Obj::toArray($this->data),
+            Obj::toArray($data)
+        );
+
+        if (method_exists($this, '_data')) {
+            $this->_data($data, $validate);
+        }
+
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+
+        return $this;
+    }
+
+    /**
      * @param int|array $id
+     * @param int       $fetchStyle
      *
      * @throws \Exception
      *
      * @return $this|array[$this]|null
      */
-    public function fetchById($id): ?self
+    public function fetchById($id, $fetchStyle = null): ?self
     {
         if (!empty($id)) {
             if (is_array($id)) {
@@ -489,7 +489,7 @@ abstract class Model
             return null;
         }
 
-        return $this->fetch();
+        return $this->fetch($fetchStyle);
     }
 
     /**
@@ -507,30 +507,27 @@ abstract class Model
     }
 
     /**
-     * @param string|array $bindings
+     * @param int   $fetchStyle
+     * @param mixed $fetchArgument
      *
-     * @return $this
-     */
-    public function bindings($bindings)
-    {
-        Helper::parseStr($bindings, $this->bindings);
-
-        return $this;
-    }
-
-    /**
      * @throws \Exception
      *
      * @return array[$this]|null
      */
-    public function fetchAll()
+    public function fetchAll($fetchStyle = null, $fetchArgument = null)
     {
+        if (empty($fetchStyle) && $this->fetchStyle) {
+            $fetchStyle = $this->fetchStyle;
+        }
+
         $this->buildSqlStatement();
 
-        $rows = $this->statement->fetchAll(
-            \PDO::FETCH_CLASS,
-            get_called_class()
-        );
+        if ($this->statement->isFetchObject($fetchStyle)) {
+            $fetchStyle = \PDO::FETCH_CLASS;
+            $fetchArgument = get_called_class();
+        }
+
+        $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
 
         if (!empty($rows)) {
             foreach ($rows as $index => $row) {
@@ -546,17 +543,25 @@ abstract class Model
     }
 
     /**
+     * @param int $fetchStyle
+     *
      * @throws \Exception
      *
      * @return $this|null
      */
-    public function fetch(): ?self
+    public function fetch($fetchStyle = null): ?self
     {
+        if (empty($fetchStyle) && $this->fetchStyle) {
+            $fetchStyle = $this->fetchStyle;
+        }
+
         $this->buildSqlStatement();
 
-        $row = $this->statement->fetch(
-            get_called_class()
-        );
+        if ($this->statement->isFetchObject($fetchStyle)) {
+            $fetchStyle = get_called_class();
+        }
+
+        $row = $this->statement->fetch($fetchStyle);
 
         if (!empty($row)) {
             if (method_exists($this, '_row')) {
@@ -565,6 +570,22 @@ abstract class Model
         }
 
         return $row ?: null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryValue()
+    {
+        return $this->{$this->getPrimaryKey()};
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
     }
 
     /**
@@ -596,14 +617,13 @@ abstract class Model
             );
         }
 
-        $this->data = $this->db
+        $this->data($this->db
             ->driver($this->driver)
             ->delete(
                 $this->table,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            )
-        ;
+            ));
 
         $this->clear();
 

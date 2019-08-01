@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -17,7 +17,7 @@ use Core\Helpers\Validate;
  *
  * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class User extends Model
+class User extends BaseModel
 {
     /**
      * @var string
@@ -45,8 +45,8 @@ class User extends Model
         // Validate
         if ($validate) {
             Validate::rules($data, [
-                'name!!' => ['required' => 'Nome não pode ser vázio.'],
-                'email!!' => [
+                'name' => ['required' => 'Nome não pode ser vázio.'],
+                'email' => [
                     'email' => 'O E-mail informado não é válido.',
                     'databaseNotExists' => [
                         'message' => 'O e-mail digitado já foi registrado.',
@@ -64,7 +64,7 @@ class User extends Model
 
         // Password
         if (!empty($data['password'])) {
-            $data['password'] = $this->password->hash($data['password']);
+            $data['password'] = $this->hash->make($data['password']);
         }
     }
 }

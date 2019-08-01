@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -46,13 +46,13 @@ class Router
     }
 
     /**
-     * @param string|array $router
+     * @param string|array $routes
      *
      * @return bool
      */
-    public static function hasCurrent($router): bool
+    public static function hasCurrent($routes): bool
     {
-        if (empty($router)) {
+        if (empty($routes)) {
             return false;
         }
 
@@ -62,7 +62,7 @@ class Router
             ->getPath()
         ;
 
-        foreach ((array)$router as $route) {
+        foreach ((array)$routes as $route) {
             if (false !== mb_strpos($current, $route)) {
                 return true;
             }
@@ -100,16 +100,15 @@ class Router
      * @param array       $data
      * @param array       $queryParams
      * @param string|null $hash
+     * @param int         $status
      *
      * @return \Slim\Http\Response
      */
-    public static function redirect(string $name, array $data = [], array $queryParams = [], ?string $hash = null)
+    public static function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, ?string $hash = null)
     {
         try {
-            $status = StatusCode::HTTP_FOUND;
             $location = self::pathFor($name, $data, $queryParams, $hash);
         } catch (\Exception $e) {
-            $status = StatusCode::HTTP_MOVED_PERMANENTLY;
             $queryParams = Helper::httpBuildQuery(array_merge_recursive($data, $queryParams));
             $location = "{$name}{$queryParams}{$hash}";
         }

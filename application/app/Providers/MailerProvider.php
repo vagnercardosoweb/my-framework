@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 30/07/2019 Vagner Cardoso
+ * @copyright 01/08/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -33,7 +33,7 @@ class MailerProvider extends Provider
                 'auth' => config('mail.auth', true),
                 'secure' => config('mail.secure', 'tls'),
                 'host' => config('mail.host', null),
-                'post' => config('mail.post', 587),
+                'port' => config('mail.port', 587),
                 'username' => config('mail.username', null),
                 'password' => config('mail.password', null),
                 'from' => [
