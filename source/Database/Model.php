@@ -36,7 +36,7 @@ use Core\Helpers\Obj;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Model
+abstract class Model implements \ArrayAccess
 {
     /**
      * @var string
@@ -163,6 +163,43 @@ abstract class Model
     public function __unset($name)
     {
         unset($this->data->{$name});
+    }
+
+    /**
+     * @param mixed $name
+     *
+     * @return mixed
+     */
+    public function offsetGet($name)
+    {
+        return $this->__get($name);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function offsetSet($name, $value)
+    {
+        $this->__set($name, $value);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function offsetExists($name)
+    {
+        return $this->__isset($name);
+    }
+
+    /**
+     * @param string $name
+     */
+    public function offsetUnset($name)
+    {
+        $this->__unset($name);
     }
 
     /**

@@ -95,7 +95,7 @@ class Request
 
         if ('GET' === $method) {
             $separator = false !== strpos($endPoint, '?') ? '&' : '?';
-            $endPoint .= "{$separator}{$params}";
+            $endPoint .= sprintf('%s%s', $separator, is_string($params) ? $params : '');
         }
 
         // Init curl

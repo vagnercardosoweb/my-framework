@@ -38,8 +38,8 @@ class User extends BaseModel
     protected function _data(array &$data, $validate)
     {
         // Where
-        $where = !empty($this->getPrimaryValue())
-            ? sprintf('AND %s.%s != "%s"', $this->table, $this->primaryKey, $this->getPrimaryValue())
+        $where = !empty($data[$this->primaryKey])
+            ? sprintf('AND %s.%s != "%s"', $this->table, $this->primaryKey, $data[$this->primaryKey])
             : null;
 
         // Validate
