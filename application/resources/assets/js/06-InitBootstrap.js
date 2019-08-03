@@ -2,7 +2,7 @@ import { getJSON } from './00-Functions';
 import { vcAjax } from './01-RequestForm';
 
 /* Carrega o documento */
-$(document).ready(function () {
+$(document).ready(function() {
   /* INIT :: Tooltip */
 
   $('*[data-toggle="tooltip"]').tooltip();
@@ -24,7 +24,7 @@ $(document).ready(function () {
    * <button data-modal="{{ modalId|json_encode }}">---</button>
    */
 
-  $(document).on('click', '*[data-modal]', function (event) {
+  $(document).on('click', '*[data-modal]', function(event) {
     event.preventDefault();
     event.stopPropagation();
 

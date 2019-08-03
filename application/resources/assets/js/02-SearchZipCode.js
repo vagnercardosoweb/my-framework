@@ -1,8 +1,8 @@
 import { getJSON } from './00-Functions';
 
 /* Carrega o documento */
-$(document).ready(function () {
-  function beforeSend (text, increment) {
+$(document).ready(function() {
+  function beforeSend(text, increment) {
     $('#cep-logradouro' + increment).val(text);
     $('#cep-complemento' + increment).val(text);
     $('#cep-bairro' + increment).val(text);
@@ -16,7 +16,7 @@ $(document).ready(function () {
   }
 
   /* Realiza a pesquisa do dados */
-  $(document).on('change', '*[data-cep]', function (event) {
+  $(document).on('change', '*[data-cep]', function(event) {
     /* Variáveis */
     var elementValue = $(event.currentTarget).val().replace(/\D/g, '');
     var elementJson = getJSON($(this).data('cep')) || {};
@@ -25,9 +25,9 @@ $(document).ready(function () {
     if (elementValue.length === 8 && /^[0-9]{8}$/.test(elementValue)) {
       beforeSend('Aguarde....', elementJson.increment);
 
-      $.get('/api/util/zipcode/' + elementValue, function (retornoJson) {
+      $.get('/api/util/zipcode/' + elementValue, function(retornoJson) {
         if (!retornoJson.error) {
-          $.each(retornoJson, function (index, value) {
+          $.each(retornoJson, function(index, value) {
             /* Trata lat e long */
             if (['latitude', 'longitude'].includes(index)) {
               value = value.replace(',', '.');
@@ -68,7 +68,7 @@ $(document).ready(function () {
 
           alert(json.error.message);
         }
-      }, 'json').catch(function (error) {
+      }, 'json').catch(function(error) {
         /* Trata erro */
         beforeSend('', elementJson.increment);
         var response = getJSON(error.responseText);
@@ -91,7 +91,7 @@ $(document).ready(function () {
  * @param {Object} json
  */
 
-function initMapChangePosition (json) {
+function initMapChangePosition(json) {
   try {
     /* Latitude e longitude */
     var position = new google.maps.LatLng(
@@ -115,7 +115,7 @@ function initMapChangePosition (json) {
     });
 
     /* Evento ao mover o marcador */
-    marker.addListener('dragend', function (event) {
+    marker.addListener('dragend', function(event) {
       $('#cep-latitude' + json.increment).val(event.latLng.lat());
       $('#cep-longitude' + json.increment).val(event.latLng.lng());
     });

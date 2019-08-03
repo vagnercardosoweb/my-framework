@@ -1,7 +1,7 @@
 import { getJSON } from './00-Functions';
 
 /* Carrega o documento */
-$(document).ready(function () {
+$(document).ready(function() {
   /**
    * Função para montar o link de compartilhamento
    *
@@ -11,7 +11,7 @@ $(document).ready(function () {
    * @param {String} hashtags
    * @returns {string}
    */
-  var mountShareUrl = function (type, link, text, hashtags) {
+  var mountShareUrl = function(type, link, text, hashtags) {
     /* Variáveis */
     var twitterVia = $('*meta[property="twitter:site"]').attr('content') || '';
     var twitter = [];
@@ -51,6 +51,9 @@ $(document).ready(function () {
       case 'google':
         mounted = 'https://plus.google.com/share?url=' + link + '&hl=pt-BR';
         break;
+      case 'linkedin':
+        mounted = `https://www.linkedin.com/shareArticle?url=${link}&title=${text}`;
+        break;
     }
 
     return mounted;
@@ -62,7 +65,7 @@ $(document).ready(function () {
   // vc-share="https://api.whatsapp.com/send?text=TEXT|URL_ENCODE"
 
   /* Realiza o compartilhamento para as redes sociais. */
-  $(document).on('click', '*[vc-share]', function (event) {
+  $(document).on('click', '*[vc-share]', function(event) {
     event.preventDefault(event);
 
     /* Variáveis */

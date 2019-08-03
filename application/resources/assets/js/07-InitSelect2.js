@@ -10,7 +10,7 @@ import { getJSON } from './00-Functions';
 
 export function initSelect2(selects2) {
   if (selects2.length) {
-    $.each(selects2, function (key, element) {
+    $.each(selects2, function(key, element) {
       var json = getJSON(($(element).data('json') || $(element).data('option'))) || {};
 
       var options = new Object({
@@ -33,9 +33,9 @@ export function initSelect2(selects2) {
             dataType: json.dataType !== undefined ? json.dataType : 'json',
             delay: json.delay !== undefined ? json.delay : 250,
             cache: json.cache !== undefined ? json.cache : false,
-            headers: {'X-Csrf-Token': $('meta[name="_csrfToken"]').attr('content') || ''},
+            headers: { 'X-Csrf-Token': $('meta[name="_csrfToken"]').attr('content') || '' },
 
-            data: function (param) {
+            data: function(param) {
               var params = {
                 term: param.term || '',
                 page: param.page || 1,
@@ -56,11 +56,11 @@ export function initSelect2(selects2) {
             },
           },
 
-          escapeMarkup: function (markup) {
+          escapeMarkup: function(markup) {
             return markup;
           },
 
-          templateResult: function (state) {
+          templateResult: function(state) {
             if (state.loading) {
               return state.text;
             }
@@ -68,7 +68,7 @@ export function initSelect2(selects2) {
             return state.name || state.text;
           },
 
-          templateSelection: function (state) {
+          templateSelection: function(state) {
             return state.name || state.text;
           },
         });
@@ -81,12 +81,12 @@ export function initSelect2(selects2) {
 };
 
 /* Carrega o documento */
-$(document).ready(function () {
+$(document).ready(function() {
   /* INIT :: Select2 */
   var selects2 = $(document).find('*[data-toggle="select2"]');
 
   if (typeof onLoadHtmlSuccess !== 'undefined' && typeof onLoadHtmlSuccess === 'function') {
-    onLoadHtmlSuccess(function () {
+    onLoadHtmlSuccess(function() {
       initSelect2(selects2);
     });
   } else {
