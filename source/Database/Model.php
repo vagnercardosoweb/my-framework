@@ -381,7 +381,8 @@ abstract class Model
             $this->data($this->db
                 ->driver($this->driver)
                 ->update(
-                    $this->table, $this->data,
+                    $this->table,
+                    $this->data,
                     sprintf('WHERE %s', $this->normalizeProperty($where)),
                     $bindings
                 ));

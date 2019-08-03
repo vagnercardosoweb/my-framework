@@ -75,7 +75,8 @@ class Database
         }
 
         throw new \BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR
+            sprintf('Call to undefined method %s::%s()', get_class(), $method),
+            E_USER_ERROR
         );
     }
 
@@ -168,7 +169,8 @@ class Database
         try {
             if (empty($sql)) {
                 throw new \InvalidArgumentException(
-                    'Parameter $sql can not be empty.', E_ERROR
+                    'Parameter $sql can not be empty.',
+                    E_ERROR
                 );
             }
 
@@ -290,7 +292,8 @@ class Database
             array_shift($arguments);
 
             return $event->emit(
-                (string)$name, ...$arguments
+                (string)$name,
+                ...$arguments
             );
         }
 
