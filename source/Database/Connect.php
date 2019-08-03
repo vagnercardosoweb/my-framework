@@ -69,8 +69,9 @@ class Connect
 
         if (empty($config)) {
             throw new \RuntimeException(
-            "Driver '{$driver}' not configured in database.", E_USER_ERROR
-        );
+                "Driver '{$driver}' not configured in database.",
+                E_USER_ERROR
+            );
         }
 
         if (empty(self::$instances[$driver])) {

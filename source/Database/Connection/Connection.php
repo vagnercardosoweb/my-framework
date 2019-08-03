@@ -97,25 +97,29 @@ abstract class Connection
     {
         if (empty($config['host'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' host not configured.", E_USER_ERROR
+                "'{$config['driver']}' host not configured.",
+                E_USER_ERROR
             );
         }
 
         if (empty($config['username'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' username not configured.", E_USER_ERROR
+                "'{$config['driver']}' username not configured.",
+                E_USER_ERROR
             );
         }
 
         if (empty($config['password']) && empty($config['notPassword'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' password not configured.", E_USER_ERROR
+                "'{$config['driver']}' password not configured.",
+                E_USER_ERROR
             );
         }
 
         if (empty($config['database']) && empty($config['notDatabase'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' database not configured.", E_USER_ERROR
+                "'{$config['driver']}' database not configured.",
+                E_USER_ERROR
             );
         }
     }
@@ -138,7 +142,8 @@ abstract class Connection
     protected function setDefaultStatement(\PDO $connection): void
     {
         $connection->setAttribute(
-            \PDO::ATTR_STATEMENT_CLASS, [Statement::class, [$connection]]
+            \PDO::ATTR_STATEMENT_CLASS,
+            [Statement::class, [$connection]]
         );
     }
 
