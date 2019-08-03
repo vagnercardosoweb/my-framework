@@ -92,14 +92,14 @@ if (!function_exists('json_success')) {
         }
 
         foreach ([
-            'storage',
-            'object',
-            'clear',
-            'trigger',
-            'switch',
-            'location',
-            'reload',
-        ] as $excluded) {
+                     'storage',
+                     'object',
+                     'clear',
+                     'trigger',
+                     'switch',
+                     'location',
+                     'reload',
+                 ] as $excluded) {
             if (isset($data[$excluded])) {
                 unset($data[$excluded]);
             }
