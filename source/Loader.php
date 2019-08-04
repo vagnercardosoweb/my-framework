@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 04/08/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -34,7 +34,7 @@ class Loader
             Dotenv::create(APP_FOLDER, '.env', new DotenvFactory([
                 new EnvConstAdapter(),
                 new PutenvAdapter(),
-                new ServerConstAdapter(),
+                // new ServerConstAdapter(),
             ]))->overload();
         } else {
             $pathEnvExample = APP_FOLDER.'/.env-example';

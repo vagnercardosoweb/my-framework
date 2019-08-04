@@ -200,23 +200,21 @@ class Helper
     }
 
     /**
-     * @param string|array $encodedString
+     * @param string|array $encoded
      * @param array|string $result
      */
-    public static function parseStr($encodedString, &$result): void
+    public static function parseStr($encoded, &$result)
     {
-        if (!empty($encodedString)) {
-            if (is_string($encodedString)) {
-                if (function_exists('mb_parse_str')) {
-                    mb_parse_str($encodedString, $result);
-                } else {
-                    parse_str($encodedString, $result);
-                }
-            } else {
-                $result = $encodedString;
+        if (!empty($encoded)) {
+            if (is_string($encoded)) {
+                mb_parse_str($encoded, $encoded);
             }
 
-            foreach ($result as $key => $value) {
+            if (is_string($result)) {
+                mb_parse_str($result, $result);
+            }
+
+            foreach ($encoded as $key => $value) {
                 $result[$key] = filter_var($value, FILTER_DEFAULT);
             }
         }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 04/08/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -406,7 +406,11 @@ abstract class Model implements \ArrayAccess
     {
         $where = implode(' ', $this->where);
         $bindings = $this->bindings;
-        $this->data($data, $validate);
+
+        if (!empty($data)) {
+            $this->data($data, $validate);
+        }
+
         $this->reset();
 
         if ($this->fetchById($this->getPrimaryValue())) {
@@ -415,14 +419,15 @@ abstract class Model implements \ArrayAccess
                 $bindings['pkid'] = $this->getPrimaryValue();
             }
 
-            $this->data($this->db
+            $this->data = $this->db
                 ->driver($this->driver)
                 ->update(
                     $this->table,
                     $this->data,
                     sprintf('WHERE %s', $this->normalizeProperty($where)),
                     $bindings
-                ));
+                )
+            ;
 
             return $this;
         }
@@ -433,7 +438,10 @@ abstract class Model implements \ArrayAccess
         ;
 
         if (!empty($lastInsertId)) {
-            return $this->fetchById($lastInsertId);
+            return $this->fetchById(
+                $lastInsertId,
+                \PDO::FETCH_OBJ
+            );
         }
 
         $this->clear();
@@ -519,7 +527,7 @@ abstract class Model implements \ArrayAccess
             }
 
             $this->where("AND {$this->table}.{$this->primaryKey} = :pkbyid", [
-                'pkbyid' => filter_var($id, FILTER_DEFAULT),
+                'pkbyid' => filter_params($id)[0],
             ]);
         }
 
@@ -655,13 +663,14 @@ abstract class Model implements \ArrayAccess
             );
         }
 
-        $this->data($this->db
+        $this->data = $this->db
             ->driver($this->driver)
             ->delete(
                 $this->table,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            ));
+            )
+        ;
 
         $this->clear();
 

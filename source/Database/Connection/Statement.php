@@ -147,8 +147,9 @@ class Statement extends \PDOStatement
                     : null;
 
                 $this->bindValue(
-                    (is_string($key) ? ":{$key}" : ((int)$key + 1)), $value,
-                    (is_int($value) ? \PDO::PARAM_BOOL : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR))
+                    (is_string($key) ? ":{$key}" : ((int)$key + 1)),
+                    $value,
+                    (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR))
                 );
             }
         }

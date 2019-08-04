@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 04/08/2019 Vagner Cardoso
  */
 
 namespace Core\Session;
@@ -66,6 +66,15 @@ class Flash
 
         // Adiciona uma nova mensagem
         $this->storage[$name] = $value;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function add($name, $value)
+    {
+        $this->set($name, $value);
     }
 
     /**

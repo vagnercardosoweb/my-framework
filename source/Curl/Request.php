@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 04/08/2019 Vagner Cardoso
  */
 
 namespace Core\Curl;
@@ -143,7 +143,11 @@ class Request
         $headers = [];
 
         foreach ($this->headers as $key => $value) {
-            $headers[] = "{$key}: {$value}";
+            if (empty($key) || is_numeric($key) || !is_string($key)) {
+                $headers[] = $value;
+            } else {
+                $headers[] = "{$key}: {$value}";
+            }
         }
 
         return $headers;
@@ -157,12 +161,17 @@ class Request
      */
     public function setHeaders($keys, $value = null): Request
     {
+        if (is_string($keys) && strpos($keys, ':')) {
+            $split = explode(':', $keys);
+            $keys = [$split[0], $split[1]];
+        }
+
         if (!is_array($keys)) {
             $keys = [$keys => $value];
         }
 
         foreach ($keys as $k => $v) {
-            $this->headers[$k] = $v;
+            $this->headers[trim($k)] = trim($v);
         }
 
         return $this;
