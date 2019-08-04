@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 04/08/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -79,10 +79,10 @@ abstract class Connection
             $connection = new \PDO($dsn, $username, $password, $options);
 
             $this->setDefaultStatement($connection);
-            $this->setDefaultAttributesAndCommands($connection, $config);
             $this->setDefaultSchema($connection, $config);
             $this->setDefaultEncoding($connection, $config);
             $this->setDefaultTimezone($connection, $config);
+            $this->setDefaultAttributesAndCommands($connection, $config);
 
             return $connection;
         } catch (\PDOException $e) {
