@@ -9,17 +9,22 @@
  * @returns {string|*}
  */
 
-export function number_format(numero, decimal, decimal_separador, milhar_separador) {
+export function number_format(
+  numero,
+  decimal,
+  decimal_separador,
+  milhar_separador
+) {
   numero = (numero + '').replace(/[^0-9+\-Ee.]/g, '');
-  var n          = !isFinite(+numero) ? 0 : +numero,
-      prec       = !isFinite(+decimal) ? 0 : Math.abs(decimal),
-      sep        = typeof milhar_separador === 'undefined' ? ',' : milhar_separador,
-      dec        = typeof decimal_separador === 'undefined' ? '.' : decimal_separador,
-      s          = '',
-      toFixedFix = function(n, prec) {
-        var k = Math.pow(10, prec);
-        return '' + Math.round(n * k) / k;
-      };
+  var n = !isFinite(+numero) ? 0 : +numero,
+    prec = !isFinite(+decimal) ? 0 : Math.abs(decimal),
+    sep = typeof milhar_separador === 'undefined' ? ',' : milhar_separador,
+    dec = typeof decimal_separador === 'undefined' ? '.' : decimal_separador,
+    s = '',
+    toFixedFix = function(n, prec) {
+      var k = Math.pow(10, prec);
+      return '' + Math.round(n * k) / k;
+    };
 
   s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
 
@@ -63,7 +68,7 @@ export function isLength(element, length) {
     return $(element).val(
       $(element)
         .val()
-        .substr(0, length - 1),
+        .substr(0, length - 1)
     );
   }
 }
@@ -107,7 +112,7 @@ export function isLength(element, length) {
 
     remove: function(key) {
       window.localStorage.removeItem(key);
-    },
+    }
   };
 })(window);
 
@@ -131,8 +136,6 @@ export function mergeObject(object, source) {
 }
 
 /**
- * Mostra a imagem
- *
  * @param input
  * @param find
  */
@@ -149,6 +152,13 @@ export function previewImage(input, find) {
   }
 }
 
+if (typeof jQuery !== 'undefined') {
+  $(document).on('change', '*[data-preview]', function(event) {
+    event.preventDefault();
+    previewImage($(this)[0], $(this).data('preview'));
+  });
+}
+
 /**
  * Calcula o tempo para o upload
  *
@@ -157,14 +167,13 @@ export function previewImage(input, find) {
  */
 
 export function calculateTimeUpload(duration) {
-
   if (!Number.isFinite(duration)) {
     return 'calculando tempo...';
   }
 
   var seconds = parseInt((duration / 1000) % 60),
-      minutes = parseInt((duration / (1000 * 60)) % 60),
-      hours   = parseInt((duration / (1000 * 60 * 60)) % 24);
+    minutes = parseInt((duration / (1000 * 60)) % 60),
+    hours = parseInt((duration / (1000 * 60 * 60)) % 24);
 
   if (hours > 0) {
     return hours + ' horas, ' + minutes + ' minutos e ' + seconds + ' segundos';

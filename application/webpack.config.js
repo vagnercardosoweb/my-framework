@@ -4,11 +4,14 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
 module.exports = {
-  mode: process.env.NODE_ENV || 'development',
+  mode: NODE_ENV,
+  devtool: NODE_ENV === 'development' ? 'source-map' : false,
   entry: {
     web: path.resolve(__dirname, 'resources', 'assets', 'web.js')
-    // adm: path.resolve(__dirname, 'resources', 'assets', 'adm.js'),
+    // admin: path.resolve(__dirname, 'resources', 'assets', 'admin.js')
   },
   output: {
     path: path.resolve(__dirname, '..', 'public_html', 'assets'),
@@ -78,13 +81,18 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
+            presets: ['@babel/preset-env', '@babel/preset-react']
           }
         }
+      },
+      {
+        test: /\.vue$/,
+        exclude: /(node_modules|bower_components)/,
+        use: 'vue-loader'
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.css', '.scss', '.sass']
+    extensions: ['.js', '.jsx', '.ts', '.vue', '.css', '.scss', '.sass']
   }
 };
