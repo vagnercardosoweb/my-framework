@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 14/08/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -183,13 +183,14 @@ abstract class BaseController
      * @param string      $name
      * @param array       $data
      * @param array       $queryParams
+     * @param int         $status
      * @param string|null $hash
      *
      * @return \Slim\Http\Response
      */
-    public function redirect(string $name, array $data = [], array $queryParams = [], string $hash = null): ?Response
+    public function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, ?string $hash = null): ?Response
     {
-        return Router::redirect($name, $data, $queryParams, $hash);
+        return Router::redirect($name, $data, $queryParams, $status, $hash);
     }
 
     /**

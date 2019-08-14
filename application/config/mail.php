@@ -19,7 +19,9 @@ return [
     'password' => env('MAIL_PASS', null),
     'from' => [
         'name' => env('MAIL_FROM_NAME', null),
-        'mail' => env('MAIL_FROM_MAIL', null),
+        'mail' => env('MAIL_FROM_MAIL', sprintf('no-reply@%s', preg_replace(
+            '/^localhost$/i', 'localhost.dev', $_SERVER['HTTP_HOST'])
+        )),
     ],
     'language' => [
         'code' => env('MAIL_LANGUAGE_CODE', null),

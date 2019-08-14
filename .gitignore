@@ -1,3 +1,4 @@
+/**/.DS_Store
 /**/.idea/
 /**/.env
 /**/vendor/
@@ -5,16 +6,22 @@
 /**/composer.lock
 /**/package-lock.json
 /**/yarn.lock
-/**/bower_components/
+/**/*.map
+
+# Docker
 /**/docker/apache/logs/*
 !/**/docker/apache/logs/.gitkeep
 /**/docker/mysql/*
 !/**/docker/mysql/.gitkeep
 /**/docker/postgres/*
 !/**/docker/postgres/.gitkeep
+
+# Application storage
 /**/storage/cache/*
 !/**/storage/cache/.gitkeep
 /**/storage/logs/*
 !/**/storage/logs/.gitkeep
+
+# Public folder
 /**/public_html/uploads/*
 !/**/public_html/uploads/.gitkeep

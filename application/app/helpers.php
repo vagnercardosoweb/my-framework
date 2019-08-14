@@ -965,3 +965,15 @@ if (!function_exists('imagemTamExato')) {
         return false;
     }
 }
+
+if (!function_exists('placeholder')) {
+    /**
+     * @param string $uri
+     *
+     * @return string
+     */
+    function placeholder(string $uri = '500x500')
+    {
+        return "https://via.placeholder.com/{$uri}";
+    }
+}
