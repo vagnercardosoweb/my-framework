@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 15/08/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -14,6 +14,61 @@ use Core\Helpers\Helper;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
 use Slim\Http\StatusCode;
+
+if (!function_exists('validate_params')) {
+    /**
+     * @param array|object $params
+     * @param array        $rules
+     */
+    function validate_params($params, array $rules)
+    {
+        if (is_object($params)) {
+            $params = Obj::toArray($params);
+        }
+
+        foreach ($rules as $index => $rule) {
+            if (!empty($rule['force'])) {
+                if (!array_key_exists($index, $params)) {
+                    $params[$index] = null;
+                }
+            }
+
+            if (!empty($params[$index]) && is_array($params[$index])) {
+                $params[$index] = array_filter($params[$index]);
+            }
+
+            if (array_key_exists($index, $params) && (empty($params[$index]) && '0' != $params[$index])) {
+                if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
+                    continue;
+                }
+                throw new \InvalidArgumentException(
+                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
+                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
+                );
+            }
+        }
+    }
+}
+
+if (!function_exists('json_trigger')) {
+    /**
+     * @param string     $message
+     * @param string|int $type
+     * @param array      $data
+     * @param int        $status
+     *
+     * @return \Slim\Http\Response
+     */
+    function json_trigger(string $message, $type = E_USER_SUCCESS, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
+    {
+        return json(array_merge([
+            'trigger' => [
+                'type' => error_code_type($type),
+                'message' => $message,
+            ],
+        ], $data), $status);
+    }
+}
 
 if (!function_exists('json_error')) {
     /**
@@ -37,26 +92,6 @@ if (!function_exists('json_error')) {
                 ], '', $exception->getFile()),
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
-            ],
-        ], $data), $status);
-    }
-}
-
-if (!function_exists('json_trigger')) {
-    /**
-     * @param string     $message
-     * @param string|int $type
-     * @param array      $data
-     * @param int        $status
-     *
-     * @return \Slim\Http\Response
-     */
-    function json_trigger(string $message, $type = E_USER_SUCCESS, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
-    {
-        return json(array_merge([
-            'trigger' => [
-                'type' => error_code_type($type),
-                'message' => $message,
             ],
         ], $data), $status);
     }
@@ -150,27 +185,6 @@ if (!function_exists('error_code_type')) {
         }
 
         return $result;
-    }
-}
-
-if (!function_exists('flash')) {
-    /**
-     * @param string          $name
-     * @param mixed           $value
-     * @param string|int|null $error
-     */
-    function flash(string $name, $value, $error = null)
-    {
-        if ($flash = App::getInstance()->resolve('flash')) {
-            if (!empty($error)) {
-                $value = [
-                    'type' => error_code_type($error),
-                    'message' => $value,
-                ];
-            }
-
-            $flash->add($name, $value);
-        }
     }
 }
 
@@ -387,6 +401,45 @@ if (!function_exists('date_for_human')) {
     }
 }
 
+if (!function_exists('check_phone')) {
+    /**
+     * @param string|int $phone
+     *
+     * @return bool|string
+     */
+    function check_phone(&$phone)
+    {
+        $phone = onlyNumber($phone);
+
+        if (strlen($phone) < 10 || strlen($phone) > 12) {
+            return false;
+        }
+
+        return $phone;
+    }
+}
+
+if (!function_exists('flash')) {
+    /**
+     * @param string          $name
+     * @param mixed           $value
+     * @param string|int|null $error
+     */
+    function flash(string $name, $value, $error = null)
+    {
+        if ($flash = App::getInstance()->resolve('flash')) {
+            if (!empty($error)) {
+                $value = [
+                    'type' => error_code_type($error),
+                    'message' => $value,
+                ];
+            }
+
+            $flash->add($name, $value);
+        }
+    }
+}
+
 if (!function_exists('get_code_video_youtube')) {
     /**
      * @param string $url
@@ -424,6 +477,27 @@ if (!function_exists('get_code_video_youtube')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('in_web')) {
+    /**
+     * return bool.
+     */
+    function in_web()
+    {
+        /** @var \Slim\Http\Request $request */
+        $request = App::getInstance()->resolve('request');
+
+        if (!empty($request->getHeaderLine('X-Csrf-Token')) || !empty(params('_csrfToken'))) {
+            return true;
+        }
+
+        if ((empty($_SERVER['HTTP_REFERER']) && empty($_SERVER['HTTP_ORIGIN'])) && has_route('/api/')) {
+            return false;
+        }
+
+        return true;
     }
 }
 
@@ -963,17 +1037,5 @@ if (!function_exists('imagemTamExato')) {
         }
 
         return false;
-    }
-}
-
-if (!function_exists('placeholder')) {
-    /**
-     * @param string $uri
-     *
-     * @return string
-     */
-    function placeholder(string $uri = '500x500')
-    {
-        return "https://via.placeholder.com/{$uri}";
     }
 }
