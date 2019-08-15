@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/08/2019 Vagner Cardoso
+ * @copyright 15/08/2019 Vagner Cardoso
  */
 
 namespace Core\Curl;
@@ -163,7 +163,7 @@ class Request
     {
         if (is_string($keys) && strpos($keys, ':')) {
             $split = explode(':', $keys);
-            $keys = [$split[0], $split[1]];
+            $keys = [$split[0] => $split[1]];
         }
 
         if (!is_array($keys)) {

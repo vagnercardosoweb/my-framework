@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/08/2019 Vagner Cardoso
+ * @copyright 15/08/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -512,7 +512,7 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return $this|array[$this]|null
+     * @return $this|$this[]|null
      */
     public function fetchById($id, $fetchStyle = null): ?self
     {
