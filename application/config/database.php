@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 15/08/2019 Vagner Cardoso
  */
 
 return [
@@ -22,6 +22,13 @@ return [
 
     // Defines the types of connections that will be accepted
     'connections' => [
+        'sqlite' => [
+            'database' => 'PATH_DATABASE_SQLITE', // Location database sqlite
+            'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
+            'attributes' => [], // Use pdo->setAttribute(key => value)
+            'commands' => [], // Use pdo->exec(...command...)
+        ],
+
         'mysql' => [
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', 3306),
