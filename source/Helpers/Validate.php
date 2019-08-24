@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 24/08/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -115,6 +115,7 @@ class Validate
         if (14 != strlen($value)) {
             return false;
         }
+
         if ($sumA != $value[12] || $sumB != $value[13]) {
             return false;
         }
@@ -622,7 +623,8 @@ class Validate
 
                         if ($exception) {
                             throw new \Exception(
-                                $validate['message'], $validate['code']
+                                $validate['message'],
+                                $validate['code']
                             );
                         }
 
@@ -656,7 +658,8 @@ class Validate
         }
 
         return call_user_func_array(
-            [$class, $method], $params
+            [$class, $method],
+            $params
         );
     }
 }

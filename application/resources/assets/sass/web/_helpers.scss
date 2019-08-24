@@ -70,6 +70,22 @@ $socialColors: map_merge(
   }
 }
 
+/* Ajax message errpr */
+*[id*='vc-message'] {
+  display: none;
+  position: relative;
+  max-width: 100%;
+  margin-top: 15px;
+  
+  .alert {
+    margin-bottom: 0;
+    
+    p {
+      margin-bottom: 0;
+    }
+  }
+}
+
 /* FORM REQUIRED ERROR */
 .vc-error {
   position: relative;

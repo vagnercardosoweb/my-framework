@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 24/08/2019 Vagner Cardoso
  */
 
 namespace Core\Phinx;
@@ -41,9 +41,9 @@ abstract class Migration extends AbstractMigration
     protected $primaryKey = false;
 
     /**
-     * @var array
+     * @var array|null
      */
-    protected $primaryKeys = [];
+    protected $primaryKeys;
 
     /**
      * @param string $name
