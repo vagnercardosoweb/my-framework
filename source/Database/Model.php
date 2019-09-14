@@ -516,18 +516,18 @@ abstract class Model implements \ArrayAccess
      */
     public function fetchById($id, $fetchStyle = null): ?self
     {
-        if (!empty($id)) {
+        if (!empty($id) && $this->getPrimaryKey()) {
             if (is_array($id)) {
                 $this->where(sprintf(
-                    "AND {$this->table}.{$this->primaryKey} IN (%s)",
+                    "AND {$this->table}.{$this->getPrimaryKey()} IN (%s)",
                     implode(',', $id)
                 ));
 
                 return $this->fetchAll();
             }
 
-            $this->where("AND {$this->table}.{$this->primaryKey} = :pkbyid", [
-                'pkbyid' => filter_params($id)[0],
+            $this->where("AND {$this->table}.{$this->getPrimaryKey()} = :__id__", [
+                '__id__' => filter_params($id)[0],
             ]);
         }
 

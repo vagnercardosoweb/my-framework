@@ -623,8 +623,7 @@ class Validate
 
                         if ($exception) {
                             throw new \Exception(
-                                $validate['message'],
-                                $validate['code']
+                                $validate['message'], $validate['code']
                             );
                         }
 
@@ -658,8 +657,7 @@ class Validate
         }
 
         return call_user_func_array(
-            [$class, $method],
-            $params
+            [$class, $method], $params
         );
     }
 }

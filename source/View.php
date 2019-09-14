@@ -71,14 +71,20 @@ class View
      */
     public function fetch(string $template, array $context = [])
     {
-        if ('.twig' === substr($template, -5)) {
-            $template = substr($template, 0, -5);
-        }
-
         $template = str_replace('.', '/', $template);
 
-        if (count(explode('/', $template)) <= 1) {
-            $template = "{$template}/index";
+        if (preg_match('/^@.*/i', $template)) {
+            list($namespace, $folder) = explode('/', $template, 2);
+
+            $path = $this->loader->getPaths(str_replace('@', '', $namespace));
+
+            if (!empty($path[0]) && file_exists("{$path[0]}/{$folder}/index.twig")) {
+                $template = "{$template}/index.twig";
+            }
+        }
+
+        if ('.twig' === substr($template, -5)) {
+            $template = substr($template, 0, -5);
         }
 
         return $this->environment->render(

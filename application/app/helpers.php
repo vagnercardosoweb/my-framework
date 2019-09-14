@@ -722,8 +722,7 @@ if (!function_exists('upload')) {
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
                 if (!move_uploaded_file($value['tmp_name'], $path)) {
                     throw new \Exception(
-                        "<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>",
-                        E_USER_ERROR
+                        "<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
                     );
                 }
             } else {
@@ -741,8 +740,7 @@ if (!function_exists('upload')) {
 
                 if (!$fnImg($value['tmp_name'], $path, $width, $height, 90)) {
                     throw new \Exception(
-                        "<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>",
-                        E_USER_ERROR
+                        "<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
                     );
                 }
             }

@@ -2,9 +2,9 @@
 var loadHtmlSuccessCallbacks = [];
 
 /* Colocar abaixo dos scripts em app.twig */
-$(window).on('load', function() {
+$(window).on('load', function () {
   if (typeof loadHtmlSuccessCallbacks !== 'undefined') {
-    loadHtmlSuccessCallbacks.forEach(function(callback) {
+    loadHtmlSuccessCallbacks.forEach(function (callback) {
       callback();
     });
   }
@@ -43,7 +43,7 @@ function loadPage(content, location, pushState, cache) {
     headers: { vcAjaxPage: true },
     cache: false,
 
-    success: function(html) {
+    success: function (html) {
       /* Retorno HTML */
       if (typeof html === 'string') {
         $('html, body').animate({ scrollTop: contentHtmlOffsetTop }, 500);
@@ -54,14 +54,14 @@ function loadPage(content, location, pushState, cache) {
           window.history.pushState(
             { content: content },
             null,
-            location.replace(/(\?|&)time\=(\d+)/g, '')
+            location.replace(/(\?|&)time\=(\d+)/g, ''),
           );
         }
       }
 
       if (html.object) {
         if (typeof html.object === 'object') {
-          $.each(html.object, function(key, value) {
+          $.each(html.object, function (key, value) {
             $('#' + key).html(value);
           });
         }
@@ -78,25 +78,25 @@ function loadPage(content, location, pushState, cache) {
       }
     },
 
-    complete: function() {
+    complete: function () {
       /* Coloca classe ativa no final da requisição no link clicado */
       var lhref = location.replace(baseUrl, '');
 
       $.each(
         $(document).find(
-          '*[href="' + lhref + '"], *[data-href="' + lhref + '"]'
+          '*[href="' + lhref + '"], *[data-href="' + lhref + '"]',
         ),
-        function(i, element) {
+        function (i, element) {
           $.each(
             $(element)
               .parent()
               .parent()
               .parent()
               .find('*[href], *[data-href]'),
-            function(i, elRemove) {
+            function (i, elRemove) {
               var vcAjax = false;
 
-              $.each(elRemove.attributes, function(i, attr) {
+              $.each(elRemove.attributes, function (i, attr) {
                 if (attr.name && attr.name.match(/vc-/g)) {
                   vcAjax = true;
                 }
@@ -104,7 +104,7 @@ function loadPage(content, location, pushState, cache) {
 
               if (vcAjax === false) {
                 var elHref =
-                  $(elRemove).attr('href') || $(elRemove).data('href');
+                      $(elRemove).attr('href') || $(elRemove).data('href');
 
                 if (!elHref.match(/#|javascript/g)) {
                   $(elRemove).removeClass('ajax-active active');
@@ -115,27 +115,27 @@ function loadPage(content, location, pushState, cache) {
               } else {
                 vcAjax = false;
               }
-            }
+            },
           );
 
-          setTimeout(function() {
+          setTimeout(function () {
             $(element).addClass('ajax-active active');
             $(element)
               .parent()
               .addClass('ajax-active active');
           }, 150);
-        }
+        },
       );
 
       /* Carrega JS */
       if (typeof loadHtmlSuccessCallbacks !== 'undefined') {
-        loadHtmlSuccessCallbacks.forEach(function(callback) {
+        loadHtmlSuccessCallbacks.forEach(function (callback) {
           callback();
         });
       }
     },
 
-    error: function(xhr) {
+    error: function (xhr) {
       var parse = JSON.parse(xhr.responseText);
 
       if (parse.error) {
@@ -147,7 +147,7 @@ function loadPage(content, location, pushState, cache) {
           loadPage(content, parse.location, true, true);
         }
       }
-    }
+    },
   });
 }
 
@@ -188,7 +188,7 @@ function changeContentSeo(title, description, image, keywords, abstract) {
   document.title = titleMounted;
 
   // Troca o link canonical da página após meio segundo
-  setTimeout(function() {
+  setTimeout(function () {
     $('*link[rel="canonical"]').attr('href', window.location.href);
   }, 500);
 
@@ -202,34 +202,34 @@ function changeContentSeo(title, description, image, keywords, abstract) {
   var arrTitle = [
     $('*meta[itemprop="name"]'),
     $('*meta[property="og:title"]'),
-    $('*meta[property="twitter:title"]')
+    $('*meta[property="twitter:title"]'),
   ];
 
   var arrDescription = [
     $('*meta[name="description"]'),
     $('*meta[itemprop="description"]'),
     $('*meta[property="og:description"]'),
-    $('*meta[property="twitter:description"]')
+    $('*meta[property="twitter:description"]'),
   ];
 
   var arrImage = [
     $('*meta[itemprop="image"]'),
     $('*meta[property="og:image"]'),
-    $('*meta[property="twitter:image"]')
+    $('*meta[property="twitter:image"]'),
   ];
 
   // Percore os titulo
-  $.each(arrTitle, function(i, element) {
+  $.each(arrTitle, function (i, element) {
     element.attr('content', titleMounted);
   });
 
   // Percore as descrição
-  $.each(arrDescription, function(i, element) {
+  $.each(arrDescription, function (i, element) {
     element.attr('content', description || window.seoDescription);
   });
 
   // Percore as imagem
-  $.each(arrImage, function(i, element) {
+  $.each(arrImage, function (i, element) {
     element.attr('content', image || window.seoImage);
   });
 }
@@ -247,23 +247,23 @@ function onLoadHtmlSuccess(callback) {
 }
 
 /* jQuery */
-(function($) {
+(function ($) {
   /* Evento do click nos links */
-  $(document).on('click', 'a, *[data-href]', function(event) {
+  $(document).on('click', 'a, *[data-href]', function (event) {
     var element = $(this);
     var content = '#content-ajax';
     var location = element.attr('href') || element.data('href');
     var hash = location.substr(0, 1) === '#';
     var ajax =
-      element.attr('vc-get') !== undefined ||
-      element.attr('vc-post') !== undefined ||
-      element.attr('vc-put') !== undefined ||
-      element.attr('vc-ajax') !== undefined ||
-      element.attr('vc-delete') !== undefined ||
-      element.attr('vc-form') !== undefined ||
-      element.attr('vc-abort') !== undefined ||
-      element.attr('vc-upload') !== undefined ||
-      false;
+          element.attr('vc-get') !== undefined ||
+          element.attr('vc-post') !== undefined ||
+          element.attr('vc-put') !== undefined ||
+          element.attr('vc-ajax') !== undefined ||
+          element.attr('vc-delete') !== undefined ||
+          element.attr('vc-form') !== undefined ||
+          element.attr('vc-abort') !== undefined ||
+          element.attr('vc-upload') !== undefined ||
+          false;
 
     if (!hash && location && ajax === false) {
       if (element.hasClass('no-ajaxpage')) {
@@ -282,12 +282,12 @@ function onLoadHtmlSuccess(callback) {
   });
 
   /* Histórico de navegação */
-  window.onpopstate = function(e) {
+  window.onpopstate = function (e) {
     loadPage(
       e.state.content || '#content-ajax',
       window.location.pathname,
       false,
-      false
+      false,
     );
   };
 })(jQuery);

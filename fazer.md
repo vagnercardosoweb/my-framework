@@ -1,5 +1,6 @@
-- Revisar ainda todas as configuraçeõs.
-- Refazer provider de session.
-- Adiciona provider de cookie.
-- Adiciona suporte a upload de arquivos e imagens.
-- Todos providers deixa independentes e receber as configurações.
+- [ ] Adicionar na view a class da ROTA ATUAL, Parâmetros etc.
+- [ ] Revisar ainda todas as configuraçeõs.
+- [ ] Refazer provider de session.
+- [ ] Adiciona provider de cookie.
+- [ ] Adiciona suporte a upload de arquivos e imagens.
+- [ ] Todos providers deixa independentes e receber as configurações.
