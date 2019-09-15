@@ -5,12 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 14/09/2019 Vagner Cardoso
  */
 
 namespace Core;
 
-use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
 /**
@@ -43,14 +43,14 @@ class View
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $template
-     * @param array                               $context
-     * @param int                                 $status
+     * @param \Slim\Http\Response $response
+     * @param string              $template
+     * @param array               $context
+     * @param int                 $status
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \Slim\Http\Response
      */
-    public function render(ResponseInterface $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): ResponseInterface
+    public function render(Response $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): Response
     {
         if ($status) {
             $response = $response->withStatus($status);

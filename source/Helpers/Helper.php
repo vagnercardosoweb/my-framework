@@ -46,15 +46,15 @@ class Helper
     {
         if (getenv('HTTP_CLIENT_IP')) {
             $realIp = getenv('HTTP_CLIENT_IP');
-        } elseif (getenv('HTTP_X_FORWARDED_FOR')) {
+        } else if (getenv('HTTP_X_FORWARDED_FOR')) {
             $realIp = getenv('HTTP_X_FORWARDED_FOR');
-        } elseif (getenv('HTTP_X_FORWARDED')) {
+        } else if (getenv('HTTP_X_FORWARDED')) {
             $realIp = getenv('HTTP_X_FORWARDED');
-        } elseif (getenv('HTTP_FORWARDED_FOR')) {
+        } else if (getenv('HTTP_FORWARDED_FOR')) {
             $realIp = getenv('HTTP_FORWARDED_FOR');
-        } elseif (getenv('HTTP_FORWARDED')) {
+        } else if (getenv('HTTP_FORWARDED')) {
             $realIp = getenv('HTTP_FORWARDED');
-        } elseif (getenv('REMOTE_ADDR')) {
+        } else if (getenv('REMOTE_ADDR')) {
             $realIp = getenv('REMOTE_ADDR');
         } else {
             $realIp = $_SERVER['REMOTE_ADDR'];
@@ -79,16 +79,16 @@ class Helper
         if (preg_match('|MSIE ([0-9].[0-9]{1,2})|', $httUserAgent, $matched)) {
             $browser = 'IE';
             $browserVersion = $matched[1];
-        } elseif (preg_match('|Opera/([0-9].[0-9]{1,2})|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Opera/([0-9].[0-9]{1,2})|', $httUserAgent, $matched)) {
             $browser = 'Opera';
             $browserVersion = $matched[1];
-        } elseif (preg_match('|Firefox/([0-9\.]+)|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Firefox/([0-9\.]+)|', $httUserAgent, $matched)) {
             $browser = 'Firefox';
             $browserVersion = $matched[1];
-        } elseif (preg_match('|Chrome/([0-9\.]+)|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Chrome/([0-9\.]+)|', $httUserAgent, $matched)) {
             $browser = 'Chrome';
             $browserVersion = $matched[1];
-        } elseif (preg_match('|Safari/([0-9\.]+)|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Safari/([0-9\.]+)|', $httUserAgent, $matched)) {
             $browser = 'Safari';
             $browserVersion = $matched[1];
         } else {
@@ -98,9 +98,9 @@ class Helper
 
         if (preg_match('|Mac|', $httUserAgent, $matched)) {
             $so = 'MAC';
-        } elseif (preg_match('|Windows|', $httUserAgent, $matched) || preg_match('|WinNT|', $httUserAgent, $matched) || preg_match('|Win95|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Windows|', $httUserAgent, $matched) || preg_match('|WinNT|', $httUserAgent, $matched) || preg_match('|Win95|', $httUserAgent, $matched)) {
             $so = 'Windows';
-        } elseif (preg_match('|Linux|', $httUserAgent, $matched)) {
+        } else if (preg_match('|Linux|', $httUserAgent, $matched)) {
             $so = 'Linux';
         } else {
             $so = 'Outro';
@@ -131,7 +131,7 @@ class Helper
 
             if ($prefix && $key && !is_int($key)) {
                 $key = "{$prefix}[{$key}]";
-            } elseif ($prefix) {
+            } else if ($prefix) {
                 $key = "{$prefix}[]";
             }
 

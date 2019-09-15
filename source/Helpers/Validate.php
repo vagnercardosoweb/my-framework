@@ -244,11 +244,11 @@ class Validate
      */
     public static function json(
         string $json,
-        bool $assoc =
-        false,
+        bool $assoc = false,
         int $depth = 512,
         int $options = 0
-    ) {
+    )
+    {
         $json = json_decode($json, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -413,6 +413,17 @@ class Validate
     }
 
     /**
+     * @param mixed  $value
+     * @param string $indexData
+     *
+     * @return bool
+     */
+    public static function equals($value, string $indexData): bool
+    {
+        return self::comparison($value, '=', self::$data[$indexData]);
+    }
+
+    /**
      * @param mixed  $value1
      * @param string $operator
      * @param mixed  $value2
@@ -446,13 +457,13 @@ class Validate
 
     /**
      * @param mixed  $value
-     * @param string $indexData
+     * @param string $regex
      *
-     * @return bool
+     * @return false|int
      */
-    public static function equals($value, string $indexData): bool
+    public static function notRegex($value, string $regex)
     {
-        return self::comparison($value, '=', self::$data[$indexData]);
+        return !self::regex($value, $regex);
     }
 
     /**
@@ -471,14 +482,23 @@ class Validate
     }
 
     /**
-     * @param mixed  $value
-     * @param string $regex
+     * @param mixed       $value
+     * @param string      $table
+     * @param string      $field
+     * @param string|null $where
+     * @param string      $driver
      *
-     * @return false|int
+     * @return bool
      */
-    public static function notRegex($value, string $regex)
+    public static function databaseNotExists(
+        $value,
+        string $table,
+        string $field,
+        ?string $where = null,
+        ?string $driver = null
+    ): bool
     {
-        return !self::regex($value, $regex);
+        return !self::databaseExists($value, $table, $field, $where, $driver);
     }
 
     /**
@@ -496,34 +516,16 @@ class Validate
         string $field,
         ?string $where = null,
         ?string $driver = null
-    ): bool {
+    ): bool
+    {
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
         return 1 == App::getInstance()
-            ->resolve('db')
-            ->driver($driver)
-            ->query($sql, ['field' => $value])
-            ->fetch(\PDO::FETCH_OBJ)
-            ->total;
-    }
-
-    /**
-     * @param mixed       $value
-     * @param string      $table
-     * @param string      $field
-     * @param string|null $where
-     * @param string      $driver
-     *
-     * @return bool
-     */
-    public static function databaseNotExists(
-        $value,
-        string $table,
-        string $field,
-        ?string $where = null,
-        ?string $driver = null
-    ): bool {
-        return !self::databaseExists($value, $table, $field, $where, $driver);
+                ->resolve('db')
+                ->driver($driver)
+                ->query($sql, ['field' => $value])
+                ->fetch(\PDO::FETCH_OBJ)
+                ->total;
     }
 
     /**

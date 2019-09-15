@@ -35,7 +35,7 @@ class UsersSeeder extends AbstractSeed
                 $user->data([
                     'name' => "User {$i}",
                     'email' => "user{$i}@email.com",
-                    'password' => $user->password->hash('password'),
+                    'password' => $user->hash->make('password'),
                     'status' => ['online', 'offline'][rand(0, 1)],
                 ])->save();
             }

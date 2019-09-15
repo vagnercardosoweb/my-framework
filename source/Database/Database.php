@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 14/09/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -211,15 +211,16 @@ class Database
         $data = ($this->emitEvent("{$table}:updating", $data) ?: $data);
 
         foreach ($data as $key => $value) {
+            $binding = $key;
             $value = filter_var($value, FILTER_DEFAULT);
             $updated->{$key} = $value;
 
-            if (!empty($bindings[$key])) {
-                $key = sprintf("{$key}_%s", mt_rand(1, time()));
+            if (!empty($bindings[$binding])) {
+                $binding = sprintf("{$key}_%s", mt_rand(1, time()));
             }
 
-            $set[] = "{$key} = :{$key}";
-            $bindings[$key] = $value;
+            $set[] = "{$key} = :{$binding}";
+            $bindings[$binding] = $value;
         }
 
         $statement = sprintf("UPDATE {$table} SET %s {$condition}", implode(', ', $set));

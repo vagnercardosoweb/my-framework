@@ -101,7 +101,7 @@ class UtilController extends BaseController
             $cep->endereco = "{$cep->logradouro} - {$cep->bairro}, {$cep->localidade} - {$cep->uf}, {$data['cep']}, Brasil";
 
             // Google Maps
-            if ($googleMapsKey = env('GOOGLE_MAPS_KEY', null)) {
+            if ($googleMapsKey = env('GOOGLE_GEOCODE_API_KEY', null)) {
                 $map = (new Request())->get('https://maps.google.com/maps/api/geocode/json', [
                     'key' => $googleMapsKey,
                     'sensor' => true,

@@ -127,14 +127,15 @@ if (!function_exists('json_success')) {
         }
 
         foreach ([
-            'storage',
-            'object',
-            'clear',
-            'trigger',
-            'switch',
-            'location',
-            'reload',
-        ] as $excluded) {
+                     'storage',
+                     'object',
+                     'clear',
+                     'trigger',
+                     'switch',
+                     'location',
+                     'reload',
+                     'type',
+                 ] as $excluded) {
             if (isset($data[$excluded])) {
                 unset($data[$excluded]);
             }
@@ -190,8 +191,6 @@ if (!function_exists('error_code_type')) {
 
 if (!function_exists('get_image')) {
     /**
-     * Recupera a imagem do asset.
-     *
      * @param string     $table
      * @param int|string $id
      * @param string     $name
@@ -220,8 +219,6 @@ if (!function_exists('get_image')) {
 
 if (!function_exists('get_galeria')) {
     /**
-     * Recupera a imagem do asset.
-     *
      * @param string     $table
      * @param int|string $id
      * @param string     $name
@@ -764,8 +761,6 @@ if (!function_exists('upload')) {
 
 if (!function_exists('upload_image')) {
     /**
-     * Upload de imagem.
-     *
      * @param array  $file
      * @param string $directory
      * @param string $name

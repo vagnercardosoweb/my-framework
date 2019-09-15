@@ -46,8 +46,7 @@ class CreateUsers extends Migration
                 'default' => 'online',
             ])
             ->addIndex('email', ['unique' => true])
-            ->save()
-        ;
+            ->save();
     }
 
     /**

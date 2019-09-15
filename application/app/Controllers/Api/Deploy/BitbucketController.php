@@ -69,7 +69,7 @@ class BitbucketController extends BaseController
                 throw new \Exception('Count change less than 0.', E_USER_ERROR);
             }
 
-            return json([
+            return $this->json([
                 'error' => false,
                 'message' => 'Deploy bitbucket successfully.',
             ], StatusCode::HTTP_OK);

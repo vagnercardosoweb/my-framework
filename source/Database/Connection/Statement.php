@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 14/09/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -147,8 +147,7 @@ class Statement extends \PDOStatement
                     : null;
 
                 $this->bindValue(
-                    (is_string($key) ? ":{$key}" : ((int)$key + 1)),
-                    $value,
+                    (is_string($key) ? ":{$key}" : ((int)$key + 1)), $value,
                     (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR))
                 );
             }
