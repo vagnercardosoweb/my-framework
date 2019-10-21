@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/08/2019 Vagner Cardoso
+ * @copyright 21/10/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -380,18 +380,8 @@ if (!function_exists('filter_params')) {
             if (is_array($value)) {
                 $result[$key] = filter_params($value);
             } else {
-                if (is_int($value)) {
-                    $filter = FILTER_SANITIZE_NUMBER_INT;
-                } elseif (is_float($value)) {
-                    $filter = FILTER_SANITIZE_NUMBER_FLOAT;
-                } elseif (is_string($value)) {
-                    $filter = FILTER_SANITIZE_STRING;
-                } else {
-                    $filter = FILTER_DEFAULT;
-                }
-
                 $result[$key] = addslashes(strip_tags(
-                    trim(filter_var($value, $filter))
+                    trim(filter_var($value, FILTER_DEFAULT))
                 ));
             }
         }

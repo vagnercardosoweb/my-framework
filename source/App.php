@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 21/10/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -61,6 +61,14 @@ class App extends \Slim\App
         }
 
         return self::$instance;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function onlyApi(): bool
+    {
+        return 'true' == env('APP_ONLY_API', false);
     }
 
     /**

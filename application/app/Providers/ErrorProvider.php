@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 21/10/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -32,13 +32,6 @@ class ErrorProvider extends Provider
     public function register(): void
     {
         $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
-            /*
-             * @param \Slim\Http\Request  $request
-             * @param \Slim\Http\Response $response
-             * @param \Exception          $exception
-             *
-             * @return \Psr\Http\Message\ResponseInterface
-             */
             return function (Request $request, Response $response, $exception) {
                 /** @var \Slim\Route $route */
                 $route = $request->getAttribute('route');
@@ -59,7 +52,7 @@ class ErrorProvider extends Provider
                     $this->event->emit('eventErrorHandler', $errors);
                 }
 
-                if (Helper::isPhpCli() || ($request->isXhr() || Router::hasCurrent('/api/'))) {
+                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson($errors, StatusCode::HTTP_INTERNAL_SERVER_ERROR);
                 }
 
@@ -73,16 +66,10 @@ class ErrorProvider extends Provider
         };
 
         $this->container['notFoundHandler'] = function () {
-            /*
-             * @param \Slim\Http\Request  $request
-             * @param \Slim\Http\Response $response
-             *
-             * @return \Psr\Http\Message\ResponseInterface
-             */
             return function (Request $request, Response $response) {
                 $uri = urldecode($request->getUri());
 
-                if (Helper::isPhpCli() || ($request->isXhr() || Router::hasCurrent('/api/'))) {
+                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson([
                         'error' => [
                             'url' => $uri,
@@ -101,18 +88,11 @@ class ErrorProvider extends Provider
         };
 
         $this->container['notAllowedHandler'] = function () {
-            /*
-             * @param \Slim\Http\Request  $request
-             * @param \Slim\Http\Response $response
-             * @param string[]            $methods
-             *
-             * @return \Psr\Http\Message\ResponseInterface
-             */
             return function (Request $request, Response $response, $methods) {
                 $uri = urldecode($request->getUri());
                 $method = $request->getMethod();
 
-                if (Helper::isPhpCli() || ($request->isXhr() || Router::hasCurrent('/api/'))) {
+                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson([
                         'error' => [
                             'url' => $uri,

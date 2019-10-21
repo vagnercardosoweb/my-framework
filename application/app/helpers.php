@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/08/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -127,15 +127,14 @@ if (!function_exists('json_success')) {
         }
 
         foreach ([
-                     'storage',
-                     'object',
-                     'clear',
-                     'trigger',
-                     'switch',
-                     'location',
-                     'reload',
-                     'type',
-                 ] as $excluded) {
+            'storage',
+            'object',
+            'clear',
+            'trigger',
+            'switch',
+            'location',
+            'reload',
+        ] as $excluded) {
             if (isset($data[$excluded])) {
                 unset($data[$excluded]);
             }

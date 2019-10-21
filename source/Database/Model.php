@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/09/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -358,6 +358,18 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
+     * @param string|array $bindings
+     *
+     * @return $this
+     */
+    public function bindings($bindings)
+    {
+        Helper::parseStr($bindings, $this->bindings);
+
+        return $this;
+    }
+
+    /**
      * @param \Closure $callback
      *
      * @throws \Exception
@@ -383,19 +395,19 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param array|object $data
-     * @param bool         $validate
+     * @param array|object|null $data
+     * @param bool              $validate
      *
      * @throws \Exception
      *
      * @return $this
      */
-    public function save($data = [], bool $validate = true): self
+    public function save($data = null, bool $validate = true): self
     {
         $where = implode(' ', $this->where);
         $bindings = $this->bindings;
 
-        if (!empty($data)) {
+        if (!is_null($data)) {
             $this->data($data, $validate);
         }
 
@@ -438,30 +450,6 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param array|object $data
-     * @param bool         $validate
-     *
-     * @return $this
-     */
-    public function data($data, bool $validate = true): self
-    {
-        $data = array_merge(
-            Obj::toArray($this->data),
-            Obj::toArray($data)
-        );
-
-        if (method_exists($this, '_data')) {
-            $this->_data($data, $validate);
-        }
-
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        return $this;
-    }
-
-    /**
      * @param string|array|null $properties
      *
      * @return $this
@@ -489,6 +477,30 @@ abstract class Model implements \ArrayAccess
             foreach ($properties as $property) {
                 $this->reset[trim($property)] = true;
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @return $this
+     */
+    public function data($data, bool $validate = true): self
+    {
+        $data = array_merge(
+            Obj::toArray($this->data),
+            Obj::toArray($data)
+        );
+
+        if (method_exists($this, '_data')) {
+            $this->_data($data, $validate);
+        }
+
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
         }
 
         return $this;
@@ -527,14 +539,6 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @return string
-     */
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
-    }
-
-    /**
      * @param string|array $where
      * @param string|array $bindings
      *
@@ -544,18 +548,6 @@ abstract class Model implements \ArrayAccess
     {
         $this->mountProperty($where, 'where');
         $this->bindings($bindings);
-
-        return $this;
-    }
-
-    /**
-     * @param string|array $bindings
-     *
-     * @return $this
-     */
-    public function bindings($bindings)
-    {
-        Helper::parseStr($bindings, $this->bindings);
 
         return $this;
     }
@@ -632,6 +624,22 @@ abstract class Model implements \ArrayAccess
     public function getPrimaryValue()
     {
         return $this->{$this->getPrimaryKey()};
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDriver()
+    {
+        return $this->driver;
     }
 
     /**

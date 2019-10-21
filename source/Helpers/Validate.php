@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 24/08/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -247,8 +247,7 @@ class Validate
         bool $assoc = false,
         int $depth = 512,
         int $options = 0
-    )
-    {
+    ) {
         $json = json_decode($json, $assoc, $depth, $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
@@ -496,8 +495,7 @@ class Validate
         string $field,
         ?string $where = null,
         ?string $driver = null
-    ): bool
-    {
+    ): bool {
         return !self::databaseExists($value, $table, $field, $where, $driver);
     }
 
@@ -516,16 +514,15 @@ class Validate
         string $field,
         ?string $where = null,
         ?string $driver = null
-    ): bool
-    {
+    ): bool {
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
         return 1 == App::getInstance()
-                ->resolve('db')
-                ->driver($driver)
-                ->query($sql, ['field' => $value])
-                ->fetch(\PDO::FETCH_OBJ)
-                ->total;
+            ->resolve('db')
+            ->driver($driver)
+            ->query($sql, ['field' => $value])
+            ->fetch(\PDO::FETCH_OBJ)
+            ->total;
     }
 
     /**
@@ -649,17 +646,14 @@ class Validate
      *
      * @return bool
      */
-    private static function runValidateMethod(string $rule, array $params): bool
+    private static function runValidateMethod($rule, array $params)
     {
         if (false !== strpos($rule, '::')) {
             list($class, $method) = explode('::', $rule);
-        } else {
-            $class = self::class;
-            $method = $rule;
+
+            return (new $class())->{$method}(...$params);
         }
 
-        return call_user_func_array(
-            [$class, $method], $params
-        );
+        return call_user_func_array([self::class, $rule], $params);
     }
 }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/09/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -216,7 +216,7 @@ class Database
             $updated->{$key} = $value;
 
             if (!empty($bindings[$binding])) {
-                $binding = sprintf("{$key}_%s", mt_rand(1, time()));
+                $binding = sprintf("{$binding}_%s", mt_rand(1, time()));
             }
 
             $set[] = "{$key} = :{$binding}";

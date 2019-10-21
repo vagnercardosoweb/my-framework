@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -128,11 +128,11 @@ class Encryption
     }
 
     /**
-     * @param array $payload
+     * @param mixed $payload
      *
      * @return bool
      */
-    protected function validPayload(array $payload): bool
+    protected function validPayload($payload): bool
     {
         return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
             strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);

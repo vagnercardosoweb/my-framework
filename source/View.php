@@ -5,12 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/09/2019 Vagner Cardoso
+ * @copyright 20/10/2019 Vagner Cardoso
  */
 
 namespace Core;
 
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Http\StatusCode;
 
 /**
@@ -38,19 +38,22 @@ class View
      */
     public function __construct($path, array $options = [])
     {
-        $this->loader = $this->createLoader(is_string($path) ? [$path] : $path);
+        $path = is_string($path) ? [$path] : $path;
+        array_push($path, ROOT);
+
+        $this->loader = $this->createLoader($path);
         $this->environment = new \Twig\Environment($this->loader, $options);
     }
 
     /**
-     * @param \Slim\Http\Response $response
-     * @param string              $template
-     * @param array               $context
-     * @param int                 $status
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param string                              $template
+     * @param array                               $context
+     * @param int                                 $status
      *
-     * @return \Slim\Http\Response
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function render(Response $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): Response
+    public function render(ResponseInterface $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): ResponseInterface
     {
         if ($status) {
             $response = $response->withStatus($status);
@@ -71,6 +74,10 @@ class View
      */
     public function fetch(string $template, array $context = [])
     {
+        if ('.twig' === substr($template, -5)) {
+            $template = substr($template, 0, -5);
+        }
+
         $template = str_replace('.', '/', $template);
 
         if (preg_match('/^@.*/i', $template)) {
@@ -81,10 +88,6 @@ class View
             if (!empty($path[0]) && file_exists("{$path[0]}/{$folder}/index.twig")) {
                 $template = "{$template}/index.twig";
             }
-        }
-
-        if ('.twig' === substr($template, -5)) {
-            $template = substr($template, 0, -5);
         }
 
         return $this->environment->render(

@@ -16,7 +16,7 @@ const getRecursiveSassFile = async (dir, tree = [], name) => {
   const files = await fs.readdir(dir);
   const regex = /\.s?[ac]ss$/gi;
 
-  for (file of files) {
+  for (let file of files) {
     const filepath = path.resolve(dir, file);
     const stat = await fs.stat(filepath);
 
