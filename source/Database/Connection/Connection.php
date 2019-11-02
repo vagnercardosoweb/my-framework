@@ -52,20 +52,13 @@ abstract class Connection
     }
 
     /**
-     * @return array
-     */
-    public function getDefaultOptions(): array
-    {
-        return $this->options;
-    }
-
-    /**
-     * @param string $dsn
-     * @param array  $config
+     * @param array $config
+     *
+     * @throws \Exception
      *
      * @return \PDO
      */
-    protected function createConnection(string $dsn, array $config): \PDO
+    public function connect(array $config): \PDO
     {
         try {
             $this->validateConfig($config);
@@ -75,8 +68,8 @@ abstract class Connection
                 $config['password'] ?? null,
             ];
 
-            $options = $config['options'] ?? [];
-            $connection = new \PDO($dsn, $username, $password, $options);
+            $options = $this->getOptions($config);
+            $connection = new \PDO($this->getDsn($config), $username, $password, $options);
 
             $this->setDefaultStatement($connection);
             $this->setDefaultSchema($connection, $config);
@@ -86,7 +79,9 @@ abstract class Connection
 
             return $connection;
         } catch (\PDOException $e) {
-            throw $e;
+            throw new \Exception(
+                $e->getMessage(), $e->getCode()
+            );
         }
     }
 
@@ -95,34 +90,56 @@ abstract class Connection
      */
     protected function validateConfig(array &$config): void
     {
+        $classSplit = explode('\\', get_called_class());
+        $className = array_pop($classSplit);
+
         if (empty($config['host'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' host not configured.",
+                sprintf('%s: host not configured.', $className),
                 E_USER_ERROR
             );
         }
 
         if (empty($config['username'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' username not configured.",
+                sprintf('%s: username not configured.', $className),
                 E_USER_ERROR
             );
         }
 
         if (empty($config['password']) && empty($config['notPassword'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' password not configured.",
+                sprintf('%s: password not configured.', $className),
                 E_USER_ERROR
             );
         }
 
         if (empty($config['database']) && empty($config['notDatabase'])) {
             throw new \InvalidArgumentException(
-                "'{$config['driver']}' database not configured.",
+                sprintf('%s: database not configured.', $className),
                 E_USER_ERROR
             );
         }
     }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function getOptions(array $config): array
+    {
+        $options = $config['options'] ?? [];
+
+        return array_diff_key($this->options, $options) + $options;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return string
+     */
+    abstract protected function getDsn(array $config): string;
 
     /**
      * @param \PDO $connection
@@ -170,17 +187,5 @@ abstract class Connection
                 $connection->exec($command);
             }
         }
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getOptions(array $config): array
-    {
-        $options = $config['options'] ?? [];
-
-        return array_diff_key($this->options, $options) + $options;
     }
 }

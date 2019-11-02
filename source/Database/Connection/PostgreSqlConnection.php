@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -17,25 +17,6 @@ namespace Core\Database\Connection;
  */
 class PostgreSqlConnection extends Connection
 {
-    /**
-     * @param array $config
-     *
-     * @return \PDO
-     */
-    public function connect(array $config): \PDO
-    {
-        try {
-            // Connection
-            $dsn = $this->getDsn($config);
-            $config['driver'] = $config['driver'] ?? 'pgsql';
-            $config['options'] = $this->getOptions($config);
-
-            return $this->createConnection($dsn, $config);
-        } catch (\PDOException $e) {
-            throw $e;
-        }
-    }
-
     /**
      * @param array $config
      *

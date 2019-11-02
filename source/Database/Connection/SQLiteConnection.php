@@ -20,25 +20,6 @@ class SQLiteConnection extends Connection
     /**
      * @param array $config
      *
-     * @return \PDO
-     */
-    public function connect(array $config): \PDO
-    {
-        try {
-            // Connection
-            $dsn = $this->getDsn($config);
-            $config['driver'] = $config['driver'] ?? 'sqlite';
-            $config['options'] = $this->getOptions($config);
-
-            return $this->createConnection($dsn, $config);
-        } catch (\PDOException $e) {
-            throw $e;
-        }
-    }
-
-    /**
-     * @param array $config
-     *
      * @return string
      */
     protected function getDsn(array $config): string
