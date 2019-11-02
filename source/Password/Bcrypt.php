@@ -18,45 +18,11 @@ namespace Core\Password;
 class Bcrypt extends Password
 {
     /**
-     * @param string $password
-     * @param array  $options
-     *
-     * @return string
-     */
-    public function make($password, array $options = []): string
-    {
-        $hashed = password_hash(
-            $password, $this->algorithm(), $this->getOptions($options)
-        );
-
-        if (false === $hashed) {
-            throw new \RuntimeException(
-                sprintf('%s password not supported.', __CLASS__)
-            );
-        }
-
-        return $hashed;
-    }
-
-    /**
      * @return int
      */
     public function algorithm(): int
     {
         return PASSWORD_BCRYPT;
-    }
-
-    /**
-     * @param string $hash
-     * @param array  $options
-     *
-     * @return bool
-     */
-    public function needsRehash(string $hash, array $options = []): bool
-    {
-        return password_needs_rehash(
-            $hash, $this->algorithm(), $this->getOptions($options)
-        );
     }
 
     /**
