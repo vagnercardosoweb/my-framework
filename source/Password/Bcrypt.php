@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -25,17 +25,25 @@ class Bcrypt extends Password
      */
     public function make($password, array $options = []): string
     {
-        $hash = password_hash(
+        $hashed = password_hash(
             $password, $this->algorithm(), $this->getOptions($options)
         );
 
-        if (false === $hash) {
+        if (false === $hashed) {
             throw new \RuntimeException(
-                'Bcrypt password not supported.'
+                sprintf('%s password not supported.', __CLASS__)
             );
         }
 
-        return $hash;
+        return $hashed;
+    }
+
+    /**
+     * @return int
+     */
+    public function algorithm(): int
+    {
+        return PASSWORD_BCRYPT;
     }
 
     /**
@@ -49,14 +57,6 @@ class Bcrypt extends Password
         return password_needs_rehash(
             $hash, $this->algorithm(), $this->getOptions($options)
         );
-    }
-
-    /**
-     * @return int
-     */
-    public function algorithm(): int
-    {
-        return PASSWORD_BCRYPT;
     }
 
     /**

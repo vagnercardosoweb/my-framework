@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Curl;
@@ -40,45 +40,6 @@ class Request
     public function get(string $endPoint, $params = []): Response
     {
         return $this->create('get', $endPoint, $params);
-    }
-
-    /**
-     * @param string       $endPoint
-     * @param array|string $params
-     *
-     * @throws \Exception
-     *
-     * @return \Core\Curl\Response
-     */
-    public function post(string $endPoint, $params = []): Response
-    {
-        return $this->create('post', $endPoint, $params);
-    }
-
-    /**
-     * @param string $endPoint
-     * @param array  $params
-     *
-     * @throws \Exception
-     *
-     * @return \Core\Curl\Response
-     */
-    public function put(string $endPoint, $params = []): Response
-    {
-        return $this->create('put', $endPoint, $params);
-    }
-
-    /**
-     * @param string $endPoint
-     * @param array  $params
-     *
-     * @throws \Exception
-     *
-     * @return \Core\Curl\Response
-     */
-    public function delete(string $endPoint, $params = []): Response
-    {
-        return $this->create('delete', $endPoint, $params);
     }
 
     /**
@@ -202,5 +163,44 @@ class Request
         }
 
         return $this;
+    }
+
+    /**
+     * @param string       $endPoint
+     * @param array|string $params
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Curl\Response
+     */
+    public function post(string $endPoint, $params = []): Response
+    {
+        return $this->create('post', $endPoint, $params);
+    }
+
+    /**
+     * @param string $endPoint
+     * @param array  $params
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Curl\Response
+     */
+    public function put(string $endPoint, $params = []): Response
+    {
+        return $this->create('put', $endPoint, $params);
+    }
+
+    /**
+     * @param string $endPoint
+     * @param array  $params
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Curl\Response
+     */
+    public function delete(string $endPoint, $params = []): Response
+    {
+        return $this->create('delete', $endPoint, $params);
     }
 }

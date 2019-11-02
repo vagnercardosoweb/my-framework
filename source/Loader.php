@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -13,7 +13,6 @@ namespace Core;
 use Dotenv\Dotenv;
 use Dotenv\Environment\Adapter\EnvConstAdapter;
 use Dotenv\Environment\Adapter\PutenvAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
 use Dotenv\Environment\DotenvFactory;
 
 /**

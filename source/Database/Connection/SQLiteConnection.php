@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -38,6 +38,20 @@ class SQLiteConnection extends Connection
 
     /**
      * @param array $config
+     *
+     * @return string
+     */
+    protected function getDsn(array $config): string
+    {
+        if ('memory' == $config['database']) {
+            return 'sqlite::memory:';
+        }
+
+        return "sqlite:{$config['database']}";
+    }
+
+    /**
+     * @param array $config
      */
     protected function validateConfig(array &$config): void
     {
@@ -52,20 +66,6 @@ class SQLiteConnection extends Connection
                 "'sqlite' database not exists in path {$config['database']}", E_USER_ERROR
             );
         }
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    protected function getDsn(array $config): string
-    {
-        if ('memory' == $config['database']) {
-            return 'sqlite::memory:';
-        }
-
-        return "sqlite:{$config['database']}";
     }
 
     /**

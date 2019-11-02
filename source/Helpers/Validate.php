@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/10/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;

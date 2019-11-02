@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Curl;
@@ -67,11 +67,11 @@ class Response
     }
 
     /**
-     * @return object|null
+     * @return bool
      */
-    public function getError(): ?object
+    public function isClientError(): bool
     {
-        return $this->error;
+        return $this->getStatus() >= 400 && $this->getStatus() < 500;
     }
 
     /**
@@ -82,6 +82,22 @@ class Response
         return isset($this->info->http_code)
             ? (int)$this->info->http_code
             : null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isServerError(): bool
+    {
+        return $this->getStatus() >= 500 && $this->getStatus() < 600;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function getError(): ?object
+    {
+        return $this->error;
     }
 
     /**
@@ -98,22 +114,6 @@ class Response
     public function getInfo(): ?object
     {
         return $this->info;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isClientError(): bool
-    {
-        return $this->getStatus() >= 400 && $this->getStatus() < 500;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isServerError(): bool
-    {
-        return $this->getStatus() >= 500 && $this->getStatus() < 600;
     }
 
     /**

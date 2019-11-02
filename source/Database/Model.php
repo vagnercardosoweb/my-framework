@@ -5,12 +5,13 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/10/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
 
 use Core\App;
+use Core\Database\Connection\Statement;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
 
@@ -140,8 +141,10 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string $name
      * @param mixed  $value
+     *
+     * @return void
      */
-    public function __set($name, $value)
+    public function __set($name, $value): void
     {
         $this->data = Obj::fromArray($this->data);
         $this->data->{$name} = $value;
@@ -152,15 +155,17 @@ abstract class Model implements \ArrayAccess
      *
      * @return bool
      */
-    public function __isset($name)
+    public function __isset($name): bool
     {
         return isset($this->data->{$name});
     }
 
     /**
      * @param string $name
+     *
+     * @return void
      */
-    public function __unset($name)
+    public function __unset($name): void
     {
         unset($this->data->{$name});
     }
@@ -178,8 +183,10 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string $name
      * @param mixed  $value
+     *
+     * @return void
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->__set($name, $value);
     }
@@ -189,15 +196,17 @@ abstract class Model implements \ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return $this->__isset($name);
     }
 
     /**
      * @param string $name
+     *
+     * @return void
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->__unset($name);
     }
@@ -205,7 +214,7 @@ abstract class Model implements \ArrayAccess
     /**
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return Obj::toArray($this->data);
     }
@@ -213,7 +222,7 @@ abstract class Model implements \ArrayAccess
     /**
      * @return object
      */
-    public function toObject()
+    public function toObject(): object
     {
         return Obj::fromArray($this->data);
     }
@@ -223,11 +232,46 @@ abstract class Model implements \ArrayAccess
      *
      * @return int
      */
-    public function rowCount()
+    public function rowCount(): int
     {
-        return $this->buildSqlStatement()
-            ->rowCount()
-        ;
+        return $this->buildSqlStatement()->rowCount();
+    }
+
+    /**
+     * @param array $properties
+     * @param bool  $reset
+     *
+     * @return self
+     */
+    public function clear(array $properties = [], bool $reset = false): self
+    {
+        $notReset = array_diff(['table', 'primaryKey', 'driver', 'fetchStyle', 'statement', 'data'], $properties);
+        $reflection = new \ReflectionClass(get_class($this));
+
+        foreach ($reflection->getProperties() as $property) {
+            if (!in_array($property->getName(), $notReset)) {
+                if (empty($properties) || in_array($property->getName(), $properties)) {
+                    if ($reset) {
+                        $this->reset[$property->getName()] = true;
+                    } else {
+                        $value = preg_match('/@var\s+(array)/im', $property->getDocComment()) ? [] : null;
+                        $this->{$property->getName()} = $value;
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string|array|null $properties
+     *
+     * @return self
+     */
+    public function reset(array $properties = []): self
+    {
+        return $this->clear($properties, true);
     }
 
     /**
@@ -237,7 +281,7 @@ abstract class Model implements \ArrayAccess
      *
      * @return int
      */
-    public function count($column = '1')
+    public function count($column = '1'): int
     {
         return (int)$this->select("COUNT({$column}) AS count")
             ->order('count DESC')->limit(1)
@@ -250,9 +294,9 @@ abstract class Model implements \ArrayAccess
      * @param int $limit
      * @param int $offset
      *
-     * @return $this
+     * @return self
      */
-    public function limit($limit, $offset = 0)
+    public function limit($limit, $offset = 0): self
     {
         if (is_numeric($limit)) {
             $this->limit = (int)$limit;
@@ -268,9 +312,9 @@ abstract class Model implements \ArrayAccess
     /**
      * @param int $offset
      *
-     * @return $this
+     * @return self
      */
-    public function offset($offset)
+    public function offset($offset): self
     {
         $this->offset = (int)$offset;
 
@@ -280,9 +324,9 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array|null $order
      *
-     * @return $this
+     * @return self
      */
-    public function order($order)
+    public function order($order): self
     {
         $this->mountProperty($order, 'order');
 
@@ -292,9 +336,9 @@ abstract class Model implements \ArrayAccess
     /**
      * @param mixed $select
      *
-     * @return $this
+     * @return self
      */
-    public function select($select = '*')
+    public function select($select = '*'): self
     {
         if (is_string($select)) {
             $select = explode(',', $select);
@@ -308,7 +352,7 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string $table
      *
-     * @return $this|string
+     * @return self|string
      */
     public function table($table = null)
     {
@@ -324,9 +368,9 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array|null $join
      *
-     * @return $this
+     * @return self
      */
-    public function join($join)
+    public function join($join): self
     {
         $this->mountProperty($join, 'join');
 
@@ -336,9 +380,9 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array|null $group
      *
-     * @return $this
+     * @return self
      */
-    public function group($group)
+    public function group($group): self
     {
         $this->mountProperty($group, 'group');
 
@@ -348,23 +392,11 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array|null $having
      *
-     * @return $this
+     * @return self
      */
-    public function having($having)
+    public function having($having): self
     {
         $this->mountProperty($having, 'having');
-
-        return $this;
-    }
-
-    /**
-     * @param string|array $bindings
-     *
-     * @return $this
-     */
-    public function bindings($bindings)
-    {
-        Helper::parseStr($bindings, $this->bindings);
 
         return $this;
     }
@@ -400,93 +432,33 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return $this
+     * @return self
      */
     public function save($data = null, bool $validate = true): self
     {
-        $where = implode(' ', $this->where);
-        $bindings = $this->bindings;
-
-        if (!is_null($data)) {
+        if (is_array($data) || is_object($data)) {
             $this->data($data, $validate);
         }
 
-        $this->reset();
+        $where = $this->where;
+        $bindings = $this->bindings;
+        $exists = $this->fetchById($this->getPrimaryValue());
 
-        if ($this->fetchById($this->getPrimaryValue())) {
-            if (!empty($this->getPrimaryValue())) {
-                $where = "{$this->table}.{$this->getPrimaryKey()} = :pkid {$where}";
-                $bindings['pkid'] = $this->getPrimaryValue();
-            }
+        if ($exists || !empty($where)) {
+            $this->where = $where;
+            $this->bindings = $bindings;
 
-            $this->data = $this->db
-                ->driver($this->driver)
-                ->update(
-                    $this->table,
-                    $this->data,
-                    sprintf('WHERE %s', $this->normalizeProperty($where)),
-                    $bindings
-                )
-            ;
-
-            return $this;
+            return $this->update($data, $validate);
         }
 
-        $lastInsertId = $this->db
-            ->driver($this->driver)
-            ->create($this->table, $this->data)
-        ;
-
-        if (!empty($lastInsertId)) {
-            return $this->fetchById(
-                $lastInsertId,
-                \PDO::FETCH_OBJ
-            );
-        }
-
-        $this->clear();
-
-        return $this;
-    }
-
-    /**
-     * @param string|array|null $properties
-     *
-     * @return $this
-     */
-    public function reset($properties = [])
-    {
-        if (empty($properties)) {
-            try {
-                $reflection = new \ReflectionClass(get_class($this));
-
-                foreach ($reflection->getProperties() as $property) {
-                    $notReset = (!empty($this->notReset) ? $this->notReset : []);
-
-                    if (!in_array($property->getName(), $notReset)) {
-                        $this->reset[$property->getName()] = true;
-                    }
-                }
-            } catch (\ReflectionException $e) {
-            }
-        } else {
-            if (is_string($properties)) {
-                $properties = explode(',', $properties);
-            }
-
-            foreach ($properties as $property) {
-                $this->reset[trim($property)] = true;
-            }
-        }
-
-        return $this;
+        return $this->create($data, $validate);
     }
 
     /**
      * @param array|object $data
      * @param bool         $validate
      *
-     * @return $this
+     * @return self
      */
     public function data($data, bool $validate = true): self
     {
@@ -512,22 +484,22 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return $this|$this[]|null
+     * @return self[]|self|null
      */
     public function fetchById($id, $fetchStyle = null): ?self
     {
-        if (!empty($id) && $this->getPrimaryKey()) {
+        if (!empty($id) && $this->primaryKey) {
             if (is_array($id)) {
                 $this->where(sprintf(
-                    "AND {$this->table}.{$this->getPrimaryKey()} IN (%s)",
+                    "AND {$this->table}.{$this->primaryKey} IN (%s)",
                     implode(',', $id)
                 ));
 
-                return $this->fetchAll();
+                return $this->fetchAll($fetchStyle);
             }
 
-            $this->where("AND {$this->table}.{$this->getPrimaryKey()} = :__id__", [
-                '__id__' => filter_params($id)[0],
+            $this->where("AND {$this->table}.{$this->primaryKey} = :pkey", [
+                'pkey' => filter_params($id)[0],
             ]);
         }
 
@@ -542,12 +514,24 @@ abstract class Model implements \ArrayAccess
      * @param string|array $where
      * @param string|array $bindings
      *
-     * @return $this
+     * @return self
      */
-    public function where($where, $bindings = null)
+    public function where($where, $bindings = null): self
     {
         $this->mountProperty($where, 'where');
         $this->bindings($bindings);
+
+        return $this;
+    }
+
+    /**
+     * @param string|array $bindings
+     *
+     * @return self
+     */
+    public function bindings($bindings): self
+    {
+        Helper::parseStr($bindings, $this->bindings);
 
         return $this;
     }
@@ -558,7 +542,7 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return array[$this]|null
+     * @return self[]|null
      */
     public function fetchAll($fetchStyle = null, $fetchArgument = null)
     {
@@ -593,7 +577,7 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return $this|null
+     * @return self|null
      */
     public function fetch($fetchStyle = null): ?self
     {
@@ -619,27 +603,103 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPrimaryValue()
+    public function getPrimaryValue(): ?string
     {
-        return $this->{$this->getPrimaryKey()};
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
+        return $this->{$this->getPrimaryKey()} ?? null;
     }
 
     /**
      * @return string|null
      */
-    public function getDriver()
+    public function getPrimaryKey(): ?string
     {
-        return $this->driver;
+        return $this->primaryKey;
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @throws \Exception
+     *
+     * @return self
+     */
+    public function update($data, bool $validate = true): self
+    {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
+        $this->checkWherePk();
+
+        if (empty($this->where)) {
+            throw new \InvalidArgumentException(
+                sprintf('[update] `%s::where()` is empty.', get_called_class()),
+                E_USER_ERROR
+            );
+        }
+
+        $this->data = $this->db
+            ->driver($this->driver)
+            ->update(
+                $this->table,
+                $this->data,
+                "WHERE {$this->normalizeProperty($this->where)}",
+                $this->bindings
+            )
+        ;
+
+        $this->clear();
+
+        return $this;
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @throws \Exception
+     *
+     * @return self
+     */
+    public function create($data, bool $validate = true): self
+    {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
+        $lastInsertId = $this->db
+            ->driver($this->driver)
+            ->create($this->table, $this->data)
+        ;
+
+        if (!empty($lastInsertId)) {
+            return $this->fetchById(
+                $lastInsertId, \PDO::FETCH_OBJ
+            );
+        }
+
+        $this->clear(['data']);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDriver(): ?string
+    {
+        return $this->driver ?? null;
     }
 
     /**
@@ -647,22 +707,15 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return $this|null
+     * @return self
      */
-    public function delete($id = null): ?self
+    public function delete($id = null): self
     {
-        if (!empty($id) && $this->getPrimaryKey()) {
+        if (!empty($id) && !is_array($id) && $this->getPrimaryKey()) {
             $this->data([$this->getPrimaryKey() => $id]);
         }
 
-        if (!empty($this->getPrimaryValue())) {
-            $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkid ";
-            $this->bindings['pkid'] = $this->getPrimaryValue();
-        }
-
-        if (is_array($this->where)) {
-            $this->where = implode(' ', $this->where);
-        }
+        $this->checkWherePk();
 
         if (empty($this->where)) {
             throw new \InvalidArgumentException(
@@ -690,7 +743,17 @@ abstract class Model implements \ArrayAccess
      *
      * @return \Core\Database\Connection\Statement
      */
-    protected function buildSqlStatement()
+    public function getStatement(): Statement
+    {
+        return $this->buildSqlStatement();
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return \Core\Database\Connection\Statement
+     */
+    protected function buildSqlStatement(): Statement
     {
         if (empty($this->table)) {
             throw new \InvalidArgumentException(
@@ -716,7 +779,7 @@ abstract class Model implements \ArrayAccess
         // Build where
         if (!empty($this->where) && is_array($this->where)) {
             $this->where = $this->normalizeProperty(implode(' ', $this->where));
-            $sql .= "WHERE {$this->where} ";
+            $sql .= "WHERE{$this->where} ";
         }
 
         // Build group by
@@ -728,7 +791,7 @@ abstract class Model implements \ArrayAccess
         // Build having
         if (!empty($this->having) && is_array($this->having)) {
             $this->having = $this->normalizeProperty(implode(' ', $this->having));
-            $sql .= "HAVING {$this->having} ";
+            $sql .= "HAVING{$this->having} ";
         }
 
         // Build order by
@@ -751,7 +814,7 @@ abstract class Model implements \ArrayAccess
         // Execute sql
         $this->statement = $this->db
             ->driver($this->driver)
-            ->query($sql, $this->bindings)
+            ->query(trim($sql), $this->bindings)
         ;
 
         $this->clear();
@@ -760,61 +823,28 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string $string
+     * @param string|array $string
      *
      * @return string
      */
-    protected function normalizeProperty(string $string)
+    protected function normalizeProperty($string): string
     {
-        $chars = ['and', 'AND', 'or', 'OR'];
-
-        foreach ($chars as $char) {
-            $len = mb_strlen($char);
-
-            if (mb_substr($string, 0, $len) === (string)$char) {
-                $string = trim(mb_substr($string, $len));
-            }
+        if (is_array($string)) {
+            $string = implode(' ', $string);
         }
 
-        return $string;
-    }
-
-    /**
-     * @return $this
-     */
-    protected function clear(): self
-    {
-        try {
-            $reflection = new \ReflectionClass(get_class($this));
-
-            foreach ($reflection->getProperties() as $property) {
-                if (!in_array($property->getName(), [
-                    'statement',
-                    'driver',
-                    'table',
-                    'primaryKey',
-                    'data',
-                ])) {
-                    $value = null;
-
-                    if (preg_match('/@var\s+(array)/im', $property->getDocComment())) {
-                        $value = [];
-                    }
-
-                    $this->{$property->getName()} = $value;
-                }
-            }
-        } catch (\ReflectionException $e) {
-        }
-
-        return $this;
+        return preg_replace(
+            '/^(and|or)/i', '', trim($string)
+        );
     }
 
     /**
      * @param string|array|null $conditions
      * @param string            $property
+     *
+     * @return void
      */
-    protected function mountProperty($conditions, $property)
+    protected function mountProperty($conditions, $property): void
     {
         if (!is_array($this->{$property})) {
             $this->{$property} = [];
@@ -824,6 +854,17 @@ abstract class Model implements \ArrayAccess
             if (!empty($condition) && !array_search($condition, $this->{$property})) {
                 $this->{$property}[] = trim((string)$condition);
             }
+        }
+    }
+
+    /**
+     * @return void
+     */
+    protected function checkWherePk(): void
+    {
+        if (!empty($this->getPrimaryValue())) {
+            $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkey";
+            $this->bindings['pkey'] = $this->getPrimaryValue();
         }
     }
 }

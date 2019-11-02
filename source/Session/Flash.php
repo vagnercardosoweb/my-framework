@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Session;
@@ -57,6 +57,15 @@ class Flash
      * @param string $name
      * @param mixed  $value
      */
+    public function add($name, $value)
+    {
+        $this->set($name, $value);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
     public function set($name, $value)
     {
         // Cria um array vasio caso não exista a key
@@ -66,15 +75,6 @@ class Flash
 
         // Adiciona uma nova mensagem
         $this->storage[$name] = $value;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    public function add($name, $value)
-    {
-        $this->set($name, $value);
     }
 
     /**

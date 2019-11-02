@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -35,20 +35,20 @@ abstract class Connection
     /**
      * @return array
      */
-    public function getSupportedDrivers(): array
-    {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
-    }
-
-    /**
-     * @return array
-     */
     public function getAvailableDrivers(): array
     {
         return array_intersect(
             $this->getSupportedDrivers(),
             str_replace(['pdo_dblib'], 'dblib', \PDO::getAvailableDrivers())
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getSupportedDrivers(): array
+    {
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
     }
 
     /**
@@ -125,18 +125,6 @@ abstract class Connection
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getOptions(array $config): array
-    {
-        $options = $config['options'] ?? [];
-
-        return array_diff_key($this->options, $options) + $options;
-    }
-
-    /**
      * @param \PDO $connection
      */
     protected function setDefaultStatement(\PDO $connection): void
@@ -182,5 +170,17 @@ abstract class Connection
                 $connection->exec($command);
             }
         }
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected function getOptions(array $config): array
+    {
+        $options = $config['options'] ?? [];
+
+        return array_diff_key($this->options, $options) + $options;
     }
 }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/10/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -42,16 +42,6 @@ class Database
     private $connect;
 
     /**
-     * @var \PDO
-     */
-    private $pdo;
-
-    /**
-     * @var array
-     */
-    private $connections = [];
-
-    /**
      * @param \Core\Database\Connect $connect
      *
      * @throws \Exception
@@ -59,7 +49,6 @@ class Database
     public function __construct(Connect $connect)
     {
         $this->connect = $connect;
-        $this->pdo = $this->connect->getPdo();
     }
 
     /**
@@ -70,8 +59,8 @@ class Database
      */
     public function __call(string $method, $arguments)
     {
-        if ($this->pdo instanceof \PDO && method_exists($this->pdo, $method)) {
-            return $this->pdo->{$method}(...$arguments);
+        if ($this->connect->getPdo() instanceof \PDO && method_exists($this->connect->getPdo(), $method)) {
+            return $this->connect->getPdo()->{$method}(...$arguments);
         }
 
         throw new \BadMethodCallException(
@@ -89,15 +78,7 @@ class Database
      */
     public function driver(?string $driver = null): Database
     {
-        if (empty($driver)) {
-            $driver = $this->connect->getDefaultConnection();
-        }
-
-        if (empty($this->connections[$driver])) {
-            $this->connections[$driver] = $this->connect->connection($driver);
-        }
-
-        return $this->connections[$driver];
+        return $this->connect->connection($driver);
     }
 
     /**
@@ -105,7 +86,7 @@ class Database
      */
     public function getPdo(): \PDO
     {
-        return $this->pdo;
+        return $this->connect->getPdo();
     }
 
     /**

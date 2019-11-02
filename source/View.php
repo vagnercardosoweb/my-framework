@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/10/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -59,9 +59,7 @@ class View
             $response = $response->withStatus($status);
         }
 
-        $response->getBody()->write(
-            $this->fetch($template, $context)
-        );
+        $response->getBody()->write($this->fetch($template, $context));
 
         return $response;
     }
@@ -90,9 +88,7 @@ class View
             }
         }
 
-        return $this->environment->render(
-            "{$template}.twig", $context
-        );
+        return $this->environment->render("{$template}.twig", $context);
     }
 
     /**

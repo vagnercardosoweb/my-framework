@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -23,14 +23,14 @@ use Core\Database\Connection\SqlServerConnection;
 class Connect
 {
     /**
-     * @var \PDO
-     */
-    private $pdo;
-
-    /**
      * @var array[\PDO]
      */
     private static $instances;
+
+    /**
+     * @var \PDO
+     */
+    private $pdo;
 
     /**
      * @var array
@@ -40,7 +40,7 @@ class Connect
     /**
      * @var string
      */
-    private $defaultConnection;
+    private $defaultDriverConnection = 'mysql';
 
     /**
      * @param array  $config
@@ -64,7 +64,7 @@ class Connect
      */
     public function connection(?string $driver = null): Database
     {
-        $driver = $driver ?? $this->getDefaultConnection() ?? 'mysql';
+        $driver = $driver ?? $this->getDefaultDriverConnection();
         $config = $this->connections[$driver] ?? null;
 
         if (empty($config)) {
@@ -100,30 +100,30 @@ class Connect
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultDriverConnection(): string
+    {
+        return $this->defaultDriverConnection;
+    }
+
+    /**
+     * @param string $defaultDriverConnection
+     *
+     * @return Connect
+     */
+    public function setDefaultDriverConnection(string $defaultDriverConnection): Connect
+    {
+        $this->defaultDriverConnection = $defaultDriverConnection;
+
+        return $this;
+    }
+
+    /**
      * @return \PDO
      */
     public function getPdo(): \PDO
     {
         return $this->pdo;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultConnection(): string
-    {
-        return $this->defaultConnection;
-    }
-
-    /**
-     * @param string $defaultConnection
-     *
-     * @return Connect
-     */
-    public function setDefaultConnection(string $defaultConnection): Connect
-    {
-        $this->defaultConnection = $defaultConnection;
-
-        return $this;
     }
 }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 return [
@@ -34,6 +34,7 @@ return [
             'port' => env('DB_PORT', 3306),
             'username' => env('DB_USER', null),
             'password' => env('DB_PASS', null),
+            // 'notPassword' => true,
             'database' => env('DB_DATABASE', null),
             'charset' => env('DB_CHARSET', 'utf8'),
             'collation' => env('DB_COLLATE', 'utf8_general_ci'),

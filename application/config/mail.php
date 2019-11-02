@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 return [
@@ -19,9 +19,7 @@ return [
     'password' => env('MAIL_PASS', null),
     'from' => [
         'name' => env('MAIL_FROM_NAME', null),
-        'mail' => env('MAIL_FROM_MAIL', sprintf('no-reply@%s', preg_replace(
-            '/^localhost$/i', 'localhost.dev', $_SERVER['HTTP_HOST'])
-        )),
+        'mail' => env('MAIL_FROM_MAIL', 'no-reply@localhost.dev'),
     ],
     'language' => [
         'code' => env('MAIL_LANGUAGE_CODE', null),

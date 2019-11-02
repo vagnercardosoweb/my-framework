@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -46,6 +46,30 @@ class Router
     }
 
     /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param string $hash
+     *
+     * @return string
+     */
+    public static function pathFor(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
+    {
+        $name = strtolower($name);
+        $baseUrl = '';
+
+        if (':' === $name[0]) {
+            $name = substr($name, 1);
+            $baseUrl = BASE_URL;
+        }
+
+        return $baseUrl.App::getInstance()
+            ->resolve('router')
+            ->pathFor($name, $data, $queryParams)
+            .$hash;
+    }
+
+    /**
      * @param string|array $routes
      *
      * @return bool
@@ -69,30 +93,6 @@ class Router
         }
 
         return false;
-    }
-
-    /**
-     * @param string $name
-     * @param array  $data
-     * @param array  $queryParams
-     * @param string $hash
-     *
-     * @return string
-     */
-    public static function pathFor(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
-    {
-        $name = strtolower($name);
-        $baseUrl = '';
-
-        if (':' === $name[0]) {
-            $name = substr($name, 1);
-            $baseUrl = BASE_URL;
-        }
-
-        return $baseUrl.App::getInstance()
-            ->resolve('router')
-            ->pathFor($name, $data, $queryParams)
-            .$hash;
     }
 
     /**

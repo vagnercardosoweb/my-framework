@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -43,43 +43,11 @@ class SqlServerConnection extends Connection
      */
     protected function getDsn(array $config): string
     {
-        if (in_array('sqlsrv', \PDO::getAvailableDrivers())) {
+        if (in_array('sqlsrv', $this->getAvailableDrivers())) {
             return $this->getSqlSrvDsn($config);
         }
 
         return $this->getDblibDsn($config);
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    protected function getDblibDsn(array $config): string
-    {
-        $arguments = [
-            'host' => $this->buildHostString($config, ':'),
-            'dbname' => $config['database'],
-        ];
-
-        if (isset($config['charset']) && 'utf8' == $config['charset']) {
-            $arguments['charset'] = 'UTF-8';
-            $arguments['version'] = '7.0';
-        }
-
-        if (isset($config['version'])) {
-            $arguments['version'] = (string)$config['version'];
-        }
-
-        if (isset($config['version'])) {
-            $arguments['version'] = (string)$config['version'];
-        }
-
-        if (isset($config['appname'])) {
-            $arguments['appname'] = (string)$config['appname'];
-        }
-
-        return $this->buildConnectString('dblib', $arguments);
     }
 
     /**
@@ -133,6 +101,21 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * @param array  $config
+     * @param string $separator
+     *
+     * @return string
+     */
+    protected function buildHostString(array $config, $separator): string
+    {
+        if (isset($config['port']) && !empty($config['port'])) {
+            return $config['host'].$separator.$config['port'];
+        }
+
+        return $config['host'];
+    }
+
+    /**
      * @param string $driver
      * @param array  $arguments
      *
@@ -146,18 +129,35 @@ class SqlServerConnection extends Connection
     }
 
     /**
-     * @param array  $config
-     * @param string $separator
+     * @param array $config
      *
      * @return string
      */
-    protected function buildHostString(array $config, $separator): string
+    protected function getDblibDsn(array $config): string
     {
-        if (isset($config['port']) && !empty($config['port'])) {
-            return $config['host'].$separator.$config['port'];
+        $arguments = [
+            'host' => $this->buildHostString($config, ':'),
+            'dbname' => $config['database'],
+        ];
+
+        if (isset($config['charset']) && 'utf8' == $config['charset']) {
+            $arguments['charset'] = 'UTF-8';
+            $arguments['version'] = '7.0';
         }
 
-        return $config['host'];
+        if (isset($config['version'])) {
+            $arguments['version'] = (string)$config['version'];
+        }
+
+        if (isset($config['version'])) {
+            $arguments['version'] = (string)$config['version'];
+        }
+
+        if (isset($config['appname'])) {
+            $arguments['appname'] = (string)$config['appname'];
+        }
+
+        return $this->buildConnectString('dblib', $arguments);
     }
 
     /**

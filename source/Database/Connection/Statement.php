@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/09/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -24,6 +24,11 @@ class Statement extends \PDOStatement
      * @var \PDO
      */
     protected $pdo;
+
+    /**
+     * @var array
+     */
+    protected $bindings = [];
 
     /**
      * Statement constructor.
@@ -124,6 +129,39 @@ class Statement extends \PDOStatement
     }
 
     /**
+     * @param int $style
+     *
+     * @return bool
+     */
+    public function isFetchObject($style = null): bool
+    {
+        $allowed = [\PDO::FETCH_OBJ, \PDO::FETCH_CLASS];
+        $fetchMode = $style ?: $this->pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
+
+        if (in_array($fetchMode, $allowed)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getQueryString(): string
+    {
+        return $this->queryString;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBindings(): array
+    {
+        return $this->bindings;
+    }
+
+    /**
      * @param array|string $bindings
      */
     public function bindValues($bindings): void
@@ -142,32 +180,11 @@ class Statement extends \PDOStatement
                     $value = (int)$value;
                 }
 
-                $value = !empty($value) || '0' == $value
-                    ? filter_var($value, FILTER_DEFAULT)
-                    : null;
-
-                $this->bindValue(
-                    (is_string($key) ? ":{$key}" : ((int)$key + 1)), $value,
-                    (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR))
-                );
+                $key = (is_string($key) ? ":{$key}" : ((int)$key + 1));
+                $value = !empty($value) || '0' == $value ? filter_var($value, FILTER_DEFAULT) : null;
+                $this->bindValue($key, $value, (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR)));
+                $this->bindings[$key] = $value;
             }
         }
-    }
-
-    /**
-     * @param int $style
-     *
-     * @return bool
-     */
-    public function isFetchObject($style = null): bool
-    {
-        $allowed = [\PDO::FETCH_OBJ, \PDO::FETCH_CLASS];
-        $fetchMode = $style ?: $this->pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
-
-        if (in_array($fetchMode, $allowed)) {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace Core\Mailer;
@@ -68,20 +68,6 @@ class Mailer
         } catch (\Exception $e) {
             throw $e;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function clearAll(): void
-    {
-        $this->mail->clearAddresses();
-        $this->mail->clearAllRecipients();
-        $this->mail->clearAttachments();
-        $this->mail->clearBCCs();
-        $this->mail->clearCCs();
-        $this->mail->clearCustomHeaders();
-        $this->mail->clearReplyTos();
     }
 
     /**
@@ -157,5 +143,19 @@ class Mailer
         }
 
         return $host;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function clearAll(): void
+    {
+        $this->mail->clearAddresses();
+        $this->mail->clearAllRecipients();
+        $this->mail->clearAttachments();
+        $this->mail->clearBCCs();
+        $this->mail->clearCCs();
+        $this->mail->clearCustomHeaders();
+        $this->mail->clearReplyTos();
     }
 }

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 02/11/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -24,13 +24,13 @@ class CorsMiddleware extends Middleware
      * @var array
      */
     protected $allowedHeaders = [
-        'X-Requested-With',
-        'X-Http-Method-Override',
-        'Content-Type',
         'Accept',
         'Origin',
-        'Authorization',
         'X-Csrf-Token',
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'X-Http-Method-Override',
     ];
 
     /**
