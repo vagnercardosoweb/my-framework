@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -61,10 +61,10 @@ class Loader
 
         // Configurações de erro
 
-        ini_set('log_errors', ('true' == env('INI_LOG_ERRORS', 'true')));
+        ini_set('log_errors', ('true' == env('INI_LOG_ERRORS', ini_get('log_errors'))));
         ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));
-        ini_set('display_errors', env('INI_DISPLAY_ERRORS', 'On'));
-        ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', 'On'));
+        ini_set('display_errors', env('INI_DISPLAY_ERRORS', ini_get('display_errors')));
+        ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
 
         if ('development' == env('APP_ENV', 'development')) {
             error_reporting(E_ALL ^ E_DEPRECATED);

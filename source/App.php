@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 21/10/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -68,7 +68,7 @@ class App extends \Slim\App
      */
     public static function onlyApi(): bool
     {
-        return 'true' == env('APP_ONLY_API', false);
+        return true == env('APP_ONLY_API', false);
     }
 
     /**
@@ -122,9 +122,7 @@ class App extends \Slim\App
                     }
                 }
 
-                return call_user_func_array(
-                    [$controller, $method], $params
-                );
+                return call_user_func_array([$controller, $method], $params);
             });
         }
 
@@ -198,7 +196,8 @@ class App extends \Slim\App
         if ($container->has($name)) {
             if (is_callable($container->get($name))) {
                 return call_user_func_array(
-                    $container->get($name), $params
+                    $container->get($name),
+                    $params
                 );
             }
 
