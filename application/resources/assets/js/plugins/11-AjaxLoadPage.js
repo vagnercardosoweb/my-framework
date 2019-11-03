@@ -35,12 +35,12 @@ function loadPage(content, location, pushState, cache) {
   }
 
   if (cache === true) {
-    location = location + '?time=' + new Date().getTime();
+    location = location + '?time=' + (new Date()).getTime();
   }
 
   $.ajax({
     url: location,
-    headers: { vcAjaxPage: true },
+    headers: { 'vcAjaxPage': true },
     cache: false,
 
     success: function (html) {
@@ -51,11 +51,7 @@ function loadPage(content, location, pushState, cache) {
 
         /* Muda URL e Histórico de Navegação */
         if (pushState) {
-          window.history.pushState(
-            { content: content },
-            null,
-            location.replace(/(\?|&)time\=(\d+)/g, ''),
-          );
+          window.history.pushState({ content: content }, null, location.replace(/(\?|&)time\=(\d+)/g, ''));
         }
       }
 
@@ -82,50 +78,33 @@ function loadPage(content, location, pushState, cache) {
       /* Coloca classe ativa no final da requisição no link clicado */
       var lhref = location.replace(baseUrl, '');
 
-      $.each(
-        $(document).find(
-          '*[href="' + lhref + '"], *[data-href="' + lhref + '"]',
-        ),
-        function (i, element) {
-          $.each(
-            $(element)
-              .parent()
-              .parent()
-              .parent()
-              .find('*[href], *[data-href]'),
-            function (i, elRemove) {
-              var vcAjax = false;
+      $.each($(document).find('*[href="' + lhref + '"], *[data-href="' + lhref + '"]'), function (i, element) {
+        $.each($(element).parent().parent().parent().find('*[href], *[data-href]'), function (i, elRemove) {
+          var vcAjax = false;
 
-              $.each(elRemove.attributes, function (i, attr) {
-                if (attr.name && attr.name.match(/vc-/g)) {
-                  vcAjax = true;
-                }
-              });
+          $.each(elRemove.attributes, function (i, attr) {
+            if (attr.name && attr.name.match(/vc-/g)) {
+              vcAjax = true;
+            }
+          });
 
-              if (vcAjax === false) {
-                var elHref =
-                      $(elRemove).attr('href') || $(elRemove).data('href');
+          if (vcAjax === false) {
+            var elHref = $(elRemove).attr('href') || $(elRemove).data('href');
 
-                if (!elHref.match(/#|javascript/g)) {
-                  $(elRemove).removeClass('ajax-active active');
-                  $(elRemove)
-                    .parent()
-                    .removeClass('ajax-active active');
-                }
-              } else {
-                vcAjax = false;
-              }
-            },
-          );
+            if (!elHref.match(/#|javascript/g)) {
+              $(elRemove).removeClass('ajax-active active');
+              $(elRemove).parent().removeClass('ajax-active active');
+            }
+          } else {
+            vcAjax = false;
+          }
+        });
 
-          setTimeout(function () {
-            $(element).addClass('ajax-active active');
-            $(element)
-              .parent()
-              .addClass('ajax-active active');
-          }, 150);
-        },
-      );
+        setTimeout(function () {
+          $(element).addClass('ajax-active active');
+          $(element).parent().addClass('ajax-active active');
+        }, 150);
+      });
 
       /* Carrega JS */
       if (typeof loadHtmlSuccessCallbacks !== 'undefined') {
@@ -283,11 +262,6 @@ function onLoadHtmlSuccess(callback) {
 
   /* Histórico de navegação */
   window.onpopstate = function (e) {
-    loadPage(
-      e.state.content || '#content-ajax',
-      window.location.pathname,
-      false,
-      false,
-    );
+    loadPage(e.state.content || '#content-ajax', window.location.pathname, false, false);
   };
 })(jQuery);

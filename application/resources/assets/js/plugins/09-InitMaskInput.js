@@ -17,23 +17,31 @@ export function initMaskInput() {
   $('.maskCnpj').mask('00.000.000/0000-00', { reverse: true, placeholder: '__.___.___/____-__' });
 
   $('.maskCep').mask('00000-000', {
-    onKeyPress: function(cep, e, field, options) {
+    onKeyPress: function (value, e, field, options) {
       var masks = ['00000-000', '0-00-00-00'];
-      var mask = (cep.length > 7) ? masks[0] : masks[1];
+      var mask = (value.length > 7) ? masks[0] : masks[1];
 
-      $('.maskCep').mask(mask, options);
+      $(field[0]).mask(mask, options);
     },
 
     placeholder: '_____-___',
   });
 
+  const MaskCpfAndCnpj = (val) => val.replace(/\D/g, '').length > 11 ? '00.000.000/0000-00' : '000.000.000-009';
+
+  $('.maskCpfAndCnpj').mask(MaskCpfAndCnpj, {
+    onKeyPress: function (value, e, field, options) {
+      field.mask(MaskCpfAndCnpj(value), options);
+    },
+  });
+
   /**
    * @return {string}
    */
-  var SPMaskBehavior = function(val) {
+  var SPMaskBehavior = function (val) {
     return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
   }, spOptions       = {
-    onKeyPress: function(val, e, field, options) {
+    onKeyPress: function (val, e, field, options) {
       field.mask(SPMaskBehavior.apply({}, arguments), options);
     },
 
@@ -45,10 +53,10 @@ export function initMaskInput() {
 };
 
 /* Carrega o documento */
-$(document).ready(function() {
+$(document).ready(function () {
   /* INIT :: Mask Input */
   if (typeof onLoadHtmlSuccess !== 'undefined' && typeof onLoadHtmlSuccess === 'function') {
-    onLoadHtmlSuccess(function() {
+    onLoadHtmlSuccess(function () {
       initMaskInput();
     });
   } else {

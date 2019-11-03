@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -84,7 +84,7 @@ class View
             $path = $this->loader->getPaths(str_replace('@', '', $namespace));
 
             if (!empty($path[0]) && file_exists("{$path[0]}/{$folder}/index.twig")) {
-                $template = "{$template}/index.twig";
+                $template = "{$template}/index";
             }
         }
 

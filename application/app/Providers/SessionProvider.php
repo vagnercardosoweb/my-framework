@@ -29,7 +29,7 @@ class SessionProvider extends Provider
     public function register(): void
     {
         $this->container['session'] = function () {
-            if (!Helper::isPhpCli() && true == env('APP_SESSION', true)) {
+            if (!Helper::isPhpCli() && 'true' == env('APP_SESSION', true)) {
                 return new Session();
             }
 
