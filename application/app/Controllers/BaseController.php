@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/08/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -21,22 +21,22 @@ use Slim\Http\StatusCode;
 /**
  * Class BaseController.
  *
- * @property \Slim\Collection        $settings
- * @property \Slim\Http\Environment  $environment
- * @property \Slim\Http\Request      $request
- * @property \Slim\Http\Response     $response
- * @property \Slim\Router            $router
- * @property \Core\View              $view
- * @property \Core\Session\Session   $session
- * @property \Core\Session\Flash     $flash
- * @property \Core\Mailer\Mailer     $mailer
- * @property \Core\Password\Password $hash
- * @property \Core\Encryption        $encryption
- * @property \Core\Jwt               $jwt
- * @property \Core\Logger            $logger
- * @property \Core\Event             $event
- * @property \Core\Database\Database $db
- * @property \Core\Database\Connect  $connect
+ * @property \Slim\Collection             $settings
+ * @property \Slim\Http\Environment       $environment
+ * @property \Slim\Http\Request           $request
+ * @property \Slim\Http\Response          $response
+ * @property \Slim\Router                 $router
+ * @property \Core\View                   $view
+ * @property \Core\Session\Session|object $session
+ * @property \Core\Session\Flash|object   $flash
+ * @property \Core\Mailer\Mailer          $mailer
+ * @property \Core\Password\Password      $hash
+ * @property \Core\Encryption             $encryption
+ * @property \Core\Jwt                    $jwt
+ * @property \Core\Logger                 $logger
+ * @property \Core\Event                  $event
+ * @property \Core\Database\Database      $db
+ * @property \Core\Database\Connect       $connect
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -195,6 +195,16 @@ abstract class BaseController
 
     /**
      * @param string|null $key
+     *
+     * @return array|mixed|object|null
+     */
+    public function getParsedBodyFiltered(?string $key = null)
+    {
+        return $this->getParsedBody($key, true);
+    }
+
+    /**
+     * @param string|null $key
      * @param bool        $filtered
      *
      * @return array|mixed|object|null
@@ -218,9 +228,9 @@ abstract class BaseController
      *
      * @return array|mixed|object|null
      */
-    public function getParsedBodyFiltered(?string $key = null)
+    public function getQueryParamsFiltered(?string $key = null)
     {
-        return $this->getParsedBody($key, true);
+        return $this->getQueryParams($key, true);
     }
 
     /**
@@ -246,11 +256,11 @@ abstract class BaseController
     /**
      * @param string|null $key
      *
-     * @return array|mixed|object|null
+     * @return array|mixed|null
      */
-    public function getQueryParamsFiltered(?string $key = null)
+    public function getParamsFiltered(?string $key = null)
     {
-        return $this->getQueryParams($key, true);
+        return $this->getParams($key, true);
     }
 
     /**
@@ -271,16 +281,6 @@ abstract class BaseController
         }
 
         return $result;
-    }
-
-    /**
-     * @param string|null $key
-     *
-     * @return array|mixed|null
-     */
-    public function getParamsFiltered(?string $key = null)
-    {
-        return $this->getParams($key, true);
     }
 
     /**

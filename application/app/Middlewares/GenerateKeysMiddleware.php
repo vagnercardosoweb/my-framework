@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -41,7 +41,7 @@ class GenerateKeysMiddleware extends Middleware
                     APP_FOLDER.'/.env',
                     preg_replace(
                         "/^{$key}{$scaped}/m",
-                        "{$key}=vcw_{$random}",
+                        "{$key}=vcw:{$random}",
                         file_get_contents(APP_FOLDER.'/.env')
                     )
                 );

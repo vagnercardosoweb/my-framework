@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -29,7 +29,7 @@ class SessionProvider extends Provider
     public function register(): void
     {
         $this->container['session'] = function () {
-            if (!Helper::isPhpCli() && true == env('APP_SESSION', 'true')) {
+            if (!Helper::isPhpCli() && true == env('APP_SESSION', true)) {
                 return new Session();
             }
 
@@ -52,9 +52,9 @@ class SessionProvider extends Provider
      */
     public function boot(): void
     {
-        if (!Helper::isPhpCli() && 'true' == env('APP_SESSION', 'true')) {
-            $this->view->addGlobal('session', $this->session->all());
-            $this->view->addGlobal('flash', $this->flash->all());
+        if ($this->session) {
+            $this->view->addGlobal('session', $this->session);
+            $this->view->addGlobal('flash', $this->flash);
         }
     }
 }

@@ -5,13 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace Core\Session;
 
-use Core\App;
-use Core\Helpers\Arr;
+use Core\Helpers\Obj;
 
 /**
  * Class Flash.
@@ -23,86 +22,148 @@ class Flash
     /**
      * @var string
      */
-    protected $key = '__flash__';
+    protected $key = 'vcw:flash';
 
     /**
-     * @var array|object
+     * @var object
      */
-    protected $data = [];
+    protected $data;
 
     /**
-     * @var array
+     * @var object
      */
     protected $storage;
 
     /**
      * Flash constructor.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
-        if (!isset($_SESSION)) {
-            App::getInstance()->resolve('session')->start();
+        if ('true' != env('APP_SESSION', true)) {
+            throw new \Exception('Session must be enabled to use flash message.');
         }
 
-        $this->storage = &$_SESSION[$this->key];
+        (new Session())->start();
 
-        if (!empty($this->storage) && is_array($this->storage)) {
+        $this->storage = &$_SESSION[$this->key];
+        $this->storage = Obj::fromArray($this->storage);
+
+        if (isset($this->storage) && is_object($this->storage)) {
             $this->data = $this->storage;
         }
 
-        $this->storage = [];
+        $this->storage = new \stdClass();
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset(string $name): bool
+    {
+        return $this->has($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        return $this->get($name);
     }
 
     /**
      * @param string $name
      * @param mixed  $value
+     *
+     * @return void
      */
-    public function add($name, $value)
+    public function __set(string $name, $value): void
     {
         $this->set($name, $value);
     }
 
     /**
      * @param string $name
-     * @param mixed  $value
+     *
+     * @return void
      */
-    public function set($name, $value)
+    public function __unset(string $name): void
     {
-        // Cria um array vasio caso não exista a key
-        if (empty($this->storage[$name])) {
-            $this->storage[$name] = [];
-        }
-
-        // Adiciona uma nova mensagem
-        $this->storage[$name] = $value;
+        $this->remove($name);
     }
 
     /**
-     * @return array
+     * @param string $name
+     *
+     * @return bool
      */
-    public function all()
+    public function has(string $name): bool
+    {
+        return isset($this->data->{$name});
+    }
+
+    /**
+     * @param string $name
+     * @param string $default
+     *
+     * @return mixed
+     */
+    public function get($name, $default = null)
+    {
+        if (isset($this->data->{$name})) {
+            return $this->data->{$name};
+        }
+
+        return $default;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function set(string $name, $value): void
+    {
+        if (is_array($value)) {
+            $value = Obj::fromArray($value);
+        }
+
+        $this->storage->{$name} = $value;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
+    public function remove(string $name): void
+    {
+        if ($this->has($name)) {
+            unset($this->storage->{$name});
+        }
+    }
+
+    /**
+     * @return object
+     */
+    public function all(): object
     {
         return $this->data;
     }
 
     /**
-     * @param string $key
-     * @param string $default
-     *
-     * @return mixed
+     * @return void
      */
-    public function get($key, $default = null)
+    public function clear(): void
     {
-        return Arr::get($this->data, $key, $default);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function has($key)
-    {
-        return Arr::has($this->data, $key);
+        $this->data = new \stdClass();
+        $this->storage = $this->data;
     }
 }

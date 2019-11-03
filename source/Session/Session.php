@@ -5,12 +5,12 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 03/11/2019 Vagner Cardoso
  */
 
 namespace Core\Session;
 
-use Core\Helpers\Arr;
+use Core\Helpers\Obj;
 
 /**
  * Class Session.
@@ -20,20 +20,71 @@ use Core\Helpers\Arr;
 class Session
 {
     /**
-     * @var array
+     * @var string
      */
-    protected $session = [];
+    protected $key = 'vcw:session';
+
+    /**
+     * @var object
+     */
+    protected $storage;
 
     /**
      * Session constructor.
+     *
+     * @throws \Exception
      */
     public function __construct()
     {
-        if (!isset($_SESSION)) {
-            $this->start();
+        if ('true' != env('APP_SESSION', true)) {
+            throw new \Exception('Session is not enabled.');
         }
 
-        $this->session = &$_SESSION;
+        $this->start();
+
+        $this->storage = &$_SESSION[$this->key];
+        $this->storage = Obj::fromArray($this->storage);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed|null
+     */
+    public function __get(string $name)
+    {
+        return $this->get($name);
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function __set(string $name, $value): void
+    {
+        $this->set($name, $value);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset(string $name): bool
+    {
+        return $this->has($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
+    public function __unset(string $name): void
+    {
+        $this->remove($name);
     }
 
     /**
@@ -41,12 +92,29 @@ class Session
      */
     public function start(): void
     {
-        if (!session_id()) {
-            $current = session_get_cookie_params();
+        if (!session_id() && PHP_SESSION_NONE === session_status()) {
+            $current = $this->cookieParams();
+            $cacheLimiter = env('APP_SESSION_CACHE_LIMITER', null);
+            $sessionSave = env('APP_SESSION_SAVE_PATH', false);
+            $sessionName = isset($_SERVER) ? $_SERVER['HTTP_HOST'] : 'vcw:session_name';
 
-            session_set_cookie_params($current['lifetime'], $current['path'], $current['domain'], $current['secure'], true);
-            session_name(md5(md5('VCWEBNETWORKS')));
-            session_cache_limiter('nocache');
+            session_set_cookie_params(
+                $current['lifetime'],
+                $current['path'],
+                $current['domain'],
+                $current['secure'],
+                true
+            );
+
+            session_name(md5(sha1($sessionName)));
+
+            if (null !== $cacheLimiter) {
+                session_cache_limiter($cacheLimiter);
+            }
+
+            if ('true' == $sessionSave) {
+                session_save_path(APP_FOLDER.'/storage/sessions');
+            }
 
             session_start();
         }
@@ -55,79 +123,91 @@ class Session
     /**
      * @return array
      */
-    public function all()
+    public function cookieParams(): array
     {
-        return $this->session;
+        return session_get_cookie_params();
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function set($key, $value = null)
-    {
-        if (!is_array($key)) {
-            $key = [$key => $value];
-        }
-
-        foreach ($key as $k => $v) {
-            Arr::set($this->session, $k, $v);
-        }
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function has($key)
-    {
-        return $this->get($key, false);
-    }
-
-    /**
-     * @param string $key
+     * @param string $name
      * @param mixed  $default
      *
      * @return mixed
      */
-    public function get($key, $default = null)
+    public function get(string $name, $default = null)
     {
-        return Arr::get($this->session, $key, $default);
+        if (isset($this->storage->{$name})) {
+            return $this->storage->{$name};
+        }
+
+        return $default;
     }
 
     /**
-     * @param string $key
+     * @param string $name
+     * @param mixed  $value
      *
-     * @return mixed
+     * @return void
      */
-    public function forget($key)
+    public function set(string $name, $value): void
     {
-        $this->remove($key);
+        if (is_array($value)) {
+            $value = Obj::fromArray($value);
+        }
+
+        $this->storage->{$name} = $value;
     }
 
     /**
-     * @param string $key
+     * @param string $name
      *
-     * @return mixed
+     * @return bool
      */
-    public function remove($key)
+    public function has(string $name): bool
     {
-        Arr::forget($this->session, $key);
+        return isset($this->storage->{$name});
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
+    public function remove(string $name): void
+    {
+        if ($this->has($name)) {
+            unset($this->storage->{$name});
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function id(): string
+    {
+        return session_id();
+    }
+
+    /**
+     * @return object
+     */
+    public function all()
+    {
+        return $this->storage;
     }
 
     /**
      * @return void
      */
-    public function destroy(): void
+    public function clear(): void
     {
-        $_SESSION = [];
+        $this->storage = new \stdClass();
 
         if (ini_get('session.use_cookies')) {
-            $params = session_get_cookie_params();
+            $params = $this->cookieParams();
 
             setcookie(
-                session_name(),
+                $this->name(),
                 '',
                 (time() - 42000),
                 $params['path'],
@@ -137,11 +217,30 @@ class Session
             );
         }
 
-        if (PHP_SESSION_ACTIVE == session_status()) {
+        if ($this->active()) {
             session_destroy();
+            session_unset();
 
             $this->regenerate();
         }
+
+        session_write_close();
+    }
+
+    /**
+     * @return string
+     */
+    public function name(): string
+    {
+        return session_name();
+    }
+
+    /**
+     * @return bool
+     */
+    public function active(): bool
+    {
+        return PHP_SESSION_ACTIVE === session_status();
     }
 
     /**
@@ -149,7 +248,7 @@ class Session
      */
     public function regenerate(): void
     {
-        if (PHP_SESSION_ACTIVE == session_status()) {
+        if ($this->active()) {
             session_regenerate_id(true);
         }
     }
