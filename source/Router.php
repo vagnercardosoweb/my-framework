@@ -5,12 +5,13 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 namespace Core;
 
 use Core\Helpers\Helper;
+use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
 /**
@@ -20,11 +21,6 @@ use Slim\Http\StatusCode;
  */
 class Router
 {
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public static function isCurrent(string $name): bool
     {
         $router = str_replace(BASE_URL, '', self::pathFor($name));
@@ -45,15 +41,7 @@ class Router
         return false;
     }
 
-    /**
-     * @param string $name
-     * @param array  $data
-     * @param array  $queryParams
-     * @param string $hash
-     *
-     * @return string
-     */
-    public static function pathFor(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
+    public static function pathFor(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
     {
         $name = strtolower($name);
         $baseUrl = '';
@@ -71,8 +59,6 @@ class Router
 
     /**
      * @param string|array $routes
-     *
-     * @return bool
      */
     public static function hasCurrent($routes): bool
     {
@@ -95,16 +81,7 @@ class Router
         return false;
     }
 
-    /**
-     * @param string      $name
-     * @param array       $data
-     * @param array       $queryParams
-     * @param string|null $hash
-     * @param int         $status
-     *
-     * @return \Slim\Http\Response
-     */
-    public static function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, ?string $hash = null)
+    public static function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, string $hash = ''): Response
     {
         try {
             $location = self::pathFor($name, $data, $queryParams, $hash);

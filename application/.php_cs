@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 04/07/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 // require_once __DIR__.'/vendor/autoload.php';
@@ -52,7 +52,7 @@ return PhpCsFixer\Config::create()
         'list_syntax' => ['syntax' => 'long'],
         'no_short_echo_tag' => true,
         'phpdoc_trim' => true,
-        //'phpdoc_summary' => false,
+        'phpdoc_summary' => true,
         'phpdoc_to_comment' => true,
         'phpdoc_add_missing_param_annotation' => ['only_untyped' => false],
         'phpdoc_align' => true,

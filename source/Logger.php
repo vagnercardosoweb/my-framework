@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -32,10 +32,6 @@ class Logger extends Monolog
      */
     protected $directory;
 
-    /**
-     * @param string $name
-     * @param string $directory
-     */
     public function __construct(string $name, string $directory)
     {
         parent::__construct($name);
@@ -54,9 +50,6 @@ class Logger extends Monolog
         $this->handlers = [];
     }
 
-    /**
-     * @return string
-     */
     public function getDirectory(): string
     {
         if (!is_dir($this->directory)) {
@@ -71,12 +64,7 @@ class Logger extends Monolog
         );
     }
 
-    /**
-     * @param string $filename
-     *
-     * @return \Core\Logger
-     */
-    public function filename($filename = null): Logger
+    public function filename(string $filename = ''): Logger
     {
         if (empty($filename)) {
             return $this;

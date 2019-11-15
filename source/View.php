@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -32,7 +32,6 @@ class View
 
     /**
      * @param string|array $path
-     * @param array        $options
      *
      * @throws \Twig\Error\LoaderError
      */
@@ -45,15 +44,7 @@ class View
         $this->environment = new \Twig\Environment($this->loader, $options);
     }
 
-    /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $template
-     * @param array                               $context
-     * @param int                                 $status
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function render(ResponseInterface $response, string $template, array $context = [], ?int $status = StatusCode::HTTP_OK): ResponseInterface
+    public function render(ResponseInterface $response, string $template, array $context = [], int $status = StatusCode::HTTP_OK): ResponseInterface
     {
         if ($status) {
             $response = $response->withStatus($status);
@@ -65,9 +56,6 @@ class View
     }
 
     /**
-     * @param string $template
-     * @param array  $context
-     *
      * @return string
      */
     public function fetch(string $template, array $context = [])
@@ -92,8 +80,6 @@ class View
     }
 
     /**
-     * @param \Twig\Extension\ExtensionInterface $extension
-     *
      * @return $this
      */
     public function addExtension(\Twig\Extension\ExtensionInterface $extension)
@@ -104,9 +90,7 @@ class View
     }
 
     /**
-     * @param string   $name
      * @param callable $callable
-     * @param array    $options
      *
      * @return $this
      */
@@ -120,9 +104,7 @@ class View
     }
 
     /**
-     * @param string   $name
      * @param callable $callable
-     * @param array    $options
      *
      * @return $this
      */
@@ -136,8 +118,7 @@ class View
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this
      */
@@ -159,8 +140,6 @@ class View
     }
 
     /**
-     * @param array $paths
-     *
      * @throws \Twig\Error\LoaderError
      *
      * @return \Twig\Loader\FilesystemLoader

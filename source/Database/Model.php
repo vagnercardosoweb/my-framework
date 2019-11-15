@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -141,8 +141,6 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return void
      */
     public function __set($name, $value): void
     {
@@ -152,8 +150,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
-     *
-     * @return bool
      */
     public function __isset($name): bool
     {
@@ -162,8 +158,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
-     *
-     * @return void
      */
     public function __unset($name): void
     {
@@ -183,8 +177,6 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string $name
      * @param mixed  $value
-     *
-     * @return void
      */
     public function offsetSet($name, $value): void
     {
@@ -193,8 +185,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
-     *
-     * @return bool
      */
     public function offsetExists($name): bool
     {
@@ -203,25 +193,17 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
-     *
-     * @return void
      */
     public function offsetUnset($name): void
     {
         $this->__unset($name);
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         return Obj::toArray($this->data);
     }
 
-    /**
-     * @return object
-     */
     public function toObject(): object
     {
         return Obj::fromArray($this->data);
@@ -229,20 +211,12 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @throws \Exception
-     *
-     * @return int
      */
     public function rowCount(): int
     {
         return $this->buildSqlStatement()->rowCount();
     }
 
-    /**
-     * @param array $properties
-     * @param bool  $reset
-     *
-     * @return self
-     */
     public function clear(array $properties = [], bool $reset = false): self
     {
         $notReset = array_diff(['table', 'primaryKey', 'driver', 'fetchStyle', 'statement', 'data'], $properties);
@@ -266,8 +240,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array|null $properties
-     *
-     * @return self
      */
     public function reset(array $properties = []): self
     {
@@ -278,8 +250,6 @@ abstract class Model implements \ArrayAccess
      * @param string $column
      *
      * @throws \Exception
-     *
-     * @return int
      */
     public function count($column = '1'): int
     {
@@ -293,8 +263,6 @@ abstract class Model implements \ArrayAccess
     /**
      * @param int $limit
      * @param int $offset
-     *
-     * @return self
      */
     public function limit($limit, $offset = 0): self
     {
@@ -311,8 +279,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param int $offset
-     *
-     * @return self
      */
     public function offset($offset): self
     {
@@ -323,8 +289,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array|null $order
-     *
-     * @return self
      */
     public function order($order): self
     {
@@ -335,8 +299,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param mixed $select
-     *
-     * @return self
      */
     public function select($select = '*'): self
     {
@@ -367,8 +329,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array|null $join
-     *
-     * @return self
      */
     public function join($join): self
     {
@@ -379,8 +339,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array|null $group
-     *
-     * @return self
      */
     public function group($group): self
     {
@@ -391,8 +349,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array|null $having
-     *
-     * @return self
      */
     public function having($having): self
     {
@@ -402,8 +358,6 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param \Closure $callback
-     *
      * @throws \Exception
      *
      * @return mixed
@@ -428,11 +382,8 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param array|object|null $data
-     * @param bool              $validate
      *
      * @throws \Exception
-     *
-     * @return self
      */
     public function save($data = null, bool $validate = true): self
     {
@@ -444,7 +395,7 @@ abstract class Model implements \ArrayAccess
         $bindings = $this->bindings;
         $exists = $this->fetchById($this->getPrimaryValue());
 
-        if ($exists || !empty($where)) {
+        if ($exists) {
             $this->where = $where;
             $this->bindings = $bindings;
 
@@ -456,9 +407,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param array|object $data
-     * @param bool         $validate
-     *
-     * @return self
      */
     public function data($data, bool $validate = true): self
     {
@@ -513,8 +461,6 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array $where
      * @param string|array $bindings
-     *
-     * @return self
      */
     public function where($where, $bindings = null): self
     {
@@ -526,8 +472,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array $bindings
-     *
-     * @return self
      */
     public function bindings($bindings): self
     {
@@ -576,8 +520,6 @@ abstract class Model implements \ArrayAccess
      * @param int $fetchStyle
      *
      * @throws \Exception
-     *
-     * @return self|null
      */
     public function fetch($fetchStyle = null): ?self
     {
@@ -602,31 +544,22 @@ abstract class Model implements \ArrayAccess
         return $row ?: null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrimaryValue(): ?string
     {
         return $this->{$this->getPrimaryKey()} ?? null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrimaryKey(): ?string
     {
         return $this->primaryKey;
     }
 
     /**
-     * @param array|object $data
-     * @param bool         $validate
+     * @param array|object|null $data
      *
      * @throws \Exception
-     *
-     * @return self
      */
-    public function update($data, bool $validate = true): self
+    public function update($data = null, bool $validate = true): self
     {
         if (is_array($data) || is_object($data)) {
             $this->data($data, $validate);
@@ -635,10 +568,7 @@ abstract class Model implements \ArrayAccess
         $this->checkWherePk();
 
         if (empty($this->where)) {
-            throw new \InvalidArgumentException(
-                sprintf('[update] `%s::where()` is empty.', get_called_class()),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('[update] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
         }
 
         $this->data = $this->db
@@ -658,11 +588,8 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param array|object $data
-     * @param bool         $validate
      *
      * @throws \Exception
-     *
-     * @return self
      */
     public function create($data, bool $validate = true): self
     {
@@ -686,17 +613,11 @@ abstract class Model implements \ArrayAccess
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTable(): string
     {
         return $this->table;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDriver(): ?string
     {
         return $this->driver ?? null;
@@ -706,8 +627,6 @@ abstract class Model implements \ArrayAccess
      * @param int|null $id Primary key value
      *
      * @throws \Exception
-     *
-     * @return self
      */
     public function delete($id = null): self
     {
@@ -718,10 +637,7 @@ abstract class Model implements \ArrayAccess
         $this->checkWherePk();
 
         if (empty($this->where)) {
-            throw new \InvalidArgumentException(
-                sprintf('[delete] `%s::where()` is empty.', get_called_class()),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('[delete] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
         }
 
         $this->data = $this->db
@@ -740,8 +656,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     public function getStatement(): Statement
     {
@@ -750,16 +664,11 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     protected function buildSqlStatement(): Statement
     {
         if (empty($this->table)) {
-            throw new \InvalidArgumentException(
-                sprintf('[buildSqlStatement] `%s::table` is empty.', get_called_class()),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('[buildSqlStatement] `%s::table` is empty.', get_called_class()), E_USER_ERROR);
         }
 
         if (method_exists($this, '_conditions')) {
@@ -824,8 +733,6 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string|array $string
-     *
-     * @return string
      */
     protected function normalizeProperty($string): string
     {
@@ -841,8 +748,6 @@ abstract class Model implements \ArrayAccess
     /**
      * @param string|array|null $conditions
      * @param string            $property
-     *
-     * @return void
      */
     protected function mountProperty($conditions, $property): void
     {
@@ -857,9 +762,6 @@ abstract class Model implements \ArrayAccess
         }
     }
 
-    /**
-     * @return void
-     */
     protected function checkWherePk(): void
     {
         if (!empty($this->getPrimaryValue())) {

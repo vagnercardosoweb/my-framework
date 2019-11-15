@@ -5,13 +5,14 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 15/11/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
 
 use Core\App;
 use Core\Router;
+use Monolog\Logger;
 use Slim\Container;
 use Slim\Exception\NotFoundException;
 use Slim\Http\Request;
@@ -57,11 +58,6 @@ abstract class BaseController
      */
     protected $container;
 
-    /**
-     * @param \Slim\Http\Request  $request
-     * @param \Slim\Http\Response $response
-     * @param \Slim\Container     $container
-     */
     public function __construct(Request $request, Response $response, Container $container)
     {
         $this->request = $request;
@@ -81,152 +77,91 @@ abstract class BaseController
         return App::getInstance()->resolve($name);
     }
 
-    /**
-     * @param string $template
-     * @param array  $context
-     * @param int    $status
-     *
-     * @return \Slim\Http\Response
-     */
-    public function view(string $template, array $context = [], ?int $status = StatusCode::HTTP_OK)
+    public function view(string $template, array $context = [], int $status = StatusCode::HTTP_OK): Response
     {
         return $this->view->render($this->response, $template, $context, $status);
     }
 
-    /**
-     * @param string $template
-     * @param array  $context
-     *
-     * @return string
-     */
     public function viewFetch(string $template, array $context = []): string
     {
         return $this->view->fetch($template, $context);
     }
 
     /**
-     * @param string $name
-     * @param string $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public function config(string $name = null, $default = null)
+    public function config(string $name = '', $default = null)
     {
-        return config(
-            $name, $default
-        );
+        return config($name, $default);
     }
 
     /**
-     * @param string $message
-     * @param array  $context
-     * @param string $file
-     * @param string $type
-     *
-     * @return mixed
+     * @return Logger|bool
      */
-    public function logger(string $message, array $context = [], string $file = null, string $type = 'info')
+    public function logger(string $message, array $context = [], string $file = '', string $type = 'info')
     {
         return logger($message, $context, $type, $file);
     }
 
     /**
      * @param mixed $data
-     * @param int   $status
-     * @param int   $options
-     *
-     * @return \Slim\Http\Response
      */
-    public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0)
+    public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
     {
         return json($data, $status, $options);
     }
 
-    /**
-     * @param string|null $message
-     * @param array       $data
-     * @param int         $status
-     *
-     * @return \Slim\Http\Response
-     */
-    public function jsonSuccess(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
+    public function jsonSuccess(string $message = '', array $data = [], int $status = StatusCode::HTTP_OK): Response
     {
         return json_success($message, $data, $status);
     }
 
-    /**
-     * @param \Exception|\Throwable $exception
-     * @param array                 $data
-     * @param int                   $status
-     *
-     * @return \Slim\Http\Response
-     */
-    public function jsonError($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
+    public function jsonError(\Exception $exception, array $data = [], int $status = StatusCode::HTTP_BAD_REQUEST): Response
     {
         return json_error($exception, $data, $status);
     }
 
-    /**
-     * @param string      $name
-     * @param array       $data
-     * @param array       $queryParams
-     * @param string|null $hash
-     *
-     * @return string
-     */
-    public function pathFor(string $name, array $data = [], array $queryParams = [], ?string $hash = null): string
+    public function pathFor(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
     {
         return Router::pathFor($name, $data, $queryParams, $hash);
     }
 
-    /**
-     * @param string      $name
-     * @param array       $data
-     * @param array       $queryParams
-     * @param int         $status
-     * @param string|null $hash
-     *
-     * @return \Slim\Http\Response
-     */
-    public function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, ?string $hash = null): ?Response
-    {
+    public function redirect(
+        string $name,
+        array $data = [],
+        array $queryParams = [],
+        int $status = StatusCode::HTTP_FOUND,
+        ?string $hash = null
+    ): Response {
         return Router::redirect($name, $data, $queryParams, $status, $hash);
     }
 
     /**
-     * @param string|null $key
-     *
-     * @return array|mixed|object|null
+     * @return mixed
      */
-    public function getParsedBodyFiltered(?string $key = null)
+    public function getParsedBodyFiltered(string $key = '')
     {
         return $this->getParsedBody($key, true);
     }
 
     /**
-     * @param string|null $key
-     * @param bool        $filtered
-     *
-     * @return array|mixed|object|null
+     * @return mixed
      */
-    public function getParsedBody(?string $key = null, bool $filtered = false)
+    public function getParsedBody(string $key = '', bool $filter = false)
     {
-        $result = empty($key)
+        $data = empty($key)
             ? $this->request->getParsedBody()
             : $this->request->getParsedBodyParam($key);
 
-        if ($filtered) {
-            $result = filter_params($result);
-            $result = empty($key) ? $result : $result[0];
-        }
-
-        return $result;
+        return $this->filterParams($data, $key, $filter);
     }
 
     /**
-     * @param string|null $key
+     * @param string $key
      *
-     * @return array|mixed|object|null
+     * @return mixed
      */
     public function getQueryParamsFiltered(?string $key = null)
     {
@@ -234,53 +169,35 @@ abstract class BaseController
     }
 
     /**
-     * @param string|null $key
-     * @param bool        $filtered
-     *
-     * @return array|mixed|object|null
+     * @return mixed
      */
-    public function getQueryParams(?string $key = null, bool $filtered = false)
+    public function getQueryParams(string $key = '', bool $filter = false)
     {
-        $result = empty($key)
+        $data = empty($key)
             ? $this->request->getQueryParams()
             : $this->request->getQueryParam($key);
 
-        if ($filtered) {
-            $result = filter_params($result);
-            $result = empty($key) ? $result : $result[0];
-        }
-
-        return $result;
+        return $this->filterParams($data, $key, $filter);
     }
 
     /**
-     * @param string|null $key
-     *
      * @return array|mixed|null
      */
-    public function getParamsFiltered(?string $key = null)
+    public function getParamsFiltered(string $key = '')
     {
         return $this->getParams($key, true);
     }
 
     /**
-     * @param string|null $key
-     * @param bool        $filtered
-     *
-     * @return array|mixed|null
+     * @return mixed
      */
-    public function getParams(?string $key = null, bool $filtered = false)
+    public function getParams(string $key = '', bool $filter = false)
     {
-        $result = empty($key)
+        $data = empty($key)
             ? $this->request->getParams()
             : $this->request->getParam($key);
 
-        if ($filtered) {
-            $result = filter_params($result);
-            $result = empty($key) ? $result : $result[0];
-        }
-
-        return $result;
+        return $this->filterParams($data, $key, $filter);
     }
 
     /**
@@ -288,15 +205,29 @@ abstract class BaseController
      */
     public function notFound()
     {
-        throw new NotFoundException(
-            $this->request, $this->response
-        );
+        throw new NotFoundException($this->request, $this->response);
+    }
+
+    protected function boot(): void
+    {
     }
 
     /**
-     * @return void
+     * @param mixed $data
+     *
+     * @return mixed
      */
-    protected function boot(): void
+    private function filterParams($data, string $key = '', bool $filter = false)
     {
+        if ($filter) {
+            $dataArray = is_array($data);
+            $data = filter_params($data);
+
+            if (!empty($key) && !$dataArray) {
+                return $data[0];
+            }
+        }
+
+        return $data;
     }
 }
