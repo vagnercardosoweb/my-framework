@@ -113,7 +113,7 @@ abstract class BaseController
         return json($data, $status, $options);
     }
 
-    public function jsonSuccess(string $message = '', array $data = [], int $status = StatusCode::HTTP_OK): Response
+    public function jsonSuccess(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
     {
         return json_success($message, $data, $status);
     }
@@ -133,7 +133,7 @@ abstract class BaseController
         array $data = [],
         array $queryParams = [],
         int $status = StatusCode::HTTP_FOUND,
-        ?string $hash = null
+        string $hash = ''
     ): Response {
         return Router::redirect($name, $data, $queryParams, $status, $hash);
     }
