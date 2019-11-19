@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 19/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -52,21 +52,17 @@ class Database
     }
 
     /**
-     * @param string $method
-     * @param mixed  ...$arguments
+     * @param mixed ...$arguments
      *
      * @return mixed
      */
     public function __call(string $method, $arguments)
     {
-        if ($this->connect->getPdo() instanceof \PDO && method_exists($this->connect->getPdo(), $method)) {
-            return $this->connect->getPdo()->{$method}(...$arguments);
+        if ($this->getPdo() instanceof \PDO && method_exists($this->getPdo(), $method)) {
+            return $this->getPdo()->{$method}(...$arguments);
         }
 
-        throw new \BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()', get_class(), $method),
-            E_USER_ERROR
-        );
+        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR);
     }
 
     /**
@@ -81,17 +77,12 @@ class Database
         return $this->connect->connection($driver);
     }
 
-    /**
-     * @return \PDO
-     */
     public function getPdo(): \PDO
     {
         return $this->connect->getPdo();
     }
 
     /**
-     * @param \Closure $callback
-     *
      * @throws \Exception
      *
      * @return mixed
@@ -112,12 +103,9 @@ class Database
     }
 
     /**
-     * @param string       $table
      * @param array|object $data
      *
      * @throws \Exception
-     *
-     * @return int|null
      */
     public function create(string $table, $data): ?int
     {
@@ -137,22 +125,15 @@ class Database
     }
 
     /**
-     * @param string       $sql
      * @param string|array $bindings
-     * @param array        $driverOptions
      *
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     public function query(string $sql, $bindings = null, array $driverOptions = []): Statement
     {
         try {
             if (empty($sql)) {
-                throw new \InvalidArgumentException(
-                    'Parameter $sql can not be empty.',
-                    E_ERROR
-                );
+                throw new \InvalidArgumentException('Parameter $sql can not be empty.', E_ERROR);
             }
 
             // Execute sql
@@ -167,14 +148,10 @@ class Database
     }
 
     /**
-     * @param string       $table
      * @param array|object $data
-     * @param string       $condition
      * @param array|string $bindings
      *
      * @throws \Exception
-     *
-     * @return object|null
      */
     public function update(string $table, $data, string $condition, $bindings = null): ?object
     {
@@ -206,20 +183,16 @@ class Database
 
         $statement = sprintf("UPDATE {$table} SET %s {$condition}", implode(', ', $set));
         $this->query($statement, $bindings);
-
         $this->emitEvent("{$table}:updated", $updated);
 
         return $updated;
     }
 
     /**
-     * @param string       $table
      * @param string       $condition
      * @param string|array $bindings
      *
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     public function read(string $table, ?string $condition = null, $bindings = null): Statement
     {
@@ -227,19 +200,16 @@ class Database
     }
 
     /**
-     * @param string       $table
-     * @param string       $condition
      * @param string|array $bindings
      *
      * @throws \Exception
      *
      * @return object
      */
-    public function delete($table, $condition, $bindings = null): ?object
+    public function delete(string $table, string $condition, $bindings = null): ?object
     {
-        $table = (string)$table;
-        $condition = (string)$condition;
-
+        $table = $table;
+        $condition = $condition;
         $deleted = $this->read($table, $condition, $bindings)->fetch();
         $deleted = Obj::fromArray($deleted);
 
@@ -248,18 +218,16 @@ class Database
         }
 
         $this->emitEvent("{$table}:deleting", $deleted);
-
         $statement = "DELETE FROM {$table} {$condition}";
         $this->query($statement, $bindings);
-
         $this->emitEvent("{$table}:deleted", $deleted);
 
         return $deleted;
     }
 
     /**
-     * @param string|null $name
      * @param mixed ... (Opcional) Argumento(s)
+     * @param string $name
      *
      * @return mixed
      */

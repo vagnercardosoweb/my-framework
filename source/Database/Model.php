@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/11/2019 Vagner Cardoso
+ * @copyright 19/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -120,11 +120,9 @@ abstract class Model implements \ArrayAccess
     protected $reset = [];
 
     /**
-     * @param string $name
-     *
      * @return mixed
      */
-    public function __get($name)
+    public function __get(string $name)
     {
         if ($provider = App::getInstance()
             ->resolve($name)) {
@@ -139,33 +137,26 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function __set($name, $value): void
+    public function __set(string $name, $value): void
     {
         $this->data = Obj::fromArray($this->data);
         $this->data->{$name} = $value;
     }
 
-    /**
-     * @param string $name
-     */
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return isset($this->data->{$name});
     }
 
-    /**
-     * @param string $name
-     */
-    public function __unset($name): void
+    public function __unset(string $name): void
     {
         unset($this->data->{$name});
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      *
      * @return mixed
      */
@@ -238,20 +229,15 @@ abstract class Model implements \ArrayAccess
         return $this;
     }
 
-    /**
-     * @param string|array|null $properties
-     */
     public function reset(array $properties = []): self
     {
         return $this->clear($properties, true);
     }
 
     /**
-     * @param string $column
-     *
      * @throws \Exception
      */
-    public function count($column = '1'): int
+    public function count(string $column = '1'): int
     {
         return (int)$this->select("COUNT({$column}) AS count")
             ->order('count DESC')->limit(1)
@@ -288,7 +274,7 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string|array|null $order
+     * @param array|string $order
      */
     public function order($order): self
     {
@@ -298,7 +284,7 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param mixed $select
+     * @param array|string $select
      */
     public function select($select = '*'): self
     {
@@ -316,7 +302,7 @@ abstract class Model implements \ArrayAccess
      *
      * @return self|string
      */
-    public function table($table = null)
+    public function table(?string $table = null)
     {
         if (!empty($table)) {
             $this->table = (string)$table;
@@ -328,7 +314,7 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string|array|null $join
+     * @param array|string $join
      */
     public function join($join): self
     {
@@ -338,7 +324,7 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string|array|null $group
+     * @param array|string $group
      */
     public function group($group): self
     {
@@ -348,7 +334,7 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param string|array|null $having
+     * @param array|string $having
      */
     public function having($having): self
     {
@@ -427,33 +413,43 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
+     * @param mixed $value
+     * @param int   $fetchStyle
+     *
+     * @throws \Exception
+     *
+     * @return array[self]
+     */
+    public function fetchBy(string $column, $value, ?int $fetchStyle = null)
+    {
+        $this->bindings[$column] = $value;
+        array_unshift($this->where, "AND {$this->table}.{$column} = :{$column}");
+
+        return $this->fetchAll($fetchStyle);
+    }
+
+    /**
      * @param int|array $id
      * @param int       $fetchStyle
      *
      * @throws \Exception
      *
-     * @return self[]|self|null
+     * @return self|array[self]|null
      */
-    public function fetchById($id, $fetchStyle = null): ?self
+    public function fetchById($id, ?int $fetchStyle = null)
     {
-        if (!empty($id) && $this->primaryKey) {
-            if (is_array($id)) {
-                $this->where(sprintf(
-                    "AND {$this->table}.{$this->primaryKey} IN (%s)",
-                    implode(',', $id)
-                ));
-
-                return $this->fetchAll($fetchStyle);
-            }
-
-            $this->where("AND {$this->table}.{$this->primaryKey} = :pkey", [
-                'pkey' => filter_params($id)[0],
-            ]);
-        }
-
-        if (empty($this->where)) {
+        if (empty($id)) {
             return null;
         }
+
+        if ($this->primaryKey && is_array($id)) {
+            array_unshift(sprintf("AND {$this->table}.{$this->primaryKey} IN (%s)", implode(',', $id)));
+
+            return $this->fetchAll($fetchStyle);
+        }
+
+        array_unshift("AND {$this->table}.{$this->primaryKey} = :u{$this->primaryKey}");
+        $this->bindings["u{$this->primaryKey}"] = filter_params($id)[0];
 
         return $this->fetch($fetchStyle);
     }
@@ -486,7 +482,7 @@ abstract class Model implements \ArrayAccess
      *
      * @throws \Exception
      *
-     * @return self[]|null
+     * @return array[self]
      */
     public function fetchAll($fetchStyle = null, $fetchArgument = null)
     {
@@ -503,17 +499,17 @@ abstract class Model implements \ArrayAccess
 
         $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
 
-        if (!empty($rows)) {
-            foreach ($rows as $index => $row) {
-                if (method_exists($this, '_row')) {
-                    $this->_row($row);
-                }
-
-                $rows[$index] = $row;
+        foreach ($rows as $index => $row) {
+            if (method_exists($this, '_row')) {
+                $this->_row($row);
             }
+
+            $rows[$index] = $row;
         }
 
-        return $rows ?: null;
+        $this->statement->closeCursor();
+
+        return $rows;
     }
 
     /**
@@ -533,15 +529,17 @@ abstract class Model implements \ArrayAccess
             $fetchStyle = get_called_class();
         }
 
-        $row = $this->statement->fetch($fetchStyle);
+        $row = $this->statement->fetch($fetchStyle) ?: null;
 
-        if (!empty($row)) {
+        if ($row) {
             if (method_exists($this, '_row')) {
                 $this->_row($row);
             }
         }
 
-        return $row ?: null;
+        $this->statement->closeCursor();
+
+        return $row;
     }
 
     public function getPrimaryValue(): ?string
@@ -630,8 +628,8 @@ abstract class Model implements \ArrayAccess
      */
     public function delete($id = null): self
     {
-        if (!empty($id) && !is_array($id) && $this->getPrimaryKey()) {
-            $this->data([$this->getPrimaryKey() => $id]);
+        if (!empty($id) && !is_array($id) && $this->primaryKey) {
+            $this->data([$this->primaryKey => $id]);
         }
 
         $this->checkWherePk();
@@ -659,16 +657,16 @@ abstract class Model implements \ArrayAccess
      */
     public function getStatement(): Statement
     {
-        return $this->buildSqlStatement();
+        $statement = $this->db->driver($this->driver)->prepare($this->getQuery());
+        $statement->bindValues($this->bindings);
+
+        return $statement;
     }
 
-    /**
-     * @throws \Exception
-     */
-    protected function buildSqlStatement(): Statement
+    public function getQuery(bool $replaceBindings = false): string
     {
         if (empty($this->table)) {
-            throw new \InvalidArgumentException(sprintf('[buildSqlStatement] `%s::table` is empty.', get_called_class()), E_USER_ERROR);
+            throw new \InvalidArgumentException(sprintf('[getQuery] `%s::table` is empty.', get_called_class()), E_USER_ERROR);
         }
 
         if (method_exists($this, '_conditions')) {
@@ -720,10 +718,41 @@ abstract class Model implements \ArrayAccess
             }
         }
 
-        // Execute sql
+        if (true === $replaceBindings) {
+            $sql = $this->replaceQueryBindings($sql);
+        }
+
+        return trim($sql);
+    }
+
+    /**
+     * @param string $sql
+     *
+     * @return string
+     */
+    protected function replaceQueryBindings($sql)
+    {
+        $keys = array_keys($this->bindings);
+        $keys = explode(',', ':'.implode(',:', $keys));
+        $values = array_map(function ($bind) {
+            if (!is_numeric($bind)) {
+                $bind = $this->db->quote($bind);
+            }
+
+            return $bind;
+        }, array_values($this->bindings));
+
+        return str_replace($keys, $values, $sql);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    protected function buildSqlStatement(): Statement
+    {
         $this->statement = $this->db
             ->driver($this->driver)
-            ->query(trim($sql), $this->bindings)
+            ->query($this->getQuery(), $this->bindings)
         ;
 
         $this->clear();
