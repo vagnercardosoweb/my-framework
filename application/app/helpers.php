@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/11/2019 Vagner Cardoso
+ * @copyright 19/11/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -18,6 +18,7 @@ use Slim\Http\StatusCode;
 if (!function_exists('validate_params')) {
     /**
      * @param array|object $params
+     * @param array        $rules
      */
     function validate_params($params, array $rules)
     {
@@ -49,6 +50,9 @@ if (!function_exists('validate_params')) {
 if (!function_exists('json_trigger')) {
     /**
      * @param string|int $type
+     * @param string     $message
+     * @param array      $data
+     * @param int        $status
      *
      * @return \Slim\Http\Response
      */
@@ -67,6 +71,7 @@ if (!function_exists('json_error')) {
     /**
      * @param \Exception|\Throwable $exception
      * @param int                   $status
+     * @param array                 $data
      *
      * @return \Slim\Http\Response
      */
@@ -92,6 +97,8 @@ if (!function_exists('json_error')) {
 if (!function_exists('json_success')) {
     /**
      * @param string $message
+     * @param array  $data
+     * @param int    $status
      *
      * @return \Slim\Http\Response
      */
@@ -414,6 +421,7 @@ if (!function_exists('flash')) {
     /**
      * @param mixed           $value
      * @param string|int|null $error
+     * @param string          $name
      */
     function flash(string $name, $value, $error = null)
     {
@@ -432,6 +440,8 @@ if (!function_exists('flash')) {
 
 if (!function_exists('get_code_video_youtube')) {
     /**
+     * @param string $url
+     *
      * @return string|bool
      */
     function get_code_video_youtube(string $url)
@@ -562,6 +572,7 @@ if (!function_exists('delete_recursive_directory')) {
 if (!function_exists('get_month_string')) {
     /**
      * @param string $month
+     * @param bool   $english
      *
      * @return string
      */
@@ -593,6 +604,7 @@ if (!function_exists('get_month_string')) {
 if (!function_exists('get_day_string')) {
     /**
      * @param string $day
+     * @param bool   $english
      *
      * @return string
      */
@@ -624,6 +636,7 @@ if (!function_exists('upload')) {
      * @param int    $height
      * @param bool   $forceJpg
      * @param bool   $whExact
+     * @param array  $file
      *
      * @throws \Exception
      *
@@ -785,6 +798,8 @@ if (!function_exists('upload_fix_orientation')) {
 
 if (!function_exists('upload_organize_multiple_files')) {
     /**
+     * @param array $files
+     *
      * @return array
      */
     function upload_organize_multiple_files(array $files)

@@ -43,6 +43,9 @@ class Connect
     private $defaultDriverConnection = 'mysql';
 
     /**
+     * @param array  $config
+     * @param string $driver
+     *
      * @return $this
      */
     public function addConnection(array $config, string $driver): Connect

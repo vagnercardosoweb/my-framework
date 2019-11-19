@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/11/2019 Vagner Cardoso
+ * @copyright 19/11/2019 Vagner Cardoso
  */
 
 namespace Core;

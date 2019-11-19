@@ -52,7 +52,8 @@ class Database
     }
 
     /**
-     * @param mixed ...$arguments
+     * @param string $method
+     * @param mixed  ...$arguments
      *
      * @return mixed
      */
@@ -66,7 +67,7 @@ class Database
     }
 
     /**
-     * @param string $driver mysql|pgsql|sqlite|sqlsrv
+     * @param string $driver
      *
      * @throws \Exception
      *
@@ -77,12 +78,17 @@ class Database
         return $this->connect->connection($driver);
     }
 
+    /**
+     * @return \PDO
+     */
     public function getPdo(): \PDO
     {
         return $this->connect->getPdo();
     }
 
     /**
+     * @param \Closure $callback
+     *
      * @throws \Exception
      *
      * @return mixed
@@ -104,8 +110,11 @@ class Database
 
     /**
      * @param array|object $data
+     * @param string       $table
      *
      * @throws \Exception
+     *
+     * @return int|null
      */
     public function create(string $table, $data): ?int
     {
@@ -126,8 +135,12 @@ class Database
 
     /**
      * @param string|array $bindings
+     * @param string       $sql
+     * @param array        $driverOptions
      *
      * @throws \Exception
+     *
+     * @return \Core\Database\Connection\Statement
      */
     public function query(string $sql, $bindings = null, array $driverOptions = []): Statement
     {
@@ -150,8 +163,12 @@ class Database
     /**
      * @param array|object $data
      * @param array|string $bindings
+     * @param string       $table
+     * @param string       $condition
      *
      * @throws \Exception
+     *
+     * @return object|null
      */
     public function update(string $table, $data, string $condition, $bindings = null): ?object
     {
@@ -191,8 +208,11 @@ class Database
     /**
      * @param string       $condition
      * @param string|array $bindings
+     * @param string       $table
      *
      * @throws \Exception
+     *
+     * @return \Core\Database\Connection\Statement
      */
     public function read(string $table, ?string $condition = null, $bindings = null): Statement
     {
@@ -201,6 +221,8 @@ class Database
 
     /**
      * @param string|array $bindings
+     * @param string       $table
+     * @param string       $condition
      *
      * @throws \Exception
      *
@@ -226,8 +248,7 @@ class Database
     }
 
     /**
-     * @param mixed ... (Opcional) Argumento(s)
-     * @param string $name
+     * @param string|null $name
      *
      * @return mixed
      */

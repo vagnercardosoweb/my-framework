@@ -120,6 +120,8 @@ abstract class Model implements \ArrayAccess
     protected $reset = [];
 
     /**
+     * @param string $name
+     *
      * @return mixed
      */
     public function __get(string $name)
@@ -137,7 +139,8 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param mixed $value
+     * @param string $name
+     * @param mixed  $value
      */
     public function __set(string $name, $value): void
     {
@@ -145,11 +148,19 @@ abstract class Model implements \ArrayAccess
         $this->data->{$name} = $value;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public function __isset(string $name): bool
     {
         return isset($this->data->{$name});
     }
 
+    /**
+     * @param string $name
+     */
     public function __unset(string $name): void
     {
         unset($this->data->{$name});
@@ -176,6 +187,8 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
+     *
+     * @return bool
      */
     public function offsetExists($name): bool
     {
@@ -190,11 +203,17 @@ abstract class Model implements \ArrayAccess
         $this->__unset($name);
     }
 
+    /**
+     * @return array
+     */
     public function toArray(): array
     {
         return Obj::toArray($this->data);
     }
 
+    /**
+     * @return object
+     */
     public function toObject(): object
     {
         return Obj::fromArray($this->data);
@@ -202,467 +221,19 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @throws \Exception
+     *
+     * @return int
      */
     public function rowCount(): int
     {
         return $this->buildSqlStatement()->rowCount();
     }
 
-    public function clear(array $properties = [], bool $reset = false): self
-    {
-        $notReset = array_diff(['table', 'primaryKey', 'driver', 'fetchStyle', 'statement', 'data'], $properties);
-        $reflection = new \ReflectionClass(get_class($this));
-
-        foreach ($reflection->getProperties() as $property) {
-            if (!in_array($property->getName(), $notReset)) {
-                if (empty($properties) || in_array($property->getName(), $properties)) {
-                    if ($reset) {
-                        $this->reset[$property->getName()] = true;
-                    } else {
-                        $value = preg_match('/@var\s+(array)/im', $property->getDocComment()) ? [] : null;
-                        $this->{$property->getName()} = $value;
-                    }
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    public function reset(array $properties = []): self
-    {
-        return $this->clear($properties, true);
-    }
-
     /**
-     * @throws \Exception
-     */
-    public function count(string $column = '1'): int
-    {
-        return (int)$this->select("COUNT({$column}) AS count")
-            ->order('count DESC')->limit(1)
-            ->buildSqlStatement()
-            ->fetch(\PDO::FETCH_OBJ)
-            ->count;
-    }
-
-    /**
-     * @param int $limit
-     * @param int $offset
-     */
-    public function limit($limit, $offset = 0): self
-    {
-        if (is_numeric($limit)) {
-            $this->limit = (int)$limit;
-
-            if (is_numeric($offset)) {
-                $this->offset($offset);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param int $offset
-     */
-    public function offset($offset): self
-    {
-        $this->offset = (int)$offset;
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $order
-     */
-    public function order($order): self
-    {
-        $this->mountProperty($order, 'order');
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $select
-     */
-    public function select($select = '*'): self
-    {
-        if (is_string($select)) {
-            $select = explode(',', $select);
-        }
-
-        $this->mountProperty($select, 'select');
-
-        return $this;
-    }
-
-    /**
-     * @param string $table
+     * @param bool $replaceBindings
      *
-     * @return self|string
+     * @return string
      */
-    public function table(?string $table = null)
-    {
-        if (!empty($table)) {
-            $this->table = (string)$table;
-
-            return $this;
-        }
-
-        return $this->table;
-    }
-
-    /**
-     * @param array|string $join
-     */
-    public function join($join): self
-    {
-        $this->mountProperty($join, 'join');
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $group
-     */
-    public function group($group): self
-    {
-        $this->mountProperty($group, 'group');
-
-        return $this;
-    }
-
-    /**
-     * @param array|string $having
-     */
-    public function having($having): self
-    {
-        $this->mountProperty($having, 'having');
-
-        return $this;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return mixed
-     */
-    public function transaction(\Closure $callback)
-    {
-        /** @var \Core\Database\Database $db */
-        $db = $this->db->driver($this->driver);
-
-        try {
-            $db->beginTransaction();
-            $callback = $callback($this);
-            $db->commit();
-
-            return $callback;
-        } catch (\Exception $e) {
-            $db->rollBack();
-
-            throw $e;
-        }
-    }
-
-    /**
-     * @param array|object|null $data
-     *
-     * @throws \Exception
-     */
-    public function save($data = null, bool $validate = true): self
-    {
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
-
-        $where = $this->where;
-        $bindings = $this->bindings;
-        $exists = $this->fetchById($this->getPrimaryValue());
-
-        if ($exists) {
-            $this->where = $where;
-            $this->bindings = $bindings;
-
-            return $this->update($data, $validate);
-        }
-
-        return $this->create($data, $validate);
-    }
-
-    /**
-     * @param array|object $data
-     */
-    public function data($data, bool $validate = true): self
-    {
-        $data = array_merge(
-            Obj::toArray($this->data),
-            Obj::toArray($data)
-        );
-
-        if (method_exists($this, '_data')) {
-            $this->_data($data, $validate);
-        }
-
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $value
-     * @param int   $fetchStyle
-     *
-     * @throws \Exception
-     *
-     * @return array[self]
-     */
-    public function fetchBy(string $column, $value, ?int $fetchStyle = null)
-    {
-        $this->bindings[$column] = $value;
-        array_unshift($this->where, "AND {$this->table}.{$column} = :{$column}");
-
-        return $this->fetchAll($fetchStyle);
-    }
-
-    /**
-     * @param int|array $id
-     * @param int       $fetchStyle
-     *
-     * @throws \Exception
-     *
-     * @return self|array[self]|null
-     */
-    public function fetchById($id, ?int $fetchStyle = null)
-    {
-        if (empty($id)) {
-            return null;
-        }
-
-        if ($this->primaryKey && is_array($id)) {
-            array_unshift(sprintf("AND {$this->table}.{$this->primaryKey} IN (%s)", implode(',', $id)));
-
-            return $this->fetchAll($fetchStyle);
-        }
-
-        array_unshift("AND {$this->table}.{$this->primaryKey} = :u{$this->primaryKey}");
-        $this->bindings["u{$this->primaryKey}"] = filter_params($id)[0];
-
-        return $this->fetch($fetchStyle);
-    }
-
-    /**
-     * @param string|array $where
-     * @param string|array $bindings
-     */
-    public function where($where, $bindings = null): self
-    {
-        $this->mountProperty($where, 'where');
-        $this->bindings($bindings);
-
-        return $this;
-    }
-
-    /**
-     * @param string|array $bindings
-     */
-    public function bindings($bindings): self
-    {
-        Helper::parseStr($bindings, $this->bindings);
-
-        return $this;
-    }
-
-    /**
-     * @param int   $fetchStyle
-     * @param mixed $fetchArgument
-     *
-     * @throws \Exception
-     *
-     * @return array[self]
-     */
-    public function fetchAll($fetchStyle = null, $fetchArgument = null)
-    {
-        if (empty($fetchStyle) && $this->fetchStyle) {
-            $fetchStyle = $this->fetchStyle;
-        }
-
-        $this->buildSqlStatement();
-
-        if ($this->statement->isFetchObject($fetchStyle)) {
-            $fetchStyle = \PDO::FETCH_CLASS;
-            $fetchArgument = get_called_class();
-        }
-
-        $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
-
-        foreach ($rows as $index => $row) {
-            if (method_exists($this, '_row')) {
-                $this->_row($row);
-            }
-
-            $rows[$index] = $row;
-        }
-
-        $this->statement->closeCursor();
-
-        return $rows;
-    }
-
-    /**
-     * @param int $fetchStyle
-     *
-     * @throws \Exception
-     */
-    public function fetch($fetchStyle = null): ?self
-    {
-        if (empty($fetchStyle) && $this->fetchStyle) {
-            $fetchStyle = $this->fetchStyle;
-        }
-
-        $this->buildSqlStatement();
-
-        if ($this->statement->isFetchObject($fetchStyle)) {
-            $fetchStyle = get_called_class();
-        }
-
-        $row = $this->statement->fetch($fetchStyle) ?: null;
-
-        if ($row) {
-            if (method_exists($this, '_row')) {
-                $this->_row($row);
-            }
-        }
-
-        $this->statement->closeCursor();
-
-        return $row;
-    }
-
-    public function getPrimaryValue(): ?string
-    {
-        return $this->{$this->getPrimaryKey()} ?? null;
-    }
-
-    public function getPrimaryKey(): ?string
-    {
-        return $this->primaryKey;
-    }
-
-    /**
-     * @param array|object|null $data
-     *
-     * @throws \Exception
-     */
-    public function update($data = null, bool $validate = true): self
-    {
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
-
-        $this->checkWherePk();
-
-        if (empty($this->where)) {
-            throw new \InvalidArgumentException(sprintf('[update] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
-        }
-
-        $this->data = $this->db
-            ->driver($this->driver)
-            ->update(
-                $this->table,
-                $this->data,
-                "WHERE {$this->normalizeProperty($this->where)}",
-                $this->bindings
-            )
-        ;
-
-        $this->clear();
-
-        return $this;
-    }
-
-    /**
-     * @param array|object $data
-     *
-     * @throws \Exception
-     */
-    public function create($data, bool $validate = true): self
-    {
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
-
-        $lastInsertId = $this->db
-            ->driver($this->driver)
-            ->create($this->table, $this->data)
-        ;
-
-        if (!empty($lastInsertId)) {
-            return $this->fetchById(
-                $lastInsertId, \PDO::FETCH_OBJ
-            );
-        }
-
-        $this->clear(['data']);
-
-        return $this;
-    }
-
-    public function getTable(): string
-    {
-        return $this->table;
-    }
-
-    public function getDriver(): ?string
-    {
-        return $this->driver ?? null;
-    }
-
-    /**
-     * @param int|null $id Primary key value
-     *
-     * @throws \Exception
-     */
-    public function delete($id = null): self
-    {
-        if (!empty($id) && !is_array($id) && $this->primaryKey) {
-            $this->data([$this->primaryKey => $id]);
-        }
-
-        $this->checkWherePk();
-
-        if (empty($this->where)) {
-            throw new \InvalidArgumentException(sprintf('[delete] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
-        }
-
-        $this->data = $this->db
-            ->driver($this->driver)
-            ->delete(
-                $this->table,
-                "WHERE {$this->normalizeProperty($this->where)}",
-                $this->bindings
-            )
-        ;
-
-        $this->clear();
-
-        return $this;
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function getStatement(): Statement
-    {
-        $statement = $this->db->driver($this->driver)->prepare($this->getQuery());
-        $statement->bindValues($this->bindings);
-
-        return $statement;
-    }
-
     public function getQuery(bool $replaceBindings = false): string
     {
         if (empty($this->table)) {
@@ -726,6 +297,560 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
+     * @param array $properties
+     * @param bool  $reset
+     *
+     * @return $this
+     */
+    public function clear(array $properties = [], bool $reset = false): self
+    {
+        $notReset = array_diff(['table', 'primaryKey', 'driver', 'fetchStyle', 'statement', 'data'], $properties);
+        $reflection = new \ReflectionClass(get_class($this));
+
+        foreach ($reflection->getProperties() as $property) {
+            if (!in_array($property->getName(), $notReset)) {
+                if (empty($properties) || in_array($property->getName(), $properties)) {
+                    if ($reset) {
+                        $this->reset[$property->getName()] = true;
+                    } else {
+                        $value = preg_match('/@var\s+(array)/im', $property->getDocComment()) ? [] : null;
+                        $this->{$property->getName()} = $value;
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $properties
+     *
+     * @return $this
+     */
+    public function reset(array $properties = []): self
+    {
+        return $this->clear($properties, true);
+    }
+
+    /**
+     * @param string $column
+     *
+     * @throws \Exception
+     *
+     * @return int
+     */
+    public function count(string $column = '1'): int
+    {
+        return (int)$this->select("COUNT({$column}) AS count")
+            ->order('count DESC')->limit(1)
+            ->buildSqlStatement()
+            ->fetch(\PDO::FETCH_OBJ)
+            ->count;
+    }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     *
+     * @return $this
+     */
+    public function limit($limit, $offset = 0): self
+    {
+        if (is_numeric($limit)) {
+            $this->limit = (int)$limit;
+
+            if (is_numeric($offset)) {
+                $this->offset($offset);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $offset
+     *
+     * @return $this
+     */
+    public function offset($offset): self
+    {
+        $this->offset = (int)$offset;
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $order
+     *
+     * @return $this
+     */
+    public function order($order): self
+    {
+        $this->mountProperty($order, 'order');
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $select
+     *
+     * @return $this
+     */
+    public function select($select = '*'): self
+    {
+        if (is_string($select)) {
+            $select = explode(',', $select);
+        }
+
+        $this->mountProperty($select, 'select');
+
+        return $this;
+    }
+
+    /**
+     * @param string $table
+     *
+     * @return $this|string
+     */
+    public function table(?string $table = null)
+    {
+        if (!empty($table)) {
+            $this->table = (string)$table;
+
+            return $this;
+        }
+
+        return $this->table;
+    }
+
+    /**
+     * @param array|string $join
+     *
+     * @return $this
+     */
+    public function join($join): self
+    {
+        $this->mountProperty($join, 'join');
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $group
+     *
+     * @return $this
+     */
+    public function group($group): self
+    {
+        $this->mountProperty($group, 'group');
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $having
+     *
+     * @return $this
+     */
+    public function having($having): self
+    {
+        $this->mountProperty($having, 'having');
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $callback
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    public function transaction(\Closure $callback)
+    {
+        /** @var \Core\Database\Database $db */
+        $db = $this->db->driver($this->driver);
+
+        try {
+            $db->beginTransaction();
+            $callback = $callback($this);
+            $db->commit();
+
+            return $callback;
+        } catch (\Exception $e) {
+            $db->rollBack();
+
+            throw $e;
+        }
+    }
+
+    /**
+     * @param array|object|null $data
+     * @param bool              $validate
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function save($data = null, bool $validate = true): self
+    {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
+        $where = $this->where;
+        $bindings = $this->bindings;
+        $exists = $this->fetchById($this->getPrimaryValue());
+
+        if ($exists) {
+            $this->where = $where;
+            $this->bindings = $bindings;
+
+            return $this->update($data, $validate);
+        }
+
+        return $this->create($data, $validate);
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @return $this
+     */
+    public function data($data, bool $validate = true): self
+    {
+        $data = array_merge(
+            Obj::toArray($this->data),
+            Obj::toArray($data)
+        );
+
+        if (method_exists($this, '_data')) {
+            $this->_data($data, $validate);
+        }
+
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int|array $id
+     * @param int       $fetchStyle
+     *
+     * @throws \Exception
+     *
+     * @return $this|array[$this]|null
+     */
+    public function fetchById($id, ?int $fetchStyle = null)
+    {
+        if (empty($id)) {
+            return null;
+        }
+
+        if ($this->primaryKey && is_array($id)) {
+            array_unshift($this->where, sprintf("AND {$this->table}.{$this->primaryKey} IN (%s)", implode(',', $id)));
+
+            return $this->fetchAll($fetchStyle);
+        }
+
+        array_unshift($this->where, "AND {$this->table}.{$this->primaryKey} = :u{$this->primaryKey}");
+        $this->bindings["u{$this->primaryKey}"] = filter_params($id)[0];
+
+        return $this->fetch($fetchStyle);
+    }
+
+    /**
+     * @param int   $fetchStyle
+     * @param mixed $fetchArgument
+     *
+     * @throws \Exception
+     *
+     * @return array[$this]
+     */
+    public function fetchAll($fetchStyle = null, $fetchArgument = null)
+    {
+        if (empty($fetchStyle) && $this->fetchStyle) {
+            $fetchStyle = $this->fetchStyle;
+        }
+
+        $this->buildSqlStatement();
+
+        if ($this->statement->isFetchObject($fetchStyle)) {
+            $fetchStyle = \PDO::FETCH_CLASS;
+            $fetchArgument = get_called_class();
+        }
+
+        $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
+
+        foreach ($rows as $index => $row) {
+            if (method_exists($this, '_row')) {
+                $this->_row($row);
+            }
+
+            $rows[$index] = $row;
+        }
+
+        $this->statement->closeCursor();
+
+        return $rows;
+    }
+
+    /**
+     * @param int $fetchStyle
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function fetch($fetchStyle = null): ?self
+    {
+        if (empty($fetchStyle) && $this->fetchStyle) {
+            $fetchStyle = $this->fetchStyle;
+        }
+
+        $this->buildSqlStatement();
+
+        if ($this->statement->isFetchObject($fetchStyle)) {
+            $fetchStyle = get_called_class();
+        }
+
+        $row = $this->statement->fetch($fetchStyle) ?: null;
+
+        if ($row) {
+            if (method_exists($this, '_row')) {
+                $this->_row($row);
+            }
+        }
+
+        $this->statement->closeCursor();
+
+        return $row;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPrimaryValue(): ?string
+    {
+        return $this->{$this->getPrimaryKey()} ?? null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPrimaryKey(): ?string
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * @param array|object|null $data
+     * @param bool              $validate
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function update($data = null, bool $validate = true): self
+    {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
+        $this->checkWherePk();
+
+        if (empty($this->where)) {
+            throw new \InvalidArgumentException(sprintf('[update] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
+        }
+
+        $this->data = $this->db
+            ->driver($this->driver)
+            ->update(
+                $this->table,
+                $this->data,
+                "WHERE {$this->normalizeProperty($this->where)}",
+                $this->bindings
+            )
+        ;
+
+        $this->clear();
+
+        return $this;
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function create($data, bool $validate = true): self
+    {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
+        $lastInsertId = $this->db
+            ->driver($this->driver)
+            ->create($this->table, $this->data)
+        ;
+
+        if (!empty($lastInsertId)) {
+            return $this->fetchById(
+                $lastInsertId, \PDO::FETCH_OBJ
+            );
+        }
+
+        $this->clear(['data']);
+
+        return $this;
+    }
+
+    /**
+     * @param mixed  $value
+     * @param int    $fetchStyle
+     * @param string $column
+     *
+     * @throws \Exception
+     *
+     * @return array[$this]
+     */
+    public function fetchBy(string $column, $value, ?int $fetchStyle = null)
+    {
+        $this->bindings[$column] = $value;
+        array_unshift($this->where, "AND {$this->table}.{$column} = :{$column}");
+
+        return $this->fetchAll($fetchStyle);
+    }
+
+    /**
+     * @param string|array $where
+     * @param string|array $bindings
+     *
+     * @return $this
+     */
+    public function where($where, $bindings = null): self
+    {
+        $this->mountProperty($where, 'where');
+        $this->bindings($bindings);
+
+        return $this;
+    }
+
+    /**
+     * @param string|array $bindings
+     *
+     * @return $this
+     */
+    public function bindings($bindings): self
+    {
+        Helper::parseStr($bindings, $this->bindings);
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDriver(): ?string
+    {
+        return $this->driver ?? null;
+    }
+
+    /**
+     * @param int|null $id
+     *
+     * @throws \Exception
+     *
+     * @return $this
+     */
+    public function delete(?int $id = null): self
+    {
+        if (!empty($id) && !is_array($id) && $this->primaryKey) {
+            $this->data([$this->primaryKey => $id]);
+        }
+
+        $this->checkWherePk();
+
+        if (empty($this->where)) {
+            throw new \InvalidArgumentException(sprintf('[delete] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
+        }
+
+        $this->data = $this->db
+            ->driver($this->driver)
+            ->delete(
+                $this->table,
+                "WHERE {$this->normalizeProperty($this->where)}",
+                $this->bindings
+            )
+        ;
+
+        $this->clear();
+
+        return $this;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return \Core\Database\Connection\Statement
+     */
+    public function getStatement(): Statement
+    {
+        $statement = $this->db->driver($this->driver)->prepare($this->getQuery());
+        $statement->bindValues($this->bindings);
+
+        return $statement;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return \Core\Database\Connection\Statement
+     */
+    protected function buildSqlStatement(): Statement
+    {
+        $this->statement = $this->db
+            ->driver($this->driver)
+            ->query($this->getQuery(), $this->bindings)
+        ;
+
+        $this->clear();
+
+        return $this->statement;
+    }
+
+    /**
+     * @param string|array $string
+     *
+     * @return string
+     */
+    protected function normalizeProperty($string): string
+    {
+        if (is_array($string)) {
+            $string = implode(' ', $string);
+        }
+
+        return preg_replace(
+            '/^(and|or)/i', '', trim($string)
+        );
+    }
+
+    /**
      * @param string $sql
      *
      * @return string
@@ -746,37 +871,10 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @throws \Exception
-     */
-    protected function buildSqlStatement(): Statement
-    {
-        $this->statement = $this->db
-            ->driver($this->driver)
-            ->query($this->getQuery(), $this->bindings)
-        ;
-
-        $this->clear();
-
-        return $this->statement;
-    }
-
-    /**
-     * @param string|array $string
-     */
-    protected function normalizeProperty($string): string
-    {
-        if (is_array($string)) {
-            $string = implode(' ', $string);
-        }
-
-        return preg_replace(
-            '/^(and|or)/i', '', trim($string)
-        );
-    }
-
-    /**
      * @param string|array|null $conditions
      * @param string            $property
+     *
+     * @return void
      */
     protected function mountProperty($conditions, $property): void
     {
@@ -791,6 +889,9 @@ abstract class Model implements \ArrayAccess
         }
     }
 
+    /**
+     * @return void
+     */
     protected function checkWherePk(): void
     {
         if (!empty($this->getPrimaryValue())) {
