@@ -412,14 +412,18 @@ class Validate
     }
 
     /**
-     * @param mixed  $value
-     * @param string $indexData
+     * @param mixed $value
+     * @param mixed $repeat
      *
      * @return bool
      */
-    public static function equals($value, string $indexData): bool
+    public static function equals($value, $repeat): bool
     {
-        return self::comparison($value, '=', self::$data[$indexData]);
+        if (!empty(self::$data[$repeat])) {
+            $repeat = self::$data[$repeat];
+        }
+
+        return self::comparison($value, '=', $repeat);
     }
 
     /**
@@ -437,9 +441,9 @@ class Validate
             case '>':
                 return $value1 > $value2;
             case '<=':
-                return $value1 < $value2;
+                return $value1 <= $value2;
             case '>=':
-                return $value1 > $value2;
+                return $value1 >= $value2;
             case '=':
             case '==':
                 return $value1 == $value2;

@@ -41,7 +41,10 @@ if (!function_exists('validate_params')) {
                 if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
                     continue;
                 }
-                throw new \InvalidArgumentException((!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')), (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE));
+                throw new \InvalidArgumentException(
+                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
+                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
+                );
             }
         }
     }
@@ -49,8 +52,8 @@ if (!function_exists('validate_params')) {
 
 if (!function_exists('json_trigger')) {
     /**
-     * @param string|int $type
      * @param string     $message
+     * @param string|int $type
      * @param array      $data
      * @param int        $status
      *
@@ -70,8 +73,8 @@ if (!function_exists('json_trigger')) {
 if (!function_exists('json_error')) {
     /**
      * @param \Exception|\Throwable $exception
-     * @param int                   $status
      * @param array                 $data
+     * @param int                   $status
      *
      * @return \Slim\Http\Response
      */
@@ -102,14 +105,14 @@ if (!function_exists('json_success')) {
      *
      * @return \Slim\Http\Response
      */
-    function json_success(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
+    function json_success($message = null, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
     {
         $inApi = !empty($data['api']);
         unset($data['api']);
 
         if (is_array($message)) {
             $data = $message;
-            $message = null;
+            $message = !empty($data['message']) ? $data['message'] : null;
         }
 
         if (!$inApi) {
@@ -419,12 +422,13 @@ if (!function_exists('check_phone')) {
 
 if (!function_exists('flash')) {
     /**
+     * @param string          $name
      * @param mixed           $value
      * @param string|int|null $error
-     * @param string          $name
      */
     function flash(string $name, $value, $error = null)
     {
+        /** @var \Core\Session\Flash $flash */
         if ($flash = App::getInstance()->resolve('flash')) {
             if (!empty($error)) {
                 $value = [
@@ -433,7 +437,7 @@ if (!function_exists('flash')) {
                 ];
             }
 
-            $flash->add($name, $value);
+            $flash->set($name, $value);
         }
     }
 }
@@ -515,6 +519,13 @@ if (!function_exists('placeholder')) {
 }
 
 if (!function_exists('preg_replace_space')) {
+    /**
+     * @param string $string
+     * @param bool   $removeEmptyTagParagraph
+     * @param bool   $removeAllEmptyTags
+     *
+     * @return string
+     */
     function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
     {
         // Remove comments
@@ -542,6 +553,12 @@ if (!function_exists('preg_replace_space')) {
 }
 
 if (!function_exists('delete_recursive_directory')) {
+    /**
+     * @param string $path
+     * @param int    $mode
+     *
+     * @return void
+     */
     function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
     {
         if (file_exists($path)) {
@@ -630,13 +647,13 @@ if (!function_exists('get_day_string')) {
 
 if (!function_exists('upload')) {
     /**
+     * @param array  $file
      * @param string $directory
      * @param string $name
      * @param int    $width
      * @param int    $height
      * @param bool   $forceJpg
      * @param bool   $whExact
-     * @param array  $file
      *
      * @throws \Exception
      *
@@ -665,17 +682,26 @@ if (!function_exists('upload')) {
             // Checa extension
             if (in_array($extension, $extImages)) {
                 if (!in_array($extension, $extImages)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.',
+                        E_USER_ERROR
+                    );
                 }
             } else {
                 if (!in_array($extension, $extensions)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.',
+                        E_USER_ERROR
+                    );
                 }
             }
 
             // Checa tamanho
             if (($value['size'] > $maxFilesize = Upload::getPhpMaxFilesize()) || 1 == $value['error']) {
-                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.', E_USER_ERROR);
+                throw new \Exception(
+                    'Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.',
+                    E_USER_ERROR
+                );
             }
 
             // Cria pasta
@@ -697,7 +723,9 @@ if (!function_exists('upload')) {
 
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
                 if (!move_uploaded_file($value['tmp_name'], $path)) {
-                    throw new \Exception("<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
+                    throw new \Exception(
+                        "<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
+                    );
                 }
             } else {
                 // Verifica se é o tamanho exato da imagem
@@ -713,7 +741,9 @@ if (!function_exists('upload')) {
                 }
 
                 if (!$fnImg($value['tmp_name'], $path, $width, $height, 90)) {
-                    throw new \Exception("<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
+                    throw new \Exception(
+                        "<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
+                    );
                 }
             }
 

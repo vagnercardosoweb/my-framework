@@ -63,7 +63,10 @@ class Database
             return $this->getPdo()->{$method}(...$arguments);
         }
 
-        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR);
+        throw new \BadMethodCallException(
+            sprintf('Call to undefined method %s::%s()', get_class(), $method),
+            E_USER_ERROR
+        );
     }
 
     /**
@@ -109,8 +112,8 @@ class Database
     }
 
     /**
-     * @param array|object $data
      * @param string       $table
+     * @param array|object $data
      *
      * @throws \Exception
      *
@@ -134,8 +137,8 @@ class Database
     }
 
     /**
-     * @param string|array $bindings
      * @param string       $sql
+     * @param string|array $bindings
      * @param array        $driverOptions
      *
      * @throws \Exception
@@ -146,7 +149,10 @@ class Database
     {
         try {
             if (empty($sql)) {
-                throw new \InvalidArgumentException('Parameter $sql can not be empty.', E_ERROR);
+                throw new \InvalidArgumentException(
+                    'Parameter $sql can not be empty.',
+                    E_ERROR
+                );
             }
 
             // Execute sql
@@ -161,10 +167,10 @@ class Database
     }
 
     /**
-     * @param array|object $data
-     * @param array|string $bindings
      * @param string       $table
+     * @param array|object $data
      * @param string       $condition
+     * @param array|string $bindings
      *
      * @throws \Exception
      *
@@ -206,9 +212,9 @@ class Database
     }
 
     /**
+     * @param string       $table
      * @param string       $condition
      * @param string|array $bindings
-     * @param string       $table
      *
      * @throws \Exception
      *
@@ -220,9 +226,9 @@ class Database
     }
 
     /**
-     * @param string|array $bindings
      * @param string       $table
      * @param string       $condition
+     * @param string|array $bindings
      *
      * @throws \Exception
      *

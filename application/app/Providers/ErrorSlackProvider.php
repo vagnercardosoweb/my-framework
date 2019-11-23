@@ -29,7 +29,7 @@ class ErrorSlackProvider extends Provider
     public function register(): void
     {
         if (
-            !preg_match('/localhost|.dev|.local/i', $_SERVER['HTTP_HOST']) &&
+            'production' == env('APP_ENV', 'development') &&
             !Helper::isPhpCli() &&
             App::getInstance()->resolve('event')
         ) {

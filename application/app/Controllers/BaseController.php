@@ -88,8 +88,8 @@ abstract class BaseController
     }
 
     /**
-     * @param mixed  $default
      * @param string $name
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -115,13 +115,15 @@ abstract class BaseController
      * @param mixed $data
      * @param int   $status
      * @param int   $options
+     *
+     * @return \Slim\Http\Response
      */
     public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
     {
         return json($data, $status, $options);
     }
 
-    public function jsonSuccess(?string $message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
+    public function jsonSuccess($message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
     {
         return json_success($message, $data, $status);
     }

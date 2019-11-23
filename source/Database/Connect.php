@@ -68,7 +68,10 @@ class Connect
         $config = $this->connections[$driver] ?? null;
 
         if (empty($config)) {
-            throw new \RuntimeException("Driver '{$driver}' not configured in database.", E_USER_ERROR);
+            throw new \RuntimeException(
+                "Driver '{$driver}' not configured in database.",
+                E_USER_ERROR
+            );
         }
 
         if (empty(self::$instances[$driver])) {
@@ -96,11 +99,19 @@ class Connect
         return new Database($this);
     }
 
+    /**
+     * @return string
+     */
     public function getDefaultDriverConnection(): string
     {
         return $this->defaultDriverConnection;
     }
 
+    /**
+     * @param string $defaultDriverConnection
+     *
+     * @return Connect
+     */
     public function setDefaultDriverConnection(string $defaultDriverConnection): Connect
     {
         $this->defaultDriverConnection = $defaultDriverConnection;
@@ -108,6 +119,9 @@ class Connect
         return $this;
     }
 
+    /**
+     * @return \PDO
+     */
     public function getPdo(): \PDO
     {
         return $this->pdo;
