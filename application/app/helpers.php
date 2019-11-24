@@ -83,15 +83,15 @@ if (!function_exists('json_error')) {
         return json(array_merge([
             'error' => [
                 'code' => $exception->getCode(),
-                'status' => $status,
                 'type' => error_code_type($exception->getCode()),
+                'status' => $status,
+                'message' => $exception->getMessage(),
+                'line' => $exception->getLine(),
                 'file' => str_replace([
                     APP_FOLDER,
                     PUBLIC_FOLDER,
                     RESOURCE_FOLDER,
                 ], '', $exception->getFile()),
-                'line' => $exception->getLine(),
-                'message' => $exception->getMessage(),
             ],
         ], $data), $status);
     }
@@ -107,42 +107,9 @@ if (!function_exists('json_success')) {
      */
     function json_success($message = null, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
     {
-        $inApi = !empty($data['api']);
-        unset($data['api']);
-
-        if (is_array($message)) {
+        if ((is_array($message) || is_object($message)) && empty($data)) {
             $data = $message;
-            $message = !empty($data['message']) ? $data['message'] : null;
-        }
-
-        if (!$inApi) {
-            if (empty($message)) {
-                return json($data, $status);
-            }
-
-            $type = !empty($data['type']) ? $data['type'] : E_USER_SUCCESS;
-            unset($data['type']);
-
-            return json_trigger(
-                nl2br($message),
-                $type,
-                $data,
-                $status
-            );
-        }
-
-        foreach ([
-            'storage',
-            'object',
-            'clear',
-            'trigger',
-            'switch',
-            'location',
-            'reload',
-        ] as $excluded) {
-            if (isset($data[$excluded])) {
-                unset($data[$excluded]);
-            }
+            $message = null;
         }
 
         return json(array_merge([

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 24/11/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -37,7 +37,7 @@ use Core\Helpers\Obj;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Model implements \ArrayAccess
+abstract class Model implements \ArrayAccess, \JsonSerializable
 {
     /**
      * @var string
@@ -140,7 +140,7 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function __set(string $name, $value): void
     {
@@ -217,6 +217,14 @@ abstract class Model implements \ArrayAccess
     public function toObject(): object
     {
         return Obj::fromArray($this->data);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 
     /**
@@ -461,8 +469,6 @@ abstract class Model implements \ArrayAccess
     }
 
     /**
-     * @param \Closure $callback
-     *
      * @throws \Exception
      *
      * @return mixed
@@ -714,17 +720,22 @@ abstract class Model implements \ArrayAccess
 
     /**
      * @param mixed  $value
+     * @param bool   $oneResult
      * @param int    $fetchStyle
      * @param string $column
      *
      * @throws \Exception
      *
-     * @return array[$this]
+     * @return $this|array[$this]
      */
-    public function fetchBy(string $column, $value, ?int $fetchStyle = null)
+    public function fetchBy(string $column, $value, bool $oneResult = false, ?int $fetchStyle = null)
     {
         $this->bindings[$column] = $value;
         array_unshift($this->where, "AND {$this->table}.{$column} = :{$column}");
+
+        if ($oneResult) {
+            return $this->fetch($fetchStyle);
+        }
 
         return $this->fetchAll($fetchStyle);
     }
