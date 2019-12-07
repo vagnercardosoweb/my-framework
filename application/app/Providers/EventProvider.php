@@ -38,15 +38,17 @@ class EventProvider extends Provider
      */
     public function boot(): void
     {
-        $this->view->addFunction('event_emit', function ($event) {
-            $params = func_get_args();
-            array_shift($params);
+        if ($this->view) {
+            $this->view->addFunction('event_emit', function ($event) {
+                $params = func_get_args();
+                array_shift($params);
 
-            return $this->event->emit($event, ...$params);
-        });
+                return $this->event->emit($event, ...$params);
+            });
 
-        $this->view->addFunction('event_has', function (string $event) {
-            return $this->event->events($event);
-        });
+            $this->view->addFunction('event_has', function (string $event) {
+                return $this->event->events($event);
+            });
+        }
     }
 }

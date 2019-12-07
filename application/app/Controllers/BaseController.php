@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -88,8 +88,7 @@ abstract class BaseController
     }
 
     /**
-     * @param string $name
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
@@ -99,11 +98,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $message
-     * @param array  $context
-     * @param string $file
-     * @param string $type
-     *
      * @return Logger|bool
      */
     public function logger(string $message, array $context = [], string $file = '', string $type = 'info')
@@ -113,17 +107,17 @@ abstract class BaseController
 
     /**
      * @param mixed $data
-     * @param int   $status
-     * @param int   $options
-     *
-     * @return \Slim\Http\Response
      */
     public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
     {
         return json($data, $status, $options);
     }
 
-    public function jsonSuccess($message = null, array $data = [], int $status = StatusCode::HTTP_OK): Response
+    /**
+     * @param string|array|object $message
+     * @param array|object        $data
+     */
+    public function jsonSuccess($message = null, $data = [], int $status = StatusCode::HTTP_OK): Response
     {
         return json_success($message, $data, $status);
     }
@@ -149,8 +143,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $key
-     *
      * @return mixed
      */
     public function getParsedBodyFiltered(string $key = '')
@@ -159,9 +151,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $key
-     * @param bool   $filter
-     *
      * @return mixed
      */
     public function getParsedBody(string $key = '', bool $filter = false)
@@ -184,9 +173,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $key
-     * @param bool   $filter
-     *
      * @return mixed
      */
     public function getQueryParams(string $key = '', bool $filter = false)
@@ -199,8 +185,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $key
-     *
      * @return array|mixed|null
      */
     public function getParamsFiltered(string $key = '')
@@ -209,9 +193,6 @@ abstract class BaseController
     }
 
     /**
-     * @param string $key
-     * @param bool   $filter
-     *
      * @return mixed
      */
     public function getParams(string $key = '', bool $filter = false)
@@ -236,15 +217,13 @@ abstract class BaseController
     }
 
     /**
-     * @param mixed  $data
-     * @param string $key
-     * @param bool   $filter
+     * @param mixed $data
      *
      * @return mixed
      */
     private function filterParams($data, string $key = '', bool $filter = false)
     {
-        if ($filter) {
+        if ($filter && !empty($data)) {
             $dataArray = is_array($data);
             $data = filter_params($data);
 

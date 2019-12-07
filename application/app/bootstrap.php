@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -33,16 +33,16 @@ if (PHP_SAPI == 'cli-server') {
 }
 
 // Autoload.
-$authload = APP_FOLDER.'/vendor/autoload.php';
+$autoload = APP_FOLDER.'/vendor/autoload.php';
 
-if (!file_exists($authload)) {
+if (!file_exists($autoload)) {
     die(
         'Run command in terminal: <br>'.
         '<code style="background: #000; color: #fff;">composer install</code>'
     );
 }
 
-require_once "{$authload}";
+require_once "{$autoload}";
 
 // Loader app
 $app = App::getInstance();

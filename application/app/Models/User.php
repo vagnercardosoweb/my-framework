@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -30,13 +30,39 @@ class User extends BaseModel
     protected $primaryKey = 'id';
 
     /**
-     * @param array $data
-     * @param bool  $validate
+     * @param \App\Models\User $row
+     *
+     * @return void
+     */
+    protected function _row(User $row)
+    {
+        // AQUI PASSA CADA LINHA DOS RESULTADOS
+        // DAS QUERYS, APENAS RESULTADOS DE LEITURA
+    }
+
+    /**
+     * @return void
+     */
+    protected function _conditions()
+    {
+        // AQUI É EXECUTADO ANTES DE TODAS LEITURAS
+        // PODENDO ADICIONAR CONDIÇÕES PADRÕES, RELACIONAMENTO
+        // ETC...
+    }
+
+    /**
+     * @param bool $validate
      *
      * @throws \Exception
      */
     protected function _data(array &$data, $validate)
     {
+        // AQUI PASSA TODOS DADOS DE ENTRADA, UPDATE, SAVE, CREATE
+        // PODENDO AQUI FAZER VERIFICAÇÕES NO BANCO, ADICIONAR CAMPOS DEFAULT,
+        // TRATAMENTO DOS DADOS E MUITAS OUTRAS COISAS QUE QUEIRA IMPLEMENTAR
+        // E TRATAR ANTES DE ENVIAR REALMENTE PRO BANCO DE DADOS.
+
+        // ============================================================ //
         // Where
         $where = !empty($data[$this->primaryKey])
             ? sprintf('AND %s.%s != "%s"', $this->table, $this->primaryKey, $data[$this->primaryKey])

@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 24/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -120,8 +120,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     protected $reset = [];
 
     /**
-     * @param string $name
-     *
      * @return mixed
      */
     public function __get(string $name)
@@ -139,7 +137,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param string $name
      * @param mixed $value
      */
     public function __set(string $name, $value): void
@@ -148,19 +145,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->data->{$name} = $value;
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
     public function __isset(string $name): bool
     {
         return isset($this->data->{$name});
     }
 
-    /**
-     * @param string $name
-     */
     public function __unset(string $name): void
     {
         unset($this->data->{$name});
@@ -187,8 +176,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param string $name
-     *
-     * @return bool
      */
     public function offsetExists($name): bool
     {
@@ -203,25 +190,16 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->__unset($name);
     }
 
-    /**
-     * @return array
-     */
     public function toArray(): array
     {
         return Obj::toArray($this->data);
     }
 
-    /**
-     * @return object
-     */
     public function toObject(): object
     {
         return Obj::fromArray($this->data);
     }
 
-    /**
-     * @return array
-     */
     public function jsonSerialize(): array
     {
         return $this->toArray();
@@ -229,19 +207,12 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @throws \Exception
-     *
-     * @return int
      */
     public function rowCount(): int
     {
         return $this->buildSqlStatement()->rowCount();
     }
 
-    /**
-     * @param bool $replaceBindings
-     *
-     * @return string
-     */
     public function getQuery(bool $replaceBindings = false): string
     {
         if (empty($this->table)) {
@@ -305,9 +276,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param array $properties
-     * @param bool  $reset
-     *
      * @return $this
      */
     public function clear(array $properties = [], bool $reset = false): self
@@ -332,8 +300,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param array $properties
-     *
      * @return $this
      */
     public function reset(array $properties = []): self
@@ -342,11 +308,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param string $column
-     *
      * @throws \Exception
-     *
-     * @return int
      */
     public function count(string $column = '1'): int
     {
@@ -478,6 +440,10 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         /** @var \Core\Database\Database $db */
         $db = $this->db->driver($this->driver);
 
+        if ($db->inTransaction()) {
+            return $callback($this);
+        }
+
         try {
             $db->beginTransaction();
             $callback = $callback($this);
@@ -493,7 +459,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object|null $data
-     * @param bool              $validate
      *
      * @throws \Exception
      *
@@ -521,7 +486,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object $data
-     * @param bool         $validate
      *
      * @return $this
      */
@@ -637,17 +601,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         return $row;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrimaryValue(): ?string
     {
         return $this->{$this->getPrimaryKey()} ?? null;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrimaryKey(): ?string
     {
         return $this->primaryKey;
@@ -655,7 +613,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object|null $data
-     * @param bool              $validate
      *
      * @throws \Exception
      *
@@ -690,13 +647,12 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object $data
-     * @param bool         $validate
      *
      * @throws \Exception
      *
      * @return $this
      */
-    public function create($data, bool $validate = true): self
+    public function create($data = null, bool $validate = true): self
     {
         if (is_array($data) || is_object($data)) {
             $this->data($data, $validate);
@@ -719,10 +675,8 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param mixed  $value
-     * @param bool   $oneResult
-     * @param int    $fetchStyle
-     * @param string $column
+     * @param mixed $value
+     * @param int   $fetchStyle
      *
      * @throws \Exception
      *
@@ -766,24 +720,18 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getTable(): string
     {
         return $this->table;
     }
 
-    /**
-     * @return string|null
-     */
     public function getDriver(): ?string
     {
         return $this->driver ?? null;
     }
 
     /**
-     * @param int|null $id
+     * @param ?int $id
      *
      * @throws \Exception
      *
@@ -817,8 +765,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     public function getStatement(): Statement
     {
@@ -830,8 +776,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
      */
     protected function buildSqlStatement(): Statement
     {
@@ -847,8 +791,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param string|array $string
-     *
-     * @return string
      */
     protected function normalizeProperty($string): string
     {
@@ -884,8 +826,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param string|array|null $conditions
      * @param string            $property
-     *
-     * @return void
      */
     protected function mountProperty($conditions, $property): void
     {
@@ -900,9 +840,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         }
     }
 
-    /**
-     * @return void
-     */
     protected function checkWherePk(): void
     {
         if (!empty($this->getPrimaryValue())) {

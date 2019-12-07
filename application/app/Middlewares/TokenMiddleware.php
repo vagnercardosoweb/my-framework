@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -27,27 +27,26 @@ class TokenMiddleware extends Middleware
      * @param \Psr\Http\Message\RequestInterface  $request  PSR7 request
      * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
      * @param callable                            $next     Next middleware
-     *
-     * @return \Psr\Http\Message\ResponseInterface
      */
     public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {
         try {
-            $type = 'Bearer';
+            // Variáveis
+            $type = '';
             $token = '';
             $authorization = $request->getHeaderLine('Authorization');
 
             // Verifica se tem o header || CSRF || Autenticado
             if (empty($authorization)) {
-                $token = ($request->getHeaderLine('X-Csrf-Token') ?: $request->getParam('_csrfToken'));
+                $token = ($request->getHeaderLine('X-Csrf-Token') ?? $request->getParam('_csrfToken') ?? $request->getParam('jwtToken'));
 
-                if ($this->auth) {
+                if (!empty($token)) {
+                    $type = 'Bearer';
+                } elseif ($this->auth) {
                     $type = 'Bearer';
                     $token = 'AUTH_SESSION_NAME';
-                } elseif (empty($token)) {
-                    throw new \Exception(
-                        'Acesso não autorizado.', E_USER_ERROR
-                    );
+                } else {
+                    throw new \Exception('Acesso não autorizado.', E_USER_ERROR);
                 }
             }
 
@@ -66,18 +65,18 @@ class TokenMiddleware extends Middleware
 
             // Verifica se o type do token é válido
             if (!in_array($type, ['Basic', 'Bearer'])) {
-                throw new \Exception(
-                    "Acesso negado! Tipo #{$type} do token não foi aceito.", E_USER_ERROR
-                );
+                throw new \Exception('Acesso negado! Tipo do token não foi aceito.', E_USER_ERROR);
             }
 
             // Tenta descriptografar o token e caso contrário verifica
             // se é acesso normal e se o token é aceito
             if (!$payload = $this->encryption->decrypt($token)) {
-                if ($token !== env('API_KEY', null)) {
-                    throw new \Exception(
-                        'Acesso negado! Essa requisição precisa de autorização.', E_USER_ERROR
-                    );
+                try {
+                    $payload = $this->jwt->decode($token);
+                } catch (\Exception $e) {
+                    if ($token !== env('API_KEY', null)) {
+                        throw new \Exception('Acesso negado! Essa requisição precisa de autorização.', E_USER_ERROR);
+                    }
                 }
             }
 

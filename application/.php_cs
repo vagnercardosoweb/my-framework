@@ -70,4 +70,4 @@ return PhpCsFixer\Config::create()
             'location' => 'after_open',
         ],
     ])
-  ;
+;

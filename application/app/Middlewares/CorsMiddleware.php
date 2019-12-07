@@ -5,7 +5,7 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -28,6 +28,7 @@ class CorsMiddleware extends Middleware
         'Origin',
         'X-Csrf-Token',
         'Content-Type',
+        'Cache-Control',
         'Authorization',
         'X-Requested-With',
         'X-Http-Method-Override',
@@ -49,8 +50,6 @@ class CorsMiddleware extends Middleware
      * @param \Psr\Http\Message\RequestInterface  $request  PSR7 request
      * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
      * @param callable                            $next     Next middleware
-     *
-     * @return \Psr\Http\Message\ResponseInterface
      */
     public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {

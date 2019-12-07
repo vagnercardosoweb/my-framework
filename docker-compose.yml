@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3'
 
 services:
   web:
@@ -25,14 +25,14 @@ services:
 
   mysql:
     image: mysql:5.7
-    command: --sql-mode=""
     restart: always
     networks:
       - mysql-network
     ports:
       - '3306:3306'
     volumes:
-      - './docker/mysql:/var/lib/mysql'
+      - './docker/mysql/config:/etc/mysql/conf.d'
+      - './docker/mysql/database:/var/lib/mysql'
     environment:
       - MYSQL_PASSWORD=root
       - MYSQL_ROOT_PASSWORD=root

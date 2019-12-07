@@ -5,12 +5,13 @@
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 07/12/2019 Vagner Cardoso
  */
 
 use Core\App;
 use Core\Date;
 use Core\Helpers\Helper;
+use Core\Helpers\Obj;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
 use Slim\Http\StatusCode;
@@ -18,7 +19,6 @@ use Slim\Http\StatusCode;
 if (!function_exists('validate_params')) {
     /**
      * @param array|object $params
-     * @param array        $rules
      */
     function validate_params($params, array $rules)
     {
@@ -41,10 +41,7 @@ if (!function_exists('validate_params')) {
                 if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
                     continue;
                 }
-                throw new \InvalidArgumentException(
-                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
-                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
-                );
+                throw new \InvalidArgumentException((!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')), (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE));
             }
         }
     }
@@ -52,10 +49,7 @@ if (!function_exists('validate_params')) {
 
 if (!function_exists('json_trigger')) {
     /**
-     * @param string     $message
      * @param string|int $type
-     * @param array      $data
-     * @param int        $status
      *
      * @return \Slim\Http\Response
      */
@@ -73,25 +67,20 @@ if (!function_exists('json_trigger')) {
 if (!function_exists('json_error')) {
     /**
      * @param \Exception|\Throwable $exception
-     * @param array                 $data
      * @param int                   $status
      *
      * @return \Slim\Http\Response
      */
     function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
     {
-        return json(array_merge([
+        return json(array_merge_recursive([
             'error' => [
                 'code' => $exception->getCode(),
                 'type' => error_code_type($exception->getCode()),
                 'status' => $status,
                 'message' => $exception->getMessage(),
+                'file' => str_replace([APP_FOLDER, PUBLIC_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
                 'line' => $exception->getLine(),
-                'file' => str_replace([
-                    APP_FOLDER,
-                    PUBLIC_FOLDER,
-                    RESOURCE_FOLDER,
-                ], '', $exception->getFile()),
             ],
         ], $data), $status);
     }
@@ -99,23 +88,33 @@ if (!function_exists('json_error')) {
 
 if (!function_exists('json_success')) {
     /**
-     * @param string $message
-     * @param array  $data
-     * @param int    $status
+     * @param mixed        $message
+     * @param array|object $data
      *
      * @return \Slim\Http\Response
      */
-    function json_success($message = null, array $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
+    function json_success($message = null, $data = [], int $status = StatusCode::HTTP_OK): Slim\Http\Response
     {
-        if ((is_array($message) || is_object($message)) && empty($data)) {
+        if ((is_array($message) || is_object($message))) {
             $data = $message;
-            $message = null;
         }
 
-        return json(array_merge([
-            'error' => false,
-            'message' => $message,
-        ], $data), $status);
+        if ($data instanceof \Core\Providers\Database\Model) {
+            $data = $data->toArray();
+        }
+
+        if (is_integer($data)) {
+            $status = $data;
+            $data = [];
+        }
+
+        $data = Obj::toArray($data);
+
+        if (is_string($message)) {
+            $data['message'] = $message;
+        }
+
+        return json(array_merge_recursive(['error' => false], $data), $status);
     }
 }
 
@@ -389,7 +388,6 @@ if (!function_exists('check_phone')) {
 
 if (!function_exists('flash')) {
     /**
-     * @param string          $name
      * @param mixed           $value
      * @param string|int|null $error
      */
@@ -411,8 +409,6 @@ if (!function_exists('flash')) {
 
 if (!function_exists('get_code_video_youtube')) {
     /**
-     * @param string $url
-     *
      * @return string|bool
      */
     function get_code_video_youtube(string $url)
@@ -486,13 +482,6 @@ if (!function_exists('placeholder')) {
 }
 
 if (!function_exists('preg_replace_space')) {
-    /**
-     * @param string $string
-     * @param bool   $removeEmptyTagParagraph
-     * @param bool   $removeAllEmptyTags
-     *
-     * @return string
-     */
     function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
     {
         // Remove comments
@@ -520,12 +509,6 @@ if (!function_exists('preg_replace_space')) {
 }
 
 if (!function_exists('delete_recursive_directory')) {
-    /**
-     * @param string $path
-     * @param int    $mode
-     *
-     * @return void
-     */
     function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
     {
         if (file_exists($path)) {
@@ -556,7 +539,6 @@ if (!function_exists('delete_recursive_directory')) {
 if (!function_exists('get_month_string')) {
     /**
      * @param string $month
-     * @param bool   $english
      *
      * @return string
      */
@@ -588,7 +570,6 @@ if (!function_exists('get_month_string')) {
 if (!function_exists('get_day_string')) {
     /**
      * @param string $day
-     * @param bool   $english
      *
      * @return string
      */
@@ -614,7 +595,6 @@ if (!function_exists('get_day_string')) {
 
 if (!function_exists('upload')) {
     /**
-     * @param array  $file
      * @param string $directory
      * @param string $name
      * @param int    $width
@@ -649,26 +629,17 @@ if (!function_exists('upload')) {
             // Checa extension
             if (in_array($extension, $extImages)) {
                 if (!in_array($extension, $extImages)) {
-                    throw new \Exception(
-                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.',
-                        E_USER_ERROR
-                    );
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.', E_USER_ERROR);
                 }
             } else {
                 if (!in_array($extension, $extensions)) {
-                    throw new \Exception(
-                        'Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.',
-                        E_USER_ERROR
-                    );
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.', E_USER_ERROR);
                 }
             }
 
             // Checa tamanho
             if (($value['size'] > $maxFilesize = Upload::getPhpMaxFilesize()) || 1 == $value['error']) {
-                throw new \Exception(
-                    'Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.',
-                    E_USER_ERROR
-                );
+                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.', E_USER_ERROR);
             }
 
             // Cria pasta
@@ -690,9 +661,7 @@ if (!function_exists('upload')) {
 
             if (in_array($extension, $extFiles) || 'gif' === $extension) {
                 if (!move_uploaded_file($value['tmp_name'], $path)) {
-                    throw new \Exception(
-                        "<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
-                    );
+                    throw new \Exception("<p>Não foi possível enviar seu arquivo no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
                 }
             } else {
                 // Verifica se é o tamanho exato da imagem
@@ -708,9 +677,7 @@ if (!function_exists('upload')) {
                 }
 
                 if (!$fnImg($value['tmp_name'], $path, $width, $height, 90)) {
-                    throw new \Exception(
-                        "<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR
-                    );
+                    throw new \Exception("<p>Não foi possível enviar sua imagem no momento!</p><p>{$uploadError}</p>", E_USER_ERROR);
                 }
             }
 
@@ -795,8 +762,6 @@ if (!function_exists('upload_fix_orientation')) {
 
 if (!function_exists('upload_organize_multiple_files')) {
     /**
-     * @param array $files
-     *
      * @return array
      */
     function upload_organize_multiple_files(array $files)
@@ -927,13 +892,16 @@ if (!function_exists('imagemTamExato')) {
      */
     function imagemTamExato($imgSrc, $dest, $thumbnail_width, $thumbnail_height, $quality)
     {
-        if (file_exists($imgSrc) && isset($dest)) {
+        if (file_exists($imgSrc)) {
             $srcSize = getimagesize($imgSrc);
-            $destInfo = pathinfo($dest);
 
-            // retifica o arquivo
-            if ('gif' == $destInfo['extension']) {
-                $dest = substr_replace($dest, 'jpg', -3);
+            if (null !== $dest) {
+                $destInfo = pathinfo($dest);
+
+                // retifica o arquivo
+                if ('gif' == $destInfo['extension']) {
+                    $dest = substr_replace($dest, 'jpg', -3);
+                }
             }
 
             list($width_orig, $height_orig) = getimagesize($imgSrc);
@@ -976,7 +944,7 @@ if (!function_exists('imagemTamExato')) {
             $thumb = imagecreatetruecolor($thumbnail_width, $thumbnail_height);
 
             if ($png) {
-                if ('png' == substr($dest, -3)) {
+                if ('png' == substr($dest, -3) || null === $dest) {
                     imagesavealpha($myImage, true);
                     imagealphablending($process, false);
                     imagesavealpha($process, true);
@@ -1000,7 +968,7 @@ if (!function_exists('imagemTamExato')) {
                 imagejpeg($thumb, $dest, $quality);
             }
 
-            return true;
+            return $thumb;
         }
 
         return false;

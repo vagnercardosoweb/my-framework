@@ -1,4 +1,4 @@
-FROM php:7.3-apache-stretch
+FROM php:7.3-apache
 
 # Atualiza e instala dependências
 RUN  apt-get update \
@@ -28,6 +28,7 @@ RUN  apt-get update \
   vim \
   sudo \
   gnupg \
+  unzip \
   && rm -rf /var/lib/apt/lists/*
 
 # Instala dependencia do php
@@ -35,6 +36,7 @@ RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
     --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir \
     --enable-gd-native-ttf
 RUN docker-php-ext-configure pdo_dblib --with-libdir=/lib/x86_64-linux-gnu
+RUN docker-php-ext-configure soap --enable-soap
 RUN docker-php-ext-install \
   gd \
   json \
@@ -50,7 +52,8 @@ RUN docker-php-ext-install \
   opcache \
   intl \
   xsl \
-  exif
+  exif \
+  soap
 
 # Instala composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
