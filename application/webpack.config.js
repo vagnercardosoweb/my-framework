@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -25,6 +26,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new ProgressBarPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[name].css',
@@ -32,7 +34,8 @@ module.exports = {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.Jquery': 'jquery',
+      'window.$': 'jquery',
+      'window.jQuery': 'jquery',
     }),
   ],
   module: {
