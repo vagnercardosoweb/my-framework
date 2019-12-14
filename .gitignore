@@ -6,7 +6,10 @@
 /**/composer.lock
 /**/package-lock.json
 /**/yarn.lock
+/**/*.code-workspace
 /**/*.map
+/**/.php_cs.cache
+/**/.vscode/
 
 # Docker
 /**/docker/apache/logs/*

@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 07/12/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -34,7 +35,7 @@ class TokenMiddleware extends Middleware
     {
         try {
             // Variáveis
-            $type = '';
+            $type = 'Bearer';
             $token = '';
             $authorization = $request->getHeaderLine('Authorization');
 
@@ -42,10 +43,7 @@ class TokenMiddleware extends Middleware
             if (empty($authorization)) {
                 $token = ($request->getHeaderLine('X-Csrf-Token') ?? $request->getParam('_csrfToken') ?? $request->getParam('jwtToken'));
 
-                if (!empty($token)) {
-                    $type = 'Bearer';
-                } elseif ($this->auth) {
-                    $type = 'Bearer';
+                if (empty($token) && $this->auth) {
                     $token = 'AUTH_SESSION_NAME';
                 } else {
                     throw new \Exception('Acesso não autorizado.', E_USER_ERROR);

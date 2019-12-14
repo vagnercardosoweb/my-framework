@@ -32,14 +32,14 @@ RUN  apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Instala dependencia do php
-RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
-    --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir \
-    --enable-gd-native-ttf
+RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir
 RUN docker-php-ext-configure pdo_dblib --with-libdir=/lib/x86_64-linux-gnu
 RUN docker-php-ext-configure soap --enable-soap
 RUN docker-php-ext-install \
   gd \
   json \
+  iconv \
+  bcmath \
   xml \
   soap \
   mbstring \

@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 07/12/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -51,7 +52,8 @@ class User extends BaseModel
     }
 
     /**
-     * @param bool $validate
+     * @param array $data
+     * @param bool  $validate
      *
      * @throws \Exception
      */

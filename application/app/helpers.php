@@ -79,7 +79,7 @@ if (!function_exists('json_error')) {
      */
     function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
     {
-        return json(array_merge([
+        return json(array_merge_recursive([
             'error' => [
                 'code' => $exception->getCode(),
                 'type' => error_code_type($exception->getCode()),
