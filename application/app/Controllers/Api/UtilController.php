@@ -38,7 +38,9 @@ class UtilController extends BaseController
             }
 
             if (!method_exists(App::class, $name)) {
-                throw new \Exception('Invalid requisition method.', E_USER_ERROR);
+                throw new \Exception(
+                    'Invalid requisition method.', E_USER_ERROR
+                );
             }
 
             $method = Str::camel(str_replace('/', '-', $arguments[0]));
@@ -46,7 +48,9 @@ class UtilController extends BaseController
             $data = array_merge(($path ? explode('/', $path) : []), $this->getParamsFiltered());
 
             if (!method_exists($this, $method)) {
-                throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($this), $method), E_ERROR);
+                throw new \BadMethodCallException(
+                    sprintf('Call to undefined method %s::%s()', get_class($this), $method), E_ERROR
+                );
             }
 
             return $this->{$method}($data);
@@ -57,6 +61,8 @@ class UtilController extends BaseController
 
     /**
      * [GET|POST] /api/zipcode/{zipcode}.
+     *
+     * @param array $data
      *
      * @throws \Exception
      *
@@ -70,11 +76,15 @@ class UtilController extends BaseController
             }
 
             if (empty($data['cep'])) {
-                throw new \InvalidArgumentException('Você deve passar o CEP para buscar.', E_USER_ERROR);
+                throw new \InvalidArgumentException(
+                    'Você deve passar o CEP para buscar.', E_USER_ERROR
+                );
             }
 
             if (strlen(preg_replace('/[^0-9]/', '', $data['cep'])) < 8) {
-                throw new \InvalidArgumentException("O CEP {$data['cep']} informado deve conter, no mínimo 8 números.", E_USER_ERROR);
+                throw new \InvalidArgumentException(
+                    "O CEP {$data['cep']} informado deve conter, no mínimo 8 números.", E_USER_ERROR
+                );
             }
 
             // Find cep...
@@ -82,7 +92,9 @@ class UtilController extends BaseController
             $cep = $response->getBody();
 
             if (!empty($cep->erro) || $response->getError()) {
-                throw new \Exception("O CEP {$data['cep']} informado não foi encontrado.", E_USER_ERROR);
+                throw new \Exception(
+                    "O CEP {$data['cep']} informado não foi encontrado.", E_USER_ERROR
+                );
             }
 
             // Format address
@@ -112,6 +124,8 @@ class UtilController extends BaseController
     /**
      * [POST] /api/modal-detail.
      *
+     * @param array $data
+     *
      * @throws \Exception
      *
      * @return \Slim\Http\Response
@@ -120,14 +134,18 @@ class UtilController extends BaseController
     {
         try {
             if (empty($data['view'])) {
-                throw new \Exception('Você deve passar a view para inserir na modal.', E_USER_ERROR);
+                throw new \Exception(
+                    'Você deve passar a view para inserir na modal.', E_USER_ERROR
+                );
             }
 
             if (!empty($data['model']) && (!empty($data['id']) && $data['id'] > 0)) {
                 $model = '\\App\\Models\\'.Str::studly($data['model']);
 
                 if (!$data['row'] = (new $model())->reset()->fetchById($data['id'])) {
-                    throw new \Exception('Registro não encontrado.', E_USER_ERROR);
+                    throw new \Exception(
+                        'Registro não encontrado.', E_USER_ERROR
+                    );
                 }
             }
 

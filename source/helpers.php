@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 15/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -41,7 +42,8 @@ if (!defined('DATE_DATABASE')) {
 
 if (!function_exists('env')) {
     /**
-     * @param mixed $default
+     * @param string $key
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -86,6 +88,10 @@ if (!function_exists('env')) {
 
 if (!function_exists('asset')) {
     /**
+     * @param string $file
+     * @param bool   $baseUrl
+     * @param bool   $version
+     *
      * @return bool|string
      */
     function asset(string $file, bool $baseUrl = false, bool $version = false)
@@ -160,17 +166,14 @@ if (!function_exists('onlyNumber')) {
      */
     function onlyNumber($value)
     {
-        if (!empty($value)) {
-            return preg_replace(
-                '/[^0-9]/', '', $value
-            );
-        }
+        return Helper::onlyNumber($value);
     }
 }
 
 if (!function_exists('config')) {
     /**
-     * @param mixed $default
+     * @param mixed  $default
+     * @param string $name
      *
      * @return mixed
      */
@@ -202,6 +205,11 @@ if (!function_exists('config')) {
 
 if (!function_exists('logger')) {
     /**
+     * @param string $message
+     * @param array  $context
+     * @param string $type
+     * @param string $file
+     *
      * @return Logger|bool
      */
     function logger(string $message, array $context = [], string $type = 'info', string $file = '')
@@ -220,6 +228,7 @@ if (!function_exists('view')) {
     /**
      * @param string $template
      * @param int    $status
+     * @param array  $context
      *
      * @return mixed
      */
@@ -255,6 +264,10 @@ if (!function_exists('view_fetch')) {
 if (!function_exists('json')) {
     /**
      * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
+     * @return \Slim\Http\Response
      */
     function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
     {
@@ -277,6 +290,8 @@ if (!function_exists('__')) {
 if (!function_exists('htmlentities_recursive')) {
     /**
      * @param mixed $values
+     *
+     * @return array
      */
     function htmlentities_recursive($values): array
     {
@@ -301,6 +316,8 @@ if (!function_exists('htmlentities_recursive')) {
 if (!function_exists('empty_recursive')) {
     /**
      * @param array|object $data
+     *
+     * @return bool
      */
     function empty_recursive($data): bool
     {
@@ -310,6 +327,8 @@ if (!function_exists('empty_recursive')) {
 
 if (!function_exists('params')) {
     /**
+     * @param string $name
+     *
      * @return mixed
      */
     function params(string $name = '')
@@ -332,6 +351,8 @@ if (!function_exists('params')) {
 if (!function_exists('filter_params')) {
     /**
      * @param mixed $values
+     *
+     * @return array
      */
     function filter_params($values): array
     {
@@ -356,6 +377,14 @@ if (!function_exists('filter_params')) {
 }
 
 if (!function_exists('path_for')) {
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param string $hash
+     *
+     * @return string
+     */
     function path_for(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
     {
         return Router::pathFor($name, $data, $queryParams, $hash);
@@ -363,6 +392,13 @@ if (!function_exists('path_for')) {
 }
 
 if (!function_exists('header_location')) {
+    /**
+     * @param string $route
+     * @param bool   $replace
+     * @param int    $status
+     *
+     * @return void
+     */
     function header_location(string $route, bool $replace = true, int $status = StatusCode::HTTP_MOVED_PERMANENTLY): void
     {
         header("Location: {$route}", $replace, $status);
@@ -372,6 +408,15 @@ if (!function_exists('header_location')) {
 }
 
 if (!function_exists('redirect')) {
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param int    $status
+     * @param string $hash
+     *
+     * @return \Slim\Http\Response
+     */
     function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, string $hash = ''): Response
     {
         return Router::redirect($name, $data, $queryParams, $status, $hash);
@@ -379,6 +424,11 @@ if (!function_exists('redirect')) {
 }
 
 if (!function_exists('is_route')) {
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     function is_route(string $name): bool
     {
         return Router::isCurrent($name);
@@ -388,16 +438,11 @@ if (!function_exists('is_route')) {
 if (!function_exists('has_route')) {
     /**
      * @param mixed $routes
+     *
+     * @return bool
      */
     function has_route($routes): bool
     {
         return Router::hasCurrent($routes);
-    }
-}
-
-if (!function_exists('is_php_cli')) {
-    function is_php_cli(): bool
-    {
-        return Helper::isPhpCli();
     }
 }

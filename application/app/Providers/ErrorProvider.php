@@ -4,14 +4,14 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 21/10/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
 
 use Core\App;
-use Core\Helpers\Helper;
 use Core\Router;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -52,7 +52,7 @@ class ErrorProvider extends Provider
                     $this->event->emit('eventErrorHandler', $errors);
                 }
 
-                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
+                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson($errors, StatusCode::HTTP_INTERNAL_SERVER_ERROR);
                 }
 
@@ -69,7 +69,7 @@ class ErrorProvider extends Provider
             return function (Request $request, Response $response) {
                 $uri = urldecode($request->getUri());
 
-                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
+                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson([
                         'error' => [
                             'url' => $uri,
@@ -92,7 +92,7 @@ class ErrorProvider extends Provider
                 $uri = urldecode($request->getUri());
                 $method = $request->getMethod();
 
-                if (Helper::isPhpCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
+                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
                     return $response->withJson([
                         'error' => [
                             'url' => $uri,

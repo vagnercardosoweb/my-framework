@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -30,7 +31,7 @@ class ErrorSlackProvider extends Provider
     {
         if (
             'production' == env('APP_ENV', 'development') &&
-            !Helper::isPhpCli() &&
+            !App::isCli() &&
             App::getInstance()->resolve('event')
         ) {
             $this->dispatch();

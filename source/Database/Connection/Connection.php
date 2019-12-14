@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -68,8 +69,9 @@ abstract class Connection
                 $config['password'] ?? null,
             ];
 
+            $dsn = $config['url'] ?? $this->getDsn($config);
             $options = $this->getOptions($config);
-            $connection = new \PDO($this->getDsn($config), $username, $password, $options);
+            $connection = new \PDO($dsn, $username, $password, $options);
 
             $this->setDefaultStatement($connection);
             $this->setDefaultSchema($connection, $config);
@@ -79,9 +81,7 @@ abstract class Connection
 
             return $connection;
         } catch (\PDOException $e) {
-            throw new \Exception(
-                $e->getMessage(), $e->getCode()
-            );
+            throw new \Exception($e->getMessage(), E_ERROR);
         }
     }
 
@@ -94,31 +94,19 @@ abstract class Connection
         $className = array_pop($classSplit);
 
         if (empty($config['host'])) {
-            throw new \InvalidArgumentException(
-                sprintf('%s: host not configured.', $className),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('%s: host not configured.', $className), E_USER_ERROR);
         }
 
         if (empty($config['username'])) {
-            throw new \InvalidArgumentException(
-                sprintf('%s: username not configured.', $className),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('%s: username not configured.', $className), E_USER_ERROR);
         }
 
         if (empty($config['password']) && empty($config['notPassword'])) {
-            throw new \InvalidArgumentException(
-                sprintf('%s: password not configured.', $className),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('%s: password not configured.', $className), E_USER_ERROR);
         }
 
         if (empty($config['database']) && empty($config['notDatabase'])) {
-            throw new \InvalidArgumentException(
-                sprintf('%s: database not configured.', $className),
-                E_USER_ERROR
-            );
+            throw new \InvalidArgumentException(sprintf('%s: database not configured.', $className), E_USER_ERROR);
         }
     }
 

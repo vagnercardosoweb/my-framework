@@ -27,6 +27,8 @@ class TokenMiddleware extends Middleware
      * @param \Psr\Http\Message\RequestInterface  $request  PSR7 request
      * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
      * @param callable                            $next     Next middleware
+     *
+     * @return \Psr\Http\Message\ResponseInterface
      */
     public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
     {

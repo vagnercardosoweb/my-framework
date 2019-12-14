@@ -4,13 +4,14 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
 
-use Core\Helpers\Helper;
+use Core\App;
 use Core\Session\Flash;
 use Core\Session\Session;
 
@@ -29,7 +30,7 @@ class SessionProvider extends Provider
     public function register(): void
     {
         $this->container['session'] = function () {
-            if (!Helper::isPhpCli() && 'true' == env('APP_SESSION', true)) {
+            if (!App::isCli() && 'true' == env('APP_SESSION', true)) {
                 return new Session();
             }
 

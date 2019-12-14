@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -72,6 +73,14 @@ class App extends \Slim\App
     }
 
     /**
+     * @return bool
+     */
+    public static function isCli(): bool
+    {
+        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
+    }
+
+    /**
      * @param string|array          $methods
      * @param string                $pattern
      * @param string|\Closure       $callable
@@ -116,9 +125,7 @@ class App extends \Slim\App
                     $method = ($originalMethod ?: 'index');
 
                     if (!method_exists($controller, $method)) {
-                        throw new \BadMethodCallException(
-                            sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR
-                        );
+                        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR);
                     }
                 }
 

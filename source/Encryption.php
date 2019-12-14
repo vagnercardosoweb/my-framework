@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -37,9 +38,7 @@ class Encryption
         $this->cipher = $cipher;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException(
-                'Encryption empty key.', E_ERROR
-            );
+            throw new \InvalidArgumentException('Encryption empty key.', E_ERROR);
         }
     }
 
@@ -82,6 +81,11 @@ class Encryption
     public function decrypt(string $payload, bool $unserialize = true)
     {
         $payload = $this->getJsonPayload($payload);
+
+        if (empty($payload['iv'])) {
+            return false;
+        }
+
         $iv = base64_decode($payload['iv']);
         $decrypted = \openssl_decrypt(
             $payload['value'], $this->cipher, $this->key, 0, $iv

@@ -35,8 +35,8 @@ function checkElementUrl(element, http) {
  */
 function showMessage(json, elementMessage) {
   /* Variávies */
-  var message = '';
   var type = '';
+  var message = '';
 
   /* Verifica o retorno do json */
   if (json.trigger) {
@@ -45,6 +45,9 @@ function showMessage(json, elementMessage) {
   } else if (json.error) {
     type = json.error.type || 'danger';
     message = json.error.message;
+  } else if ('error' in json && !json.error && json.message) {
+    type = json.type || 'success';
+    message = json.message;
   }
 
   /* Printa ou alerta a mensagem */
@@ -434,7 +437,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
         }
 
         /* Mensagem de retorno ou erro */
-        if (json.trigger || json.error) {
+        if (json.trigger || json.error || (!json.error && json.message)) {
           showMessage(json, message);
         }
 

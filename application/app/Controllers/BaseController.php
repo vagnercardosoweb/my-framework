@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 07/12/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -88,7 +89,8 @@ abstract class BaseController
     }
 
     /**
-     * @param mixed $default
+     * @param string $name
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -98,6 +100,11 @@ abstract class BaseController
     }
 
     /**
+     * @param string $message
+     * @param array  $context
+     * @param string $file
+     * @param string $type
+     *
      * @return Logger|bool
      */
     public function logger(string $message, array $context = [], string $file = '', string $type = 'info')
@@ -107,6 +114,10 @@ abstract class BaseController
 
     /**
      * @param mixed $data
+     * @param int   $status
+     * @param int   $options
+     *
+     * @return \Slim\Http\Response
      */
     public function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
     {
@@ -116,6 +127,9 @@ abstract class BaseController
     /**
      * @param string|array|object $message
      * @param array|object        $data
+     * @param int                 $status
+     *
+     * @return \Slim\Http\Response
      */
     public function jsonSuccess($message = null, $data = [], int $status = StatusCode::HTTP_OK): Response
     {
@@ -143,17 +157,22 @@ abstract class BaseController
     }
 
     /**
+     * @param string $key
+     *
      * @return mixed
      */
-    public function getParsedBodyFiltered(string $key = '')
+    public function getParsedBodyFiltered(?string $key = null)
     {
         return $this->getParsedBody($key, true);
     }
 
     /**
+     * @param string $key
+     * @param bool   $filter
+     *
      * @return mixed
      */
-    public function getParsedBody(string $key = '', bool $filter = false)
+    public function getParsedBody(?string $key = null, bool $filter = false)
     {
         $data = empty($key)
             ? $this->request->getParsedBody()
@@ -173,9 +192,12 @@ abstract class BaseController
     }
 
     /**
+     * @param string $key
+     * @param bool   $filter
+     *
      * @return mixed
      */
-    public function getQueryParams(string $key = '', bool $filter = false)
+    public function getQueryParams(?string $key = null, bool $filter = false)
     {
         $data = empty($key)
             ? $this->request->getQueryParams()
@@ -185,17 +207,22 @@ abstract class BaseController
     }
 
     /**
+     * @param string $key
+     *
      * @return array|mixed|null
      */
-    public function getParamsFiltered(string $key = '')
+    public function getParamsFiltered(?string $key = null)
     {
         return $this->getParams($key, true);
     }
 
     /**
+     * @param string $key
+     * @param bool   $filter
+     *
      * @return mixed
      */
-    public function getParams(string $key = '', bool $filter = false)
+    public function getParams(?string $key = null, bool $filter = false)
     {
         $data = empty($key)
             ? $this->request->getParams()
@@ -217,11 +244,13 @@ abstract class BaseController
     }
 
     /**
-     * @param mixed $data
+     * @param mixed  $data
+     * @param string $key
+     * @param bool   $filter
      *
      * @return mixed
      */
-    private function filterParams($data, string $key = '', bool $filter = false)
+    private function filterParams($data, ?string $key = null, bool $filter = false)
     {
         if ($filter && !empty($data)) {
             $dataArray = is_array($data);

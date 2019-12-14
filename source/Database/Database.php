@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -63,10 +64,7 @@ class Database
             return $this->getPdo()->{$method}(...$arguments);
         }
 
-        throw new \BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()', get_class(), $method),
-            E_USER_ERROR
-        );
+        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR);
     }
 
     /**
@@ -149,10 +147,7 @@ class Database
     {
         try {
             if (empty($sql)) {
-                throw new \InvalidArgumentException(
-                    'Parameter $sql can not be empty.',
-                    E_ERROR
-                );
+                throw new \InvalidArgumentException('Parameter $sql can not be empty.', E_ERROR);
             }
 
             // Execute sql

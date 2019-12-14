@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -29,14 +30,6 @@ class Helper
         }
 
         return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public static function isPhpCli(): bool
-    {
-        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
     }
 
     /**
@@ -217,6 +210,18 @@ class Helper
             foreach ($encoded as $key => $value) {
                 $result[$key] = filter_var($value, FILTER_DEFAULT);
             }
+        }
+    }
+
+    /**
+     * @param string|int $value
+     *
+     * @return string|int
+     */
+    public static function onlyNumber($value)
+    {
+        if (!empty($value)) {
+            return preg_replace('/[^0-9]/', '', $value);
         }
     }
 }

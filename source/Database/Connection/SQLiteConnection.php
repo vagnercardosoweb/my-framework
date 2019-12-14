@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -37,15 +38,11 @@ class SQLiteConnection extends Connection
     protected function validateConfig(array &$config): void
     {
         if (empty($config['database'])) {
-            throw new \InvalidArgumentException(
-                "'sqlite' database not configured.", E_USER_ERROR
-            );
+            throw new \InvalidArgumentException("'sqlite' database not configured.", E_USER_ERROR);
         }
 
         if ('memory' !== $config['database'] && !realpath($config['database'])) {
-            throw new \InvalidArgumentException(
-                "'sqlite' database not exists in path {$config['database']}", E_USER_ERROR
-            );
+            throw new \InvalidArgumentException("'sqlite' database not exists in path {$config['database']}", E_USER_ERROR);
         }
     }
 

@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -40,7 +41,7 @@ class Connect
     /**
      * @var string
      */
-    private $defaultDriverConnection = 'mysql';
+    private $defaultConnection = 'mysql';
 
     /**
      * @param array  $config
@@ -64,18 +65,17 @@ class Connect
      */
     public function connection(?string $driver = null): Database
     {
-        $driver = $driver ?? $this->getDefaultDriverConnection();
-        $config = $this->connections[$driver] ?? null;
+        $driver = $driver ?? $this->getDefaultConnection();
 
-        if (empty($config)) {
-            throw new \RuntimeException(
-                "Driver '{$driver}' not configured in database.",
-                E_USER_ERROR
-            );
+        if (empty($this->connections[$driver])) {
+            throw new \Exception("Connection {$driver} does not exist configured.", E_ERROR);
         }
 
+        $config = $this->connections[$driver];
+        $config['driver'] = $config['driver'] ?? $driver;
+
         if (empty(self::$instances[$driver])) {
-            switch ($driver) {
+            switch ($config['driver']) {
                 case 'mysql':
                     self::$instances[$driver] = (new MySqlConnection())->connect($config);
                     break;
@@ -102,19 +102,19 @@ class Connect
     /**
      * @return string
      */
-    public function getDefaultDriverConnection(): string
+    public function getDefaultConnection(): string
     {
-        return $this->defaultDriverConnection;
+        return $this->defaultConnection;
     }
 
     /**
-     * @param string $defaultDriverConnection
+     * @param string $defaultConnection
      *
      * @return Connect
      */
-    public function setDefaultDriverConnection(string $defaultDriverConnection): Connect
+    public function setDefaultConnection(string $defaultConnection): Connect
     {
-        $this->defaultDriverConnection = $defaultDriverConnection;
+        $this->defaultConnection = $defaultConnection;
 
         return $this;
     }

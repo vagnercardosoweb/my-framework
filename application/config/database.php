@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 return [
@@ -23,6 +24,7 @@ return [
     // Defines the types of connections that will be accepted
     'connections' => [
         'sqlite' => [
+            'driver' => 'sqlite',
             'database' => 'PATH_DATABASE_SQLITE', // Location database sqlite
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
@@ -30,14 +32,15 @@ return [
         ],
 
         'mysql' => [
+            'driver' => 'mysql',
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', 3306),
             'username' => env('DB_USER', null),
             'password' => env('DB_PASS', null),
             'notPassword' => true,
             'database' => env('DB_DATABASE', null),
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'collation' => env('DB_COLLATE', 'utf8_general_ci'),
+            'charset' => env('DB_CHARSET', 'utf8mb4'),
+            'collation' => env('DB_COLLATE', 'utf8mb4_unicode_ci'),
             'timezone' => env('APP_TIMEZONE', null),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
@@ -45,6 +48,7 @@ return [
         ],
 
         'pgsql' => [
+            'driver' => 'pgsql',
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', 5432),
             'username' => env('DB_USER', null),
@@ -59,6 +63,7 @@ return [
         ],
 
         'sqlsrv' => [
+            'driver' => 'sqlsrv',
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', 1433),
             'username' => env('DB_USER', null),

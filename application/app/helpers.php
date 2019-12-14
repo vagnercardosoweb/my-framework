@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 07/12/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -19,6 +20,7 @@ use Slim\Http\StatusCode;
 if (!function_exists('validate_params')) {
     /**
      * @param array|object $params
+     * @param array        $rules
      */
     function validate_params($params, array $rules)
     {
@@ -49,7 +51,10 @@ if (!function_exists('validate_params')) {
 
 if (!function_exists('json_trigger')) {
     /**
+     * @param string     $message
      * @param string|int $type
+     * @param array      $data
+     * @param int        $status
      *
      * @return \Slim\Http\Response
      */
@@ -67,13 +72,14 @@ if (!function_exists('json_trigger')) {
 if (!function_exists('json_error')) {
     /**
      * @param \Exception|\Throwable $exception
+     * @param array                 $data
      * @param int                   $status
      *
      * @return \Slim\Http\Response
      */
     function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
     {
-        return json(array_merge_recursive([
+        return json(array_merge([
             'error' => [
                 'code' => $exception->getCode(),
                 'type' => error_code_type($exception->getCode()),
@@ -88,8 +94,9 @@ if (!function_exists('json_error')) {
 
 if (!function_exists('json_success')) {
     /**
-     * @param mixed        $message
-     * @param array|object $data
+     * @param string|array|object $message
+     * @param array|object|int    $data
+     * @param int                 $status
      *
      * @return \Slim\Http\Response
      */
@@ -99,7 +106,7 @@ if (!function_exists('json_success')) {
             $data = $message;
         }
 
-        if ($data instanceof \Core\Providers\Database\Model) {
+        if ($data instanceof \Core\Database\Model) {
             $data = $data->toArray();
         }
 
@@ -388,6 +395,7 @@ if (!function_exists('check_phone')) {
 
 if (!function_exists('flash')) {
     /**
+     * @param string          $name
      * @param mixed           $value
      * @param string|int|null $error
      */
@@ -409,6 +417,8 @@ if (!function_exists('flash')) {
 
 if (!function_exists('get_code_video_youtube')) {
     /**
+     * @param string $url
+     *
      * @return string|bool
      */
     function get_code_video_youtube(string $url)
@@ -482,6 +492,13 @@ if (!function_exists('placeholder')) {
 }
 
 if (!function_exists('preg_replace_space')) {
+    /**
+     * @param string $string
+     * @param bool   $removeEmptyTagParagraph
+     * @param bool   $removeAllEmptyTags
+     *
+     * @return string
+     */
     function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
     {
         // Remove comments
@@ -509,6 +526,12 @@ if (!function_exists('preg_replace_space')) {
 }
 
 if (!function_exists('delete_recursive_directory')) {
+    /**
+     * @param string $path
+     * @param int    $mode
+     *
+     * @return void
+     */
     function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
     {
         if (file_exists($path)) {
@@ -539,6 +562,7 @@ if (!function_exists('delete_recursive_directory')) {
 if (!function_exists('get_month_string')) {
     /**
      * @param string $month
+     * @param bool   $english
      *
      * @return string
      */
@@ -570,6 +594,7 @@ if (!function_exists('get_month_string')) {
 if (!function_exists('get_day_string')) {
     /**
      * @param string $day
+     * @param bool   $english
      *
      * @return string
      */
@@ -595,6 +620,7 @@ if (!function_exists('get_day_string')) {
 
 if (!function_exists('upload')) {
     /**
+     * @param array  $file
      * @param string $directory
      * @param string $name
      * @param int    $width
@@ -762,6 +788,8 @@ if (!function_exists('upload_fix_orientation')) {
 
 if (!function_exists('upload_organize_multiple_files')) {
     /**
+     * @param array $files
+     *
      * @return array
      */
     function upload_organize_multiple_files(array $files)

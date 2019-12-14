@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 14/12/2019 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -28,7 +29,7 @@ class DatabaseProvider extends Provider
     {
         // Connect instance
         $connect = new Connect();
-        $connect->setDefaultDriverConnection(config('database.default', 'mysql'));
+        $connect->setDefaultConnection(config('database.default', 'mysql'));
 
         // Add connections config
         foreach (config('database.connections') as $driver => $config) {
