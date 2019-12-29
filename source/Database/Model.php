@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -508,21 +508,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         /** @var \Core\Database\Database $db */
         $db = $this->db->driver($this->driver);
 
-        if ($db->inTransaction()) {
-            return $callback($this);
-        }
-
-        try {
-            $db->beginTransaction();
-            $callback = $callback($this);
-            $db->commit();
-
-            return $callback;
-        } catch (\Exception $e) {
-            $db->rollBack();
-
-            throw $e;
-        }
+        return $db->transaction($callback, $this);
     }
 
     /**
@@ -751,13 +737,13 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             ->create($this->table, $this->data)
         ;
 
-        $new = clone $this;
+        $new = $this->clone();
 
         if ($lastInsertId && $this->primaryKey) {
             $new->{$this->primaryKey} = $lastInsertId;
         }
 
-        $this->clear(['data']);
+        $this->clear(['data', 'statement']);
 
         return $new;
     }
@@ -831,9 +817,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return $this
+     * @return array[$this]|null
      */
-    public function delete(?int $id = null): self
+    public function delete(?int $id = null): ?array
     {
         if (!empty($id) && !is_array($id) && $this->primaryKey) {
             $this->data([$this->primaryKey => $id]);
@@ -845,7 +831,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             throw new \InvalidArgumentException(sprintf('[delete] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
         }
 
-        $this->data = $this->db
+        $rows = $this->db
             ->driver($this->driver)
             ->delete(
                 $this->table,
@@ -854,9 +840,17 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             )
         ;
 
-        $this->clear();
+        if (!$rows) {
+            return null;
+        }
 
-        return $this;
+        foreach ($rows as $key => $row) {
+            $new = new static();
+            $new->data = $row;
+            $rows[$key] = $new;
+        }
+
+        return $rows;
     }
 
     /**

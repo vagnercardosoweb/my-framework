@@ -9,25 +9,24 @@
  * @copyright 29/12/2019 Vagner Cardoso
  */
 
-namespace App\Controllers\Web;
+namespace App\Events;
 
-use App\Controller\BaseController;
-use Slim\Http\Response;
+use Core\App;
 
 /**
- * Class IndexController.
+ * Class Event.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class IndexController extends BaseController
+abstract class Event
 {
     /**
-     * [GET] /.
+     * @param string $name
      *
-     * @return \Slim\Http\Response
+     * @return mixed
      */
-    public function index(): Response
+    public function __get(string $name)
     {
-        return $this->view('@web.index');
+        return App::getInstance()->resolve($name);
     }
 }

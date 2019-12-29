@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -21,6 +22,7 @@ class Event
      * @var array
      */
     protected $events = [];
+
     /**
      * @var Event
      */
@@ -39,24 +41,27 @@ class Event
     }
 
     /**
-     * @param string   $event
-     * @param callable $callable
-     * @param int      $priority
+     * @param string          $event
+     * @param callable|string $callable
+     * @param int             $priority
+     *
+     * @throws \Exception
      *
      * @return void
      */
-    public function on(string $event, callable $callable, int $priority = 10): void
+    public function on(string $event, $callable, int $priority = 10): void
     {
-        $event = (string)$event;
-        $priority = (int)$priority;
-
         if (!isset($this->events[$event])) {
-            $this->events[$event] = [];
+            $this->events[$event] = [[]];
         }
 
-        if (is_callable($callable)) {
-            $this->events[$event][$priority][] = $callable;
+        if (is_string($callable) && class_exists($callable)) {
+            $callable = [new $callable(), '__invoke'];
+        } elseif (!is_callable($callable)) {
+            throw new \Exception("Callable invalid in event {$event}.", E_ERROR);
         }
+
+        $this->events[$event][$priority][] = $callable;
     }
 
     /**
@@ -67,8 +72,6 @@ class Event
      */
     public function emit(string $event)
     {
-        $event = (string)$event;
-
         if (!isset($this->events[$event])) {
             $this->events[$event] = [[]];
         }
@@ -83,12 +86,8 @@ class Event
             $executed = [];
 
             foreach ($this->events[$event] as $priority) {
-                if (!empty($priority)) {
-                    foreach ($priority as $callable) {
-                        $executed[] = call_user_func_array(
-                            $callable, $params
-                        );
-                    }
+                foreach ($priority as $callable) {
+                    $executed[] = call_user_func_array($callable, $params);
                 }
             }
 
@@ -119,8 +118,6 @@ class Event
      */
     public function clear(?string $event = null): void
     {
-        $event = (string)$event;
-
         if (!empty($event) && isset($this->events[$event])) {
             $this->events[$event] = [[]];
         } else {

@@ -4,14 +4,15 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
 
 /**
  * Class OldParamMiddleware.
@@ -21,13 +22,13 @@ use Psr\Http\Message\ResponseInterface;
 class OldParamMiddleware extends Middleware
 {
     /**
-     * @param \Psr\Http\Message\RequestInterface|\Slim\Http\Request $request  PSR7 request
-     * @param \Psr\Http\Message\ResponseInterface                   $response PSR7 response
-     * @param callable                                              $next     Next middleware
+     * @param \Slim\Http\Request  $request  PSR7 request
+     * @param \Slim\Http\Response $response PSR7 response
+     * @param callable            $next     Next middleware
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \Slim\Http\Response
      */
-    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function __invoke(Request $request, Response $response, callable $next): Response
     {
         if (!$request->isXhr()) {
             $this->view->addGlobal('oldParam', filter_params($request->getParams()));

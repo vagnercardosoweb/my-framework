@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/11/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace Core;
@@ -75,9 +76,7 @@ class Loader
         if ('true' == env('APP_ERROR_HANDLER', 'true')) {
             set_error_handler(function ($level, $message, $file = '', $line = 0) {
                 if (error_reporting() & $level) {
-                    throw new \ErrorException(
-                        $message, 0, $level, $file, $line
-                    );
+                    throw new \ErrorException($message, 0, $level, $file, $line);
                 }
             });
         }
@@ -116,7 +115,7 @@ class Loader
 
         foreach ($middlewares as $name => $middleware) {
             if (class_exists($middleware)) {
-                $app->add(new $middleware($app->getContainer()));
+                $app->add($middleware);
             }
         }
     }

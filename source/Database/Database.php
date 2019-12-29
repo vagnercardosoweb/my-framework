@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -96,9 +96,19 @@ class Database
      */
     public function transaction(\Closure $callback)
     {
+        $param = $this;
+
+        if (func_num_args() >= 2) {
+            $param = func_get_args()[1];
+        }
+
+        if ($this->inTransaction()) {
+            return $callback($param);
+        }
+
         try {
             $this->beginTransaction();
-            $callback = $callback($this);
+            $callback = $callback($param);
             $this->commit();
 
             return $callback;
@@ -120,14 +130,14 @@ class Database
     public function create(string $table, $data): ?int
     {
         $data = Obj::fromArray($data);
-        $data = $bindings = ($this->emitEvent("{$table}:creating", $data) ?: $data);
+        $data = $bindings = ($this->event("{$table}:creating", $data) ?: $data);
         $values = '(:'.implode(', :', array_keys(get_object_vars($data))).')';
         $columns = implode(', ', array_keys(get_object_vars($data)));
 
         $sql = "INSERT INTO {$table} ({$columns}) VALUES {$values}";
         $lastInsertId = $this->query($sql, $bindings)->lastInsertId();
 
-        $this->emitEvent("{$table}:created", $lastInsertId);
+        $this->event("{$table}:created", $lastInsertId);
 
         return !empty($lastInsertId)
             ? (int)$lastInsertId
@@ -184,11 +194,10 @@ class Database
 
         $set = [];
         $data = Obj::fromArray($data);
-        $data = ($this->emitEvent("{$table}:updating", $data) ?: $data);
+        $data = ($this->event("{$table}:updating", $data) ?: $data);
 
         foreach ($data as $key => $value) {
             $binding = $key;
-            $value = filter_var($value, FILTER_DEFAULT);
             $updated->{$key} = $value;
 
             if (!empty($bindings[$binding])) {
@@ -201,7 +210,7 @@ class Database
 
         $statement = sprintf("UPDATE {$table} SET %s {$condition}", implode(', ', $set));
         $this->query($statement, $bindings);
-        $this->emitEvent("{$table}:updated", $updated);
+        $this->event("{$table}:updated", $updated);
 
         return $updated;
     }
@@ -227,25 +236,25 @@ class Database
      *
      * @throws \Exception
      *
-     * @return object
+     * @return array[object]|null
      */
-    public function delete(string $table, string $condition, $bindings = null): ?object
+    public function delete(string $table, string $condition, $bindings = null): ?array
     {
-        $table = $table;
-        $condition = $condition;
-        $deleted = $this->read($table, $condition, $bindings)->fetch();
-        $deleted = Obj::fromArray($deleted);
+        $rows = $this->read($table, $condition, $bindings)->fetchAll();
 
-        if (empty(get_object_vars($deleted))) {
+        if (empty($rows[0])) {
             return null;
         }
 
-        $this->emitEvent("{$table}:deleting", $deleted);
-        $statement = "DELETE FROM {$table} {$condition}";
-        $this->query($statement, $bindings);
-        $this->emitEvent("{$table}:deleted", $deleted);
+        foreach ($rows as $key => $deleted) {
+            $rows[$key] = Obj::fromArray($deleted);
+        }
 
-        return $deleted;
+        $this->event("{$table}:deleting", $rows);
+        $this->query("DELETE {$table} FROM {$table} {$condition}", $bindings);
+        $this->event("{$table}:deleted", $rows);
+
+        return $rows;
     }
 
     /**
@@ -253,19 +262,16 @@ class Database
      *
      * @return mixed
      */
-    private function emitEvent(?string $name = null)
+    private function event(?string $name = null)
     {
-        $event = App::getInstance()
-            ->resolve('event')
-        ;
+        $event = App::getInstance()->resolve('event');
 
         if (!empty($name) && $event) {
             $arguments = func_get_args();
             array_shift($arguments);
 
             return $event->emit(
-                (string)$name,
-                ...$arguments
+                (string)$name, ...$arguments
             );
         }
 

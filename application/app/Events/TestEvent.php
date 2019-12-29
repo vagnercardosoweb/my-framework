@@ -9,25 +9,20 @@
  * @copyright 29/12/2019 Vagner Cardoso
  */
 
-namespace App\Controllers\Web;
-
-use App\Controller\BaseController;
-use Slim\Http\Response;
+namespace App\Events;
 
 /**
- * Class IndexController.
+ * Class TestEvent.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class IndexController extends BaseController
+class TestEvent extends Event
 {
     /**
-     * [GET] /.
-     *
-     * @return \Slim\Http\Response
+     * @param mixed $data
      */
-    public function index(): Response
+    public function __invoke($data)
     {
-        return $this->view('@web.index');
+        dd($data);
     }
 }

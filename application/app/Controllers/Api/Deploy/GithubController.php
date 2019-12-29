@@ -15,14 +15,14 @@ use App\Controller\BaseController;
 use Slim\Http\StatusCode;
 
 /**
- * Class GitlabController.
+ * Class GithubController.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class GitlabController extends BaseController
+class GithubController extends BaseController
 {
     /**
-     * [POST] /api/deploy/gitlab.
+     * [POST] /api/deploy/github.
      *
      * @return \Slim\Http\Response
      */
@@ -30,27 +30,36 @@ class GitlabController extends BaseController
     {
         try {
             // Headers
-            $token = $this->request->getHeaderLine('X-Gitlab-Token');
-            $event = $this->request->getHeaderLine('X-Gitlab-Event');
+            $signature = $this->request->getHeaderLine('X-Hub-Signature');
+            $event = $this->request->getHeaderLine('X-GitHub-Event');
+            $contentType = $this->request->getHeaderLine('Content-Type');
 
-            if (empty($token) || $token !== env('DEPLOY_KEY')) {
-                throw new \Exception('Token inválid.', E_USER_ERROR);
+            if ('ping' === $event) {
+                return $this->jsonSuccess('Ping successfully!');
+            }
+
+            if ('application/json' !== $contentType) {
+                throw new \InvalidArgumentException("Content-Type {$contentType} invalid.");
             }
 
             // Body
-            $body = json_decode(file_get_contents('php://input'), true);
+            $rawBody = file_get_contents('php://input');
+            $jsonBody = json_decode($rawBody);
 
-            if (empty($body['ref'])) {
-                throw new \InvalidArgumentException('Body ref empty.', E_USER_ERROR);
+            // Signature
+            list($algo, $hash) = explode('=', $signature);
+
+            if (!hash_equals(hash_hmac($algo, $rawBody, env('API_KEY', null)), $hash)) {
+                throw new \Exception("Invalid signature {$algo}={$hash}");
             }
 
-            // Trata branch
-            list(, , $branch) = explode('/', $body['ref']);
+            // Branch
+            list(, , $branch) = explode('/', $jsonBody->ref);
 
-            // Muda o diretório para a raiz
+            // Change root directory
             chdir(ROOT);
 
-            // Verifica pasta .git
+            // Verify initialize git
             if (!file_exists(ROOT.'/.git')) {
                 throw new \Exception('Git not initialize.', E_USER_ERROR);
             }
@@ -65,7 +74,7 @@ class GitlabController extends BaseController
 
             return $this->jsonSuccess([
                 'error' => false,
-                'message' => 'Deploy gitlab successfully.',
+                'message' => 'Deploy successfully.',
             ], StatusCode::HTTP_OK);
         } catch (\Exception $e) {
             return $this->jsonError(

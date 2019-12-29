@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 use Core\App;
@@ -43,6 +43,7 @@ if (!function_exists('validate_params')) {
                 if (array_key_exists('force', (array)$rule) && false == $rule['force']) {
                     continue;
                 }
+
                 throw new \InvalidArgumentException((!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')), (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE));
             }
         }

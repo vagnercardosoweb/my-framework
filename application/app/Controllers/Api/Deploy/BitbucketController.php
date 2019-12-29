@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
@@ -69,12 +70,12 @@ class BitbucketController extends BaseController
                 throw new \Exception('Count change less than 0.', E_USER_ERROR);
             }
 
-            return $this->json([
+            return $this->jsonSuccess([
                 'error' => false,
                 'message' => 'Deploy bitbucket successfully.',
             ], StatusCode::HTTP_OK);
         } catch (\Exception $e) {
-            return json_error(
+            return $this->jsonError(
                 $e, [], StatusCode::HTTP_BAD_REQUEST
             );
         }

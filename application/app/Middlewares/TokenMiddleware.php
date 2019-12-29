@@ -6,13 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
 /**
@@ -25,13 +25,13 @@ use Slim\Http\StatusCode;
 class TokenMiddleware extends Middleware
 {
     /**
-     * @param \Psr\Http\Message\RequestInterface  $request  PSR7 request
-     * @param \Psr\Http\Message\ResponseInterface $response PSR7 response
-     * @param callable                            $next     Next middleware
+     * @param \Slim\Http\Request  $request  PSR7 request
+     * @param \Slim\Http\Response $response PSR7 response
+     * @param callable            $next     Next middleware
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \Slim\Http\Response
      */
-    public function __invoke(RequestInterface $request, ResponseInterface $response, callable $next): ResponseInterface
+    public function __invoke(Request $request, Response $response, callable $next): Response
     {
         try {
             // Variáveis

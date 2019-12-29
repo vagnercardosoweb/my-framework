@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/12/2019 Vagner Cardoso
+ * @copyright 29/12/2019 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -20,6 +21,30 @@ use Core\Database\Model;
 class BaseModel extends Model
 {
     /**
+     * @return string
+     */
+    public function tb(): string
+    {
+        return $this->table;
+    }
+
+    /**
+     * @return string
+     */
+    public function pk(): string
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * @return string
+     */
+    public function fk(): string
+    {
+        return $this->foreignKey;
+    }
+
+    /**
      * @param array|object $rows
      *
      * @return array
@@ -33,7 +58,7 @@ class BaseModel extends Model
             foreach ($row as $column => $value) {
                 if (is_array($value) && !empty($value[0])) {
                     $newRows[$index][$this->columnCamelCase($column)] = $this->toAllCamelCase($value);
-                } else if (is_array($value) || is_object($value)) {
+                } elseif (is_array($value) || is_object($value)) {
                     $newRows[$index][$this->columnCamelCase($column)] = $this->toCamelCase($value);
                 } else {
                     $newRows[$index][$this->columnCamelCase($column)] = $value;
