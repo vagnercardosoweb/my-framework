@@ -7,10 +7,10 @@ services:
     restart: always
     networks:
       - mysql-network
-      # - pgsql-network
+      # - postgres-network
     depends_on:
       - mysql
-      # - pgsql
+      # - postgres
     ports:
       - '80:80'
       - '443:443'
@@ -50,11 +50,11 @@ services:
   #    ports:
   #      - '8080:80'
 
-  #  pgsql:
+  #  postgres:
   #    image: postgres
   #    restart: always
   #    networks:
-  #      - pgsql-network
+  #      - postgres-network
   #    ports:
   #      - '5432:5432'
   #    volumes:
@@ -67,5 +67,5 @@ services:
 networks:
   mysql-network:
     driver: bridge
-  #  pgsql-network:
+  #  postgres-network:
   #    driver: bridge
