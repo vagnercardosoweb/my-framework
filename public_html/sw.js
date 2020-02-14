@@ -1,18 +1,18 @@
 // Constants
 const staticCacheName = 'vcweb-v1';
 const filesToCache = [
-  '/offline'
+  '/offline',
 ];
 
 // Cache on install
-self.addEventListener("install", event => {
+self.addEventListener('install', event => {
   self.skipWaiting();
-  
+
   event.waitUntil(
     caches.open(staticCacheName)
       .then(cache => {
         return cache.addAll(filesToCache);
-      })
+      }),
   );
 });
 
@@ -24,14 +24,14 @@ self.addEventListener('activate', event => {
         cacheNames
           .filter(cacheName => (cacheName.startsWith('vcweb-')))
           .filter(cacheName => (cacheName !== staticCacheName))
-          .map(cacheName => caches.delete(cacheName))
+          .map(cacheName => caches.delete(cacheName)),
       );
-    })
+    }),
   );
 });
 
 // Serve from Cache
-self.addEventListener("fetch", event => {
+self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -39,6 +39,6 @@ self.addEventListener("fetch", event => {
       })
       .catch(() => {
         return caches.match('/offline');
-      })
+      }),
   );
 });

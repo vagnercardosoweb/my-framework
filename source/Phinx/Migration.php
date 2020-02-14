@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Phinx;
@@ -70,10 +71,7 @@ abstract class Migration extends AbstractMigration
         $table = $table ?? $this->table;
 
         if (empty($table)) {
-            throw new \Exception(
-                sprintf('Table not defined in %s.', get_class($this)),
-                E_ERROR
-            );
+            throw new \Exception(sprintf('Table not defined in %s.', get_class($this)), E_ERROR);
         }
 
         return parent::table($table, array_merge([

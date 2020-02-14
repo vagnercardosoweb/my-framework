@@ -4,12 +4,13 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 return [
-    // Configurações do slim
+    // Slim 3+ Settings
 
     'slim' => [
         'httpVersion' => '1.1',
@@ -21,14 +22,14 @@ return [
         'routerCacheFile' => false,
     ],
 
-    // Define a versão da aplicação
+    // Sets the application versions
 
     'version' => [
         'framework' => 'v1.0.0',
         'skeleton' => 'v1.0.0',
     ],
 
-    // Registra os serviços
+    // Register providers
 
     'providers' => [
         \App\Providers\ViewProvider::class,
@@ -44,9 +45,9 @@ return [
         \App\Providers\EventProvider::class,
     ],
 
-    // Registra as middlewares
+    // Register middleware
 
-    'middlewares' => [
+    'middleware' => [
         'automatic' => [
             \App\Middlewares\TrailingSlashMiddleware::class,
             \App\Middlewares\GenerateKeysMiddleware::class,

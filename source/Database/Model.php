@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 29/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -173,22 +173,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @return $this
-     */
-    public function clone(): self
-    {
-        $new = clone $this;
-        $newData = clone $this->toObject();
-        unset($newData->{$new->primaryKey});
-
-        $new->data = $newData;
-        $new->statement = null;
-        $new->fetchStyle = null;
-
-        return $new;
-    }
-
-    /**
      * @param string $name
      *
      * @return mixed
@@ -228,25 +212,17 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @return array
      */
-    public function toArray(): array
+    public function jsonSerialize(): array
     {
-        return Obj::toArray($this->data);
-    }
-
-    /**
-     * @return object
-     */
-    public function toObject(): object
-    {
-        return Obj::fromArray($this->data);
+        return $this->toArray();
     }
 
     /**
      * @return array
      */
-    public function jsonSerialize(): array
+    public function toArray(): array
     {
-        return $this->toArray();
+        return Obj::toArray($this->data);
     }
 
     /**
@@ -676,14 +652,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @return string|null
-     */
-    public function getForeignKey(): ?string
-    {
-        return $this->foreignKey;
-    }
-
-    /**
      * @param array|object|null $data
      * @param bool              $validate
      *
@@ -746,6 +714,38 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->clear(['data', 'statement']);
 
         return $new;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clone(): self
+    {
+        $new = clone $this;
+        $newData = clone $this->toObject();
+        unset($newData->{$new->primaryKey});
+
+        $new->data = $newData;
+        $new->statement = null;
+        $new->fetchStyle = null;
+
+        return $new;
+    }
+
+    /**
+     * @return object
+     */
+    public function toObject(): object
+    {
+        return Obj::fromArray($this->data);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getForeignKey(): ?string
+    {
+        return $this->foreignKey;
     }
 
     /**

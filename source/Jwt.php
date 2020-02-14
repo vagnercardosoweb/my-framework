@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -39,9 +40,7 @@ class Jwt
         $this->key = (string)$key;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException(
-                'Jwt empty key.', E_USER_ERROR
-            );
+            throw new \InvalidArgumentException('Jwt empty key.', E_USER_ERROR);
         }
     }
 
@@ -76,48 +75,34 @@ class Jwt
         $split = explode('.', $token);
 
         if (3 != count($split)) {
-            throw new \InvalidArgumentException(
-                'The token does not contain a valid format.', E_USER_ERROR
-            );
+            throw new \InvalidArgumentException('The token does not contain a valid format.', E_USER_ERROR);
         }
 
         // Separate the token
         list($header64, $payload64, $signature) = $split;
 
         if (!$header = json_decode(base64_decode($header64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException(
-                'Invalid header encoding.', E_USER_ERROR
-            );
+            throw new \UnexpectedValueException('Invalid header encoding.', E_USER_ERROR);
         }
 
         if (!$payload = json_decode(base64_decode($payload64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException(
-                'Invalid payload encoding.', E_USER_ERROR
-            );
+            throw new \UnexpectedValueException('Invalid payload encoding.', E_USER_ERROR);
         }
 
         if (!$signature = base64_decode($signature)) {
-            throw new \UnexpectedValueException(
-                'Invalid signature encoding.', E_USER_ERROR
-            );
+            throw new \UnexpectedValueException('Invalid signature encoding.', E_USER_ERROR);
         }
 
         if (empty($header['alg'])) {
-            throw new \UnexpectedValueException(
-                'Empty algorithm.', E_USER_ERROR
-            );
+            throw new \UnexpectedValueException('Empty algorithm.', E_USER_ERROR);
         }
 
         if (!array_key_exists($header['alg'], $this->algorithms)) {
-            throw new \UnexpectedValueException(
-                "Algorithm {$header['alg']} is not supported.", E_USER_ERROR
-            );
+            throw new \UnexpectedValueException("Algorithm {$header['alg']} is not supported.", E_USER_ERROR);
         }
 
         if (!$this->validate("{$header64}.{$payload64}", $signature, $header['alg'])) {
-            throw new \Exception(
-                'Signature verification failed.', E_USER_ERROR
-            );
+            throw new \Exception('Signature verification failed.', E_USER_ERROR);
         }
 
         return $payload;
@@ -132,9 +117,7 @@ class Jwt
     private function signature(string $hashed, string $algorithm = 'HS256'): string
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException(
-                "Algorithm {$algorithm} is not supported.", E_USER_ERROR
-            );
+            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
         }
 
         list($function, $algorithm) = $this->algorithms[$algorithm];
@@ -156,9 +139,7 @@ class Jwt
     private function validate(string $hashed, string $signature, string $algorithm = 'HS256'): bool
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException(
-                "Algorithm {$algorithm} is not supported.", E_USER_ERROR
-            );
+            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
         }
 
         list($function, $algorithm) = $this->algorithms[$algorithm];

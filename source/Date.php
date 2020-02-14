@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -26,9 +27,7 @@ class Date extends \DateTime
         try {
             parent::__construct(str_replace('/', '-', $time), $timezone);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(
-                $e->getMessage(), $e->getCode(), $e->getPrevious()
-            );
+            throw new \InvalidArgumentException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 
@@ -45,9 +44,7 @@ class Date extends \DateTime
 
             return $date->setTimestamp((int)$timestamp);
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException(
-                $e->getMessage(), $e->getCode(), $e->getPrevious()
-            );
+            throw new \InvalidArgumentException($e->getMessage(), $e->getCode(), $e->getPrevious());
         }
     }
 

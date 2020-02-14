@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -625,9 +626,7 @@ class Validate
                             ?? 'There is validation with undefined message return.';
 
                         if ($exception) {
-                            throw new \Exception(
-                                $validate['message'], $validate['code']
-                            );
+                            throw new \Exception($validate['message'], $validate['code']);
                         }
 
                         $errors[$field] = [

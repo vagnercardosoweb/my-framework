@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -25,6 +25,8 @@ class ErrorSlackProvider extends Provider
     /**
      * {@inheritdoc}
      *
+     * @throws \Exception
+     *
      * @return void
      */
     public function register(): void
@@ -40,6 +42,8 @@ class ErrorSlackProvider extends Provider
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Exception
      *
      * @return void
      */

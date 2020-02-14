@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -55,9 +56,7 @@ abstract class Password
         );
 
         if (false === $hashed) {
-            throw new \RuntimeException(
-                sprintf('%s password not supported.', __CLASS__)
-            );
+            throw new \RuntimeException(sprintf('%s password not supported.', __CLASS__));
         }
 
         return $hashed;

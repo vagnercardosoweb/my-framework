@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 29/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -68,6 +68,14 @@ class Database
     }
 
     /**
+     * @return \PDO
+     */
+    public function getPdo(): \PDO
+    {
+        return $this->connect->getPdo();
+    }
+
+    /**
      * @param string $driver
      *
      * @throws \Exception
@@ -77,14 +85,6 @@ class Database
     public function driver(?string $driver = null): Database
     {
         return $this->connect->connection($driver);
-    }
-
-    /**
-     * @return \PDO
-     */
-    public function getPdo(): \PDO
-    {
-        return $this->connect->getPdo();
     }
 
     /**

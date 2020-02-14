@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace App\Controller;
@@ -59,6 +59,13 @@ abstract class BaseController
      */
     protected $container;
 
+    /**
+     * BaseController constructor.
+     *
+     * @param \Slim\Http\Request  $request
+     * @param \Slim\Http\Response $response
+     * @param \Slim\Container     $container
+     */
     public function __construct(Request $request, Response $response, Container $container)
     {
         $this->request = $request;
@@ -78,11 +85,24 @@ abstract class BaseController
         return App::getInstance()->resolve($name);
     }
 
+    /**
+     * @param string $template
+     * @param array  $context
+     * @param int    $status
+     *
+     * @return \Slim\Http\Response
+     */
     public function view(string $template, array $context = [], int $status = StatusCode::HTTP_OK): Response
     {
         return $this->view->render($this->response, $template, $context, $status);
     }
 
+    /**
+     * @param string $template
+     * @param array  $context
+     *
+     * @return string
+     */
     public function viewFetch(string $template, array $context = []): string
     {
         return $this->view->fetch($template, $context);
@@ -136,16 +156,40 @@ abstract class BaseController
         return json_success($message, $data, $status);
     }
 
+    /**
+     * @param \Exception $exception
+     * @param array      $data
+     * @param int        $status
+     *
+     * @return \Slim\Http\Response
+     */
     public function jsonError(\Exception $exception, array $data = [], int $status = StatusCode::HTTP_BAD_REQUEST): Response
     {
         return json_error($exception, $data, $status);
     }
 
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param string $hash
+     *
+     * @return string
+     */
     public function pathFor(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
     {
         return Router::pathFor($name, $data, $queryParams, $hash);
     }
 
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param int    $status
+     * @param string $hash
+     *
+     * @return \Slim\Http\Response
+     */
     public function redirect(
         string $name,
         array $data = [],
@@ -239,6 +283,9 @@ abstract class BaseController
         throw new NotFoundException($this->request, $this->response);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function boot(): void
     {
     }

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 29/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace App\Events;
@@ -19,7 +19,7 @@ namespace App\Events;
 class TestEvent extends Event
 {
     /**
-     * @param mixed $data
+     * {@inheritdoc}
      */
     public function __invoke($data)
     {

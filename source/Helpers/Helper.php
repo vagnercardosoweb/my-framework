@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -220,8 +220,43 @@ class Helper
      */
     public static function onlyNumber($value)
     {
-        if (!empty($value)) {
-            return preg_replace('/[^0-9]/', '', $value);
+        if (empty($value)) {
+            return null;
         }
+
+        return preg_replace(
+            '/[^0-9]/',
+            '',
+            $value
+        );
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    public static function normalizeTypeValue($value)
+    {
+        switch (strtolower($value)) {
+            case 'true':
+            case '(true)':
+                return true;
+                break;
+            case 'false':
+            case '(false)':
+                return false;
+                break;
+            case 'empty':
+            case '(empty)':
+                return '';
+                break;
+            case 'null':
+            case '(null)':
+                return null;
+                break;
+        }
+
+        return $value;
     }
 }

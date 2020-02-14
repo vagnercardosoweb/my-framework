@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 19/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -21,6 +22,11 @@ use Slim\Http\StatusCode;
  */
 class Router
 {
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
     public static function isCurrent(string $name): bool
     {
         $router = str_replace(BASE_URL, '', self::pathFor($name));
@@ -41,6 +47,14 @@ class Router
         return false;
     }
 
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param string $hash
+     *
+     * @return string
+     */
     public static function pathFor(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
     {
         $name = strtolower($name);
@@ -59,6 +73,8 @@ class Router
 
     /**
      * @param string|array $routes
+     *
+     * @return bool
      */
     public static function hasCurrent($routes): bool
     {
@@ -81,6 +97,15 @@ class Router
         return false;
     }
 
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param array  $queryParams
+     * @param int    $status
+     * @param string $hash
+     *
+     * @return \Slim\Http\Response
+     */
     public static function redirect(string $name, array $data = [], array $queryParams = [], int $status = StatusCode::HTTP_FOUND, string $hash = ''): Response
     {
         try {

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -113,6 +113,13 @@ abstract class Connection
     /**
      * @param array $config
      *
+     * @return string
+     */
+    abstract protected function getDsn(array $config): string;
+
+    /**
+     * @param array $config
+     *
      * @return array
      */
     protected function getOptions(array $config): array
@@ -121,13 +128,6 @@ abstract class Connection
 
         return array_diff_key($this->options, $options) + $options;
     }
-
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
-    abstract protected function getDsn(array $config): string;
 
     /**
      * @param \PDO $connection

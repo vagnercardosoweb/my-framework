@@ -4,8 +4,9 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core\Mailer;
@@ -56,9 +57,7 @@ class Mailer
 
             // Send mailer
             if (!$this->mail->send()) {
-                throw new \Exception(
-                    $this->mail->ErrorInfo, E_USER_ERROR
-                );
+                throw new \Exception($this->mail->ErrorInfo, E_USER_ERROR);
             }
 
             // Clear properties
@@ -76,15 +75,11 @@ class Mailer
     protected function validateOptions(array &$options): void
     {
         if (empty($options['host'])) {
-            throw new \InvalidArgumentException(
-                'Host not configured.', E_USER_ERROR
-            );
+            throw new \InvalidArgumentException('Host not configured.', E_USER_ERROR);
         }
 
         if (empty($options['username']) || empty($options['password'])) {
-            throw new \InvalidArgumentException(
-                'User and password not configured.', E_USER_ERROR
-            );
+            throw new \InvalidArgumentException('User and password not configured.', E_USER_ERROR);
         }
     }
 
