@@ -4,15 +4,14 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 02/11/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
-use Core\Password\Argon;
-use Core\Password\Argon2Id;
-use Core\Password\Bcrypt;
+use Core\Password\PasswordFactory;
 
 /**
  * Class PasswordProvider.
@@ -29,19 +28,9 @@ class PasswordProvider extends Provider
     public function register(): void
     {
         $this->container['hash'] = function () {
-            switch (env('APP_PASSWORD_DRIVER', 'bcrypt')) {
-                case 'bcrypt':
-                    return new Bcrypt();
-                    break;
-
-                case 'argon':
-                    return new Argon();
-                    break;
-
-                case 'argon2id':
-                    return new Argon2Id();
-                    break;
-            }
+            return PasswordFactory::create(
+                env('APP_PASSWORD_DRIVER', 'bcrypt')
+            );
         };
     }
 }

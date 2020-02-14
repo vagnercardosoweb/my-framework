@@ -4,11 +4,13 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 use App\Models\User;
+use Core\Password\PasswordFactory;
 use Phinx\Seed\AbstractSeed;
 
 /**
@@ -31,13 +33,12 @@ class UsersSeeder extends AbstractSeed
             }
 
             for ($i = 1; $i <= 10; $i++) {
-                $user = new User();
-                $user->data([
+                (new User())->create([
                     'name' => "User {$i}",
                     'email' => "user{$i}@email.com",
-                    'password' => $user->hash->make('password'),
+                    'password' => PasswordFactory::create()->make('password'),
                     'status' => ['online', 'offline'][rand(0, 1)],
-                ])->save();
+                ]);
             }
         } catch (Exception $e) {
             die("ERROR: {$e->getMessage()}");
