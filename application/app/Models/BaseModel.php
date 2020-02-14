@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 29/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -42,31 +42,6 @@ class BaseModel extends Model
     public function fk(): string
     {
         return $this->foreignKey;
-    }
-
-    /**
-     * @param array|object $rows
-     *
-     * @return array
-     */
-    public function toAllCamelCase($rows)
-    {
-        // CORRIGIR ESSE MÉTODO PORQUE ESTÁ CONVERTENDO A CLASSE TODA AO INVEZ DE APENAS OS DADOS
-        $newRows = [];
-
-        foreach ($rows as $index => $row) {
-            foreach ($row as $column => $value) {
-                if (is_array($value) && !empty($value[0])) {
-                    $newRows[$index][$this->columnCamelCase($column)] = $this->toAllCamelCase($value);
-                } elseif (is_array($value) || is_object($value)) {
-                    $newRows[$index][$this->columnCamelCase($column)] = $this->toCamelCase($value);
-                } else {
-                    $newRows[$index][$this->columnCamelCase($column)] = $value;
-                }
-            }
-        }
-
-        return $newRows;
     }
 
     /**
