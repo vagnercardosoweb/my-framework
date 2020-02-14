@@ -4,12 +4,12 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 03/08/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 use Core\App;
-use Core\Loader;
 
 try {
     // Constants
@@ -24,20 +24,7 @@ try {
 
     // Loader app
     $app = App::getInstance();
-
-    // Loader providers
-    Loader::providers($app, [
-        \App\Providers\ViewProvider::class,
-        \App\Providers\ErrorProvider::class,
-        \App\Providers\SessionProvider::class,
-        \App\Providers\DatabaseProvider::class,
-        \App\Providers\MailerProvider::class,
-        \App\Providers\EncryptionProvider::class,
-        \App\Providers\PasswordProvider::class,
-        \App\Providers\JwtProvider::class,
-        \App\Providers\LoggerProvider::class,
-        \App\Providers\EventProvider::class,
-    ]);
+    $app->registerProviders();
 
     // Configuration:
     //

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -32,8 +32,11 @@ class App extends \Slim\App
      */
     public function __construct()
     {
-        // Dotenv
-        Loader::dotEnvironment();
+        // Environment
+        Environment::load();
+
+        // PHP Configuration
+        $this->registerPhpConfiguration();
 
         // Slim settings
         parent::__construct([
@@ -47,9 +50,6 @@ class App extends \Slim\App
                 'routerCacheFile' => false,
             ], config('app.slim', [])),
         ]);
-
-        // Default settings php
-        Loader::defaultPhpConfig();
     }
 
     /**
@@ -139,7 +139,7 @@ class App extends \Slim\App
         }
 
         if (!empty($middleware)) {
-            $middlewareManual = config('app.middlewares.manual', []);
+            $middlewareManual = config('app.middleware.manual', []);
 
             if (!is_array($middleware)) {
                 $middleware = [$middleware];
@@ -202,15 +202,120 @@ class App extends \Slim\App
 
         if ($container->has($name)) {
             if (is_callable($container->get($name))) {
-                return call_user_func_array(
-                    $container->get($name),
-                    $params
-                );
+                return call_user_func_array($container->get($name), $params);
             }
 
             return $container->get($name);
         }
 
         return false;
+    }
+
+    /**
+     * @param string|null $folder
+     *
+     * @return $this
+     */
+    public function registerFolderRoutes(?string $folder = null): self
+    {
+        $file = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator(
+                $folder ?: APP_FOLDER.'/routes',
+                \FilesystemIterator::SKIP_DOTS
+            )
+        );
+
+        $file->rewind();
+
+        while ($file->valid()) {
+            if ($file->isFile()) {
+                call_user_func(function ($file, $app) {
+                    require_once "{$file->getRealPath()}";
+                }, $file, $this);
+            }
+
+            $file->next();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $middleware
+     *
+     * @return $this
+     */
+    public function registerMiddleware(array $middleware = []): self
+    {
+        if (!$middleware) {
+            $middleware = config('app.middleware.automatic', []);
+        }
+
+        foreach ($middleware as $name => $middle) {
+            if (class_exists($middle)) {
+                $this->add($middle);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $providers
+     *
+     * @return $this
+     */
+    public function registerProviders(array $providers = []): self
+    {
+        if (!$providers) {
+            $providers = config('app.providers', []);
+        }
+
+        foreach ($providers as $provider) {
+            if (class_exists($provider)) {
+                $provider = new $provider($this);
+
+                foreach (['register', 'boot'] as $method) {
+                    if (method_exists($provider, $method)) {
+                        call_user_func([$provider, $method]);
+                    }
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return void
+     */
+    private function registerPhpConfiguration(): void
+    {
+        $charset = env('APP_CHARSET', 'UTF-8');
+        $locale = env('APP_LOCALE', 'pt_BR');
+
+        ini_set('default_charset', $charset);
+        date_default_timezone_set(env('APP_TIMEZONE', 'America/Sao_Paulo'));
+        mb_internal_encoding($charset);
+        setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
+
+        // Configurations de err
+
+        ini_set('log_errors', true);
+        ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));
+        ini_set('display_errors', env('INI_DISPLAY_ERRORS', ini_get('display_errors')));
+        ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
+
+        if ('development' == env('APP_ENV', 'development')) {
+            error_reporting(E_ALL);
+        } else {
+            error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
+        }
+
+        set_error_handler(function ($level, $message, $file = '', $line = 0) {
+            if (error_reporting() & $level) {
+                throw new \ErrorException($message, 0, $level, $file, $line);
+            }
+        });
     }
 }

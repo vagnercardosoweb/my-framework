@@ -6,19 +6,16 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 use Core\App;
+use Core\Environment;
 use Core\Helpers\Arr;
 use Core\Helpers\Helper;
 use Core\Helpers\Validate;
 use Core\Logger;
 use Core\Router;
-use Dotenv\Environment\Adapter\EnvConstAdapter;
-use Dotenv\Environment\Adapter\PutenvAdapter;
-use Dotenv\Environment\Adapter\ServerConstAdapter;
-use Dotenv\Environment\DotenvFactory;
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
@@ -49,40 +46,7 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
-        static $variables;
-
-        if (empty($variables)) {
-            $variables = (new DotenvFactory([
-                new EnvConstAdapter(),
-                new PutenvAdapter(),
-                new ServerConstAdapter(),
-            ]))->createImmutable();
-        }
-
-        if (!$value = $variables->get($key)) {
-            return $default;
-        }
-
-        switch (strtolower($value)) {
-            case 'true':
-            case '(true)':
-                return true;
-                break;
-            case 'false':
-            case '(false)':
-                return false;
-                break;
-            case 'empty':
-            case '(empty)':
-                return '';
-                break;
-            case 'null':
-            case '(null)':
-                return null;
-                break;
-        }
-
-        return trim($value);
+        return Environment::get($key, $default);
     }
 }
 

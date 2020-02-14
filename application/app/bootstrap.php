@@ -4,12 +4,12 @@
  * VCWeb Networks <https://www.vcwebnetworks.com.br/>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
+ * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 07/12/2019 Vagner Cardoso
+ * @copyright 13/02/2020 Vagner Cardoso
  */
 
 use Core\App;
-use Core\Loader;
 
 // Minify html, js, css etc...
 ob_start(function ($buffer) {
@@ -46,9 +46,9 @@ require_once "{$autoload}";
 
 // Loader app
 $app = App::getInstance();
-Loader::providers($app);
-Loader::middlewares($app);
-Loader::routes($app);
+$app->registerProviders();
+$app->registerMiddleware();
+$app->registerFolderRoutes();
 $app->run();
 
 // Flush buffer
