@@ -11,8 +11,8 @@
 
 namespace App\Events;
 
-use Core\App;
 use Core\Interfaces\EventListener;
+use Slim\Container;
 
 /**
  * Class AbstractEvent.
@@ -42,16 +42,16 @@ use Core\Interfaces\EventListener;
 abstract class Event implements EventListener
 {
     /**
-     * @var \Core\App
+     * @var \Slim\Container
      */
-    protected $app;
+    protected $container;
 
     /**
-     * @param \Core\App $app
+     * @param \Slim\Container $container
      */
-    public function __construct(App $app)
+    public function __construct(Container $container)
     {
-        $this->app = $app;
+        $this->container = $container;
     }
 
     /**
@@ -61,6 +61,10 @@ abstract class Event implements EventListener
      */
     public function __get(string $name)
     {
-        return $this->app->resolve($name);
+        if ($this->container->has($name)) {
+            return $this->container->get($name);
+        }
+
+        return null;
     }
 }

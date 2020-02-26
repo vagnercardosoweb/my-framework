@@ -245,7 +245,7 @@ class App extends SlimApp
                 );
             }
 
-            $instance = new $class($this);
+            $instance = new $class($this->getContainer());
 
             $this->resolve('event')->on(
                 $instance->name(), [$instance, 'register']
