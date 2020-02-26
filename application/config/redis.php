@@ -24,12 +24,12 @@ return [
      * If the [url] variable is set, the other variables will not be used
      */
 
-    'url' => Env::get('REDIS_URL', null),
+    'url' => Env::get('REDIS_URL'),
 
     'host' => Env::get('REDIS_HOST', '127.0.0.1'),
     'port' => Env::get('REDIS_PORT', 6379),
-    'password' => Env::get('REDIS_PASSWORD', null),
-    'database' => Env::get('REDIS_DATABASE', null),
+    'password' => Env::get('REDIS_PASSWORD'),
+    'database' => Env::get('REDIS_DATABASE', '0'),
 
     /*
      * Specifies the protocol used to communicate with an instance of Redis.
@@ -47,7 +47,7 @@ return [
      * connecting to Redis using UNIX domain sockets.
      */
 
-    'path' => Env::get('REDIS_UNIX_PATH', null),
+    'path' => Env::get('REDIS_UNIX_PATH'),
 
     /*
      * Specifies if the underlying connection resource should be
@@ -77,6 +77,6 @@ return [
          * the keys contained in a command issued to Redis.
          */
 
-        'prefix' => null,
+        'prefix' => Env::get('REDIS_PREFIX'),
     ],
 ];
