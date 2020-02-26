@@ -19,7 +19,7 @@ return [
      * Supported: "redis", "file", "apc"
      */
 
-    'default' => Env::get('CACHE_DRIVER', 'redis'),
+    'default' => Env::get('CACHE_DRIVER', 'file'),
 
     'stores' => [
         'file' => [
