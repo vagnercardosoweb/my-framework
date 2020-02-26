@@ -12,7 +12,6 @@
 namespace App\Providers;
 
 use Core\Event;
-use Pimple\Container;
 
 /**
  * Class EventProvider.
@@ -34,14 +33,14 @@ class EventProvider extends Provider
      */
     public function register(): \Closure
     {
-        return function (Container $container) {
-            $event = Event::getInstance();
+        $event = Event::getInstance();
 
-            if ($container->offsetExists('view')) {
-                $container['view']->addFunction('event_emit', [$event, 'emit']);
-                $container['view']->addFunction('event_has', [$event, 'events']);
-            }
+        if ($this->view) {
+            $this->view->addFunction('event_emit', [$event, 'emit']);
+            $this->view->addFunction('event_has', [$event, 'events']);
+        }
 
+        return function () use ($event) {
             return $event;
         };
     }
