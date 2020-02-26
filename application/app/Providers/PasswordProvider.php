@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -21,13 +21,19 @@ use Core\Password\PasswordFactory;
 class PasswordProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['hash'] = function () {
+        return 'hash';
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function () {
             return PasswordFactory::create(
                 env('APP_PASSWORD_DRIVER', 'bcrypt')
             );

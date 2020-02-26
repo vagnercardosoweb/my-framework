@@ -6,10 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
-use Core\App;
+use Core\Helpers\Path;
 
 return [
     // Configura as opções padões do twig
@@ -19,7 +19,7 @@ return [
         'charset' => 'UTF-8',
         'strict_variables' => false,
         'autoescape' => 'html',
-        'cache' => ('production' == env('APP_ENV') ? APP_FOLDER.'/storage/cache' : false),
+        'cache' => ('production' == env('APP_ENV') ? Path::storage('/cache/twig') : false),
         'auto_reload' => true,
         'optimizations' => -1,
     ],
@@ -34,9 +34,9 @@ return [
      */
 
     'templates' => [
-        'web' => RESOURCE_FOLDER.'/views/web',
-        'error' => RESOURCE_FOLDER.'/views/error',
-        'mail' => RESOURCE_FOLDER.'/views/mail',
+        'web' => Path::resource('/views/web'),
+        'error' => Path::resource('/views/error'),
+        'mail' => Path::resource('/views/mail'),
     ],
 
     // Registra funções e filtros para usar na view
@@ -52,10 +52,10 @@ return [
             'placeholder' => 'placeholder',
             'error_code_type' => 'error_code_type',
             'has_container' => function ($name, $params = []) {
-                return App::getInstance()->resolve($name, $params);
+                return app()->resolve($name, $params);
             },
             'csrf_token' => function ($input = true) {
-                $token = App::getInstance()->resolve('encryption')->encrypt([
+                $token = app()->resolve('encryption')->encrypt([
                     'token' => uniqid(rand(), true),
                     'expired' => time() + (60 * 60 * 24),
                 ]);

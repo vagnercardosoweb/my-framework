@@ -6,13 +6,15 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
+use Core\Exception\ResponseException;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Http\StatusCode;
 
 /**
  * Class MaintenanceMiddleware.
@@ -26,14 +28,14 @@ class MaintenanceMiddleware extends Middleware
      * @param \Slim\Http\Response $response PSR7 response
      * @param callable            $next     Next middleware
      *
+     * @throws \Core\Exception\ResponseException
+     *
      * @return \Slim\Http\Response
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
         if ('true' == env('APP_MAINTENANCE', false)) {
-            return $this->view->render(
-                $response, '@error.503', [], 503
-            );
+            throw new ResponseException('Error 503 (Service Unavailable)', StatusCode::HTTP_SERVICE_UNAVAILABLE);
         }
 
         return $next($request, $response);

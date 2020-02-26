@@ -6,14 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
+use Core\Interfaces\Middleware as MiddlewareInterface;
 use Slim\Container;
-use Slim\Http\Request;
-use Slim\Http\Response;
 
 /**
  * Class Middleware.
@@ -33,11 +32,14 @@ use Slim\Http\Response;
  * @property \Core\Logger                 $logger
  * @property \Core\Event                  $event
  * @property \Core\Database\Database      $db
- * @property \Core\Database\Connect       $connect
+ * @property \Core\Database\Database      $database
+ * @property \Core\Curl\Curl              $curl
+ * @property \Core\Redis                  $redis
+ * @property \Core\Cache\Cache            $cache
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Middleware
+abstract class Middleware implements MiddlewareInterface
 {
     /**
      * @var \Slim\Container
@@ -53,15 +55,6 @@ abstract class Middleware
     }
 
     /**
-     * @param \Slim\Http\Request  $request  PSR7 request
-     * @param \Slim\Http\Response $response PSR7 response
-     * @param callable            $next     Next middleware
-     *
-     * @return \Slim\Http\Response
-     */
-    abstract public function __invoke(Request $request, Response $response, callable $next);
-
-    /**
      * @param string $name
      *
      * @return mixed
@@ -72,6 +65,6 @@ abstract class Middleware
             return $this->container->get($name);
         }
 
-        return false;
+        return null;
     }
 }

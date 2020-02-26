@@ -6,19 +6,20 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 23/02/2020 Vagner Cardoso
  */
 
 namespace Core\Curl;
 
-use Core\Helpers\Validate;
+use Core\Helpers\Helper;
+use Core\Helpers\Obj;
 
 /**
  * Class Response.
  *
  * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class Response
+class Response implements \JsonSerializable
 {
     /**
      * @var mixed
@@ -56,15 +57,24 @@ class Response
      */
     public function __get(string $name)
     {
-        if (is_array($this->body) && isset($this->body[$name])) {
-            return $this->body[$name];
-        }
+        $body = Obj::fromArray($this->body);
 
-        if (is_object($this->body) && isset($this->body->{$name})) {
-            return $this->body->{$name};
+        if (isset($body->{$name})) {
+            return $body->{$name};
         }
 
         return null;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function __set($name, $value)
+    {
+        if (is_object($this->body)) {
+            $this->body->{$name} = $value;
+        }
     }
 
     /**
@@ -118,13 +128,31 @@ class Response
     }
 
     /**
+     * @return mixed|object|string|null
+     */
+    public function jsonSerialize()
+    {
+        return $this->body;
+    }
+
+    /**
      * @param string $body
      *
      * @return object|string|null
      */
     private function buildBody(string $body)
     {
-        return Validate::json($body) ?? Validate::xml($body) ?? ($body ?: null);
+        $result = $body;
+
+        if ($xml = Helper::parseXml($result)) {
+            $result = $xml;
+        }
+
+        if ($json = Helper::decodeJson($result)) {
+            $result = $json;
+        }
+
+        return $result ?? null;
     }
 
     /**

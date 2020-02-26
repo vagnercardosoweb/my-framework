@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 23/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -75,28 +75,24 @@ class Encryption
      * @param string $payload
      * @param bool   $unserialize
      *
-     * @return mixed|false
+     * @return mixed|null
      */
-    public function decrypt(string $payload, bool $unserialize = true)
+    public function decrypt($payload, bool $unserialize = true)
     {
         $payload = $this->getJsonPayload($payload);
 
         if (empty($payload['iv'])) {
-            return false;
+            return null;
         }
 
         $iv = base64_decode($payload['iv']);
-        $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
-        );
+        $decrypted = \openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
         if (false === $decrypted) {
-            return false;
+            return null;
         }
 
-        return $unserialize
-            ? unserialize($decrypted)
-            : $decrypted;
+        return $unserialize ? unserialize($decrypted) : $decrypted;
     }
 
     /**
@@ -115,7 +111,7 @@ class Encryption
      *
      * @return array|null
      */
-    protected function getJsonPayload(string $payload): ?array
+    protected function getJsonPayload($payload): ?array
     {
         $payload = json_decode(base64_decode($payload), true);
 

@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
+use Core\Helpers\Path;
 use Core\Logger;
 
 /**
@@ -21,14 +22,20 @@ use Core\Logger;
 class LoggerProvider extends Provider
 {
     /**
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['logger'] = function () {
-            return new Logger(
-                'VCWebNetworks', APP_FOLDER.'/storage/logs'
-            );
+        return 'logger';
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function () {
+            return new Logger('app', Path::app('/storage/logs'));
         };
     }
 }

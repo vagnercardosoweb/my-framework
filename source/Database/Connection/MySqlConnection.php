@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 24/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -35,37 +35,34 @@ class MySqlConnection extends Connection
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultSchema(\PDO $connection, array $config): void
+    protected function setSchema(array $config): void
     {
         if (!empty($config['database'])) {
-            $connection->exec("USE {$config['database']};");
+            $this->exec("USE {$config['database']};");
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultEncoding(\PDO $connection, array $config): void
+    protected function setEncoding(array $config): void
     {
         if (!empty($config['charset'])) {
-            $encoding = "SET NAMES {$connection->quote($config['charset'])}";
-            $encoding .= (!empty($config['collation']) ? " COLLATE {$connection->quote($config['collation'])}" : '');
-            $connection->exec("{$encoding};");
+            $encoding = "SET NAMES {$this->quote($config['charset'])}";
+            $encoding .= (!empty($config['collation']) ? " COLLATE {$this->quote($config['collation'])}" : '');
+            $this->exec("{$encoding};");
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultTimezone(\PDO $connection, array $config): void
+    protected function setTimezone(array $config): void
     {
         if (!empty($config['timezone'])) {
-            $connection->exec("SET time_zone = {$connection->quote($config['timezone'])};");
+            $this->exec("SET time_zone = {$this->quote($config['timezone'])};");
         }
     }
 }

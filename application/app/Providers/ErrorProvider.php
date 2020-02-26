@@ -6,13 +6,16 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
 use Core\App;
+use Core\Helpers\Helper;
+use Core\Helpers\Path;
 use Core\Router;
+use Pimple\Container;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
@@ -25,90 +28,102 @@ use Slim\Http\StatusCode;
 class ErrorProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['phpErrorHandler'] = $this->container['errorHandler'] = function () {
-            return function (Request $request, Response $response, $exception) {
-                /** @var \Slim\Route $route */
-                $route = $request->getAttribute('route');
+        return 'errorHandler';
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function (Container $container) {
+            return function (Request $request, Response $response, \Throwable $exception) use ($container) {
+                $url = $request->getUri();
+                $method = $request->getMethod();
+                $status = StatusCode::HTTP_INTERNAL_SERVER_ERROR;
+
+                if ($exception instanceof \Exception) {
+                    $status = StatusCode::HTTP_BAD_REQUEST;
+                }
+
+                if (method_exists($exception, 'getStatusCode')) {
+                    $status = $exception->getStatusCode();
+                }
 
                 $errors = [
-                    'debug' => $this->container->settings['displayErrorDetails'],
+                    'debug' => $container->get('settings')['displayErrorDetails'],
                     'error' => [
                         'code' => $exception->getCode(),
-                        'file' => str_replace([PUBLIC_FOLDER, APP_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
-                        'line' => $exception->getLine(),
+                        'type' => error_code_type($exception->getCode()),
+                        'name' => get_class($exception),
+                        'status' => $status,
                         'message' => $exception->getMessage(),
-                        'route' => (is_object($route) ? '('.implode(', ', $route->getMethods()).') ' : null).$request->getUri(),
+                        'route' => "({$method}) {$url}",
+                        'file' => str_replace([
+                            Path::app(),
+                            Path::resource(),
+                            Path::public(),
+                        ], '', $exception->getFile()),
+                        'line' => $exception->getLine(),
                         'trace' => explode("\n", $exception->getTraceAsString()),
                     ],
                 ];
 
-                if (App::getInstance()->resolve('event')) {
-                    $this->event->emit('eventErrorHandler', $errors);
+                // Emit error event
+                if (!empty($container['event'])) {
+                    $container['event']->emit('eventErrorHandler', $errors);
                 }
 
-                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
-                    return $response->withJson($errors, StatusCode::HTTP_INTERNAL_SERVER_ERROR);
+                $errors['error']['sha1'] = sha1(json_encode($errors['error']));
+
+                // Logger error
+                if (!empty($container['logger']) && 'true' == env('APP_ERROR_LOGGER')) {
+                    /** @var \Core\Logger $logger */
+                    $logger = $container['logger']->filename('error');
+
+                    if ('true' === env('APP_ERROR_HTML')) {
+                        $logger->setHtmlFormatter();
+                    }
+
+                    if (!empty(Helper::normalizeValueType(env('LOGGER_SLACK_WEBHOOK_URL', null)))) {
+                        $logger->setSlackWebHookHandler(
+                            env('LOGGER_SLACK_WEBHOOK_URL'),
+                            Helper::normalizeValueType(env('LOGGER_SLACK_CHANNEL', null)),
+                            Helper::normalizeValueType(env('LOGGER_SLACK_USERNAME', null))
+                        );
+                    }
+
+                    $logger->error($exception->getMessage(), $errors['error']);
                 }
 
-                return $this->view->render(
-                    $response,
-                    '@error.500',
-                    $errors,
-                    StatusCode::HTTP_INTERNAL_SERVER_ERROR
-                );
+                if ($this->isResponseJson($request) || !$container->offsetExists('view')) {
+                    unset($errors['debug'], $errors['error']['trace']);
+
+                    return $response->withJson($errors, $status);
+                }
+
+                $template = sprintf('@error.%s', $status);
+
+                if (!$container['view']->exists($template)) {
+                    $template = '@error.500';
+                }
+
+                return $container['view']->render($response, $template, $errors, $status);
             };
         };
+    }
 
-        $this->container['notFoundHandler'] = function () {
-            return function (Request $request, Response $response) {
-                $uri = urldecode($request->getUri());
-
-                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
-                    return $response->withJson([
-                        'error' => [
-                            'url' => $uri,
-                            'message' => 'Error 404 (Not Found)',
-                        ],
-                    ], StatusCode::HTTP_NOT_FOUND);
-                }
-
-                return $this->view->render(
-                    $response,
-                    '@error.404',
-                    ['url' => $uri],
-                    StatusCode::HTTP_NOT_FOUND
-                );
-            };
-        };
-
-        $this->container['notAllowedHandler'] = function () {
-            return function (Request $request, Response $response, $methods) {
-                $uri = urldecode($request->getUri());
-                $method = $request->getMethod();
-
-                if (App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi()) {
-                    return $response->withJson([
-                        'error' => [
-                            'url' => $uri,
-                            'method' => $method,
-                            'methods' => implode(', ', $methods),
-                            'message' => 'Error 405 (Method not Allowed)',
-                        ],
-                    ], StatusCode::HTTP_METHOD_NOT_ALLOWED);
-                }
-
-                return $this->view->render($response, '@error.405', [
-                    'url' => $uri,
-                    'method' => $method,
-                    'methods' => implode(', ', $methods),
-                ], StatusCode::HTTP_METHOD_NOT_ALLOWED);
-            };
-        };
+    /**
+     * @param Request $request
+     *
+     * @return bool
+     */
+    protected function isResponseJson(Request $request): bool
+    {
+        return App::isCli() || $request->isXhr() || Router::hasCurrent('/api/') || App::onlyApi();
     }
 }

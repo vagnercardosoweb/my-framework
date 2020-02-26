@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 25/02/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -21,9 +21,9 @@ class Obj
     /**
      * @param array|object $array
      *
-     * @return \stdClass
+     * @return object
      */
-    public static function fromArray($array): \stdClass
+    public static function fromArray($array)
     {
         $object = new \stdClass();
 
@@ -60,11 +60,11 @@ class Obj
         }
 
         foreach (explode('.', $name) as $segment) {
-            if (is_object($object) || isset($object->{$segment})) {
-                $object = $object->{$segment};
-            } else {
+            if (!is_object($object) || !isset($object->{$segment})) {
                 return $default;
             }
+
+            $object = $object->{$segment};
         }
 
         return $object;
@@ -77,9 +77,7 @@ class Obj
      */
     public static function toJson($object): string
     {
-        return json_encode(
-            self::toArray($object)
-        );
+        return json_encode(self::toArray($object));
     }
 
     /**
@@ -100,6 +98,10 @@ class Obj
         }
 
         foreach ($object as $key => $value) {
+            if ($value instanceof \SimpleXMLElement) {
+                $value = strval($value);
+            }
+
             if (is_object($value) || is_array($value)) {
                 $array[$key] = self::toArray($value);
             } else {

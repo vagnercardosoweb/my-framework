@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -143,34 +143,31 @@ class SqlServerConnection extends Connection
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultSchema(\PDO $connection, array $config): void
+    protected function setSchema(array $config): void
     {
         if (!empty($config['database'])) {
-            $connection->exec("USE {$config['database']};");
+            $this->exec("USE {$config['database']};");
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultEncoding(\PDO $connection, array $config): void
+    protected function setEncoding(array $config): void
     {
         if (!empty($config['charset']) && 'utf8' == $config['charset']) {
-            $connection->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
+            $this->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_UTF8);
         } else {
-            $connection->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_DEFAULT);
+            $this->setAttribute(\PDO::SQLSRV_ATTR_ENCODING, \PDO::SQLSRV_ENCODING_DEFAULT);
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultTimezone(\PDO $connection, array $config): void
+    protected function setTimezone(array $config): void
     {
         // TODO
     }

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -29,12 +29,9 @@ class Router
      */
     public static function isCurrent(string $name): bool
     {
-        $router = str_replace(BASE_URL, '', self::pathFor($name));
-        $current = App::getInstance()
-            ->resolve('request')
-            ->getUri()
-            ->getPath()
-        ;
+        $baseUrl = defined('BASE_URL') ? constant('BASE_URL') : '';
+        $router = str_replace($baseUrl, '', self::pathFor($name));
+        $current = app()->resolve('request')->getUri()->getPath();
 
         if ('/' !== substr($current, 0, 1)) {
             $current = "/{$current}";
@@ -62,10 +59,10 @@ class Router
 
         if (':' === $name[0]) {
             $name = substr($name, 1);
-            $baseUrl = BASE_URL;
+            $baseUrl = defined('BASE_URL') ? constant('BASE_URL') : '';
         }
 
-        return $baseUrl.App::getInstance()
+        return $baseUrl.app()
             ->resolve('router')
             ->pathFor($name, $data, $queryParams)
             .$hash;
@@ -82,11 +79,7 @@ class Router
             return false;
         }
 
-        $current = App::getInstance()
-            ->resolve('request')
-            ->getUri()
-            ->getPath()
-        ;
+        $current = request()->getUri()->getPath();
 
         foreach ((array)$routes as $route) {
             if (false !== mb_strpos($current, $route)) {
@@ -115,15 +108,10 @@ class Router
             $location = "{$name}{$queryParams}{$hash}";
         }
 
-        if (App::getInstance()->resolve('request')->isXhr()) {
+        if (request()->isXhr()) {
             return json(['location' => $location], $status);
         }
 
-        return App::getInstance()
-            ->resolve('response')
-            ->withRedirect(
-                $location, $status
-            )
-        ;
+        return response()->withRedirect($location, $status);
     }
 }

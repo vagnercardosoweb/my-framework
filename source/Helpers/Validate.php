@@ -6,12 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
-
-use Core\App;
 
 /**
  * Class Validate.
@@ -23,7 +21,22 @@ class Validate
     /**
      * @var array
      */
-    private static $data = [];
+    private static $data;
+
+    /**
+     * @var string|callable
+     */
+    private static $rule;
+
+    /**
+     * @var string
+     */
+    private static $field;
+
+    /**
+     * @var array
+     */
+    private static $errors;
 
     /**
      * @param string $value
@@ -137,6 +150,7 @@ class Validate
         if (12 != strlen($titleVoter) || $uf < 1 || $uf > 28) {
             return false;
         }
+
         $d = 0;
 
         for ($i = 0; $i < 8; $i++) {
@@ -207,114 +221,6 @@ class Validate
     }
 
     /**
-     * @param string $xml
-     *
-     * @return \SimpleXMLElement|null
-     */
-    public static function xml(string $xml): ?\SimpleXMLElement
-    {
-        $xml = trim($xml);
-
-        if (empty($xml)) {
-            return null;
-        }
-
-        if (false !== stripos($xml, '<!DOCTYPE html>')) {
-            return null;
-        }
-
-        libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($xml);
-        $errors = libxml_get_errors();
-        libxml_clear_errors();
-
-        if (!empty($errors)) {
-            return null;
-        }
-
-        return $xml;
-    }
-
-    /**
-     * @param string $json
-     * @param bool   $assoc
-     * @param int    $depth
-     * @param int    $options
-     *
-     * @return object|array|bool
-     */
-    public static function json(
-        string $json,
-        bool $assoc = false,
-        int $depth = 512,
-        int $options = 0
-    ) {
-        $json = json_decode($json, $assoc, $depth, $options);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            return false;
-        }
-
-        return $json;
-    }
-
-    /**
-     * @param array|object $data
-     *
-     * @return bool
-     */
-    public static function emptyArrayRecursive($data): bool
-    {
-        $data = Obj::toArray($data);
-
-        if (empty($data)) {
-            return true;
-        }
-
-        foreach ((array)$data as $key => $value) {
-            if (is_array($value)) {
-                return self::emptyArrayRecursive($value);
-            }
-
-            if (empty($value) && '0' != $value) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    public static function numeric($value): bool
-    {
-        return is_numeric($value);
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    public static function string($value): bool
-    {
-        return is_string($value);
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    public static function array($value): bool
-    {
-        return is_array($value);
-    }
-
-    /**
      * @param mixed $value
      * @param array $array
      * @param bool  $strict
@@ -357,6 +263,40 @@ class Validate
     public static function maxLength($value, $length): bool
     {
         return strlen($value) <= $length;
+    }
+
+    /**
+     * @param mixed $value
+     * @param mixed $min
+     * @param mixed $max
+     * @param bool  $length
+     *
+     * @return bool
+     */
+    public static function between($value, $min = null, $max = null, bool $length = false): bool
+    {
+        if ($length) {
+            $value = strlen($value);
+        }
+
+        if (!$length && '0' == substr($value, 0, 1)) {
+            while ('0' == substr($value, 0, 1)) {
+                $value = substr($value, 1);
+            }
+        }
+
+        if (!is_numeric($value)) {
+            throw new \InvalidArgumentException(
+                sprintf('%s: value must be an integer', self::$field)
+            );
+        }
+
+        return filter_var($value, FILTER_VALIDATE_INT, [
+            'options' => [
+                'min_range' => $min ?? PHP_INT_MIN,
+                'max_range' => $max ?? PHP_INT_MAX,
+            ],
+        ]);
     }
 
     /**
@@ -463,9 +403,9 @@ class Validate
      * @param mixed  $value
      * @param string $regex
      *
-     * @return false|int
+     * @return bool
      */
-    public static function notRegex($value, string $regex)
+    public static function notRegex($value, string $regex): bool
     {
         return !self::regex($value, $regex);
     }
@@ -474,9 +414,9 @@ class Validate
      * @param mixed  $value
      * @param string $regex
      *
-     * @return false|int
+     * @return bool
      */
-    public static function regex($value, string $regex)
+    public static function regex($value, string $regex): bool
     {
         if (!is_string($value) && !is_numeric($value)) {
             return false;
@@ -488,7 +428,7 @@ class Validate
     /**
      * @param mixed       $value
      * @param string      $table
-     * @param string      $field
+     * @param string|null $field
      * @param string|null $where
      * @param string      $driver
      *
@@ -497,7 +437,7 @@ class Validate
     public static function databaseNotExists(
         $value,
         string $table,
-        string $field,
+        ?string $field = null,
         ?string $where = null,
         ?string $driver = null
     ): bool {
@@ -507,7 +447,7 @@ class Validate
     /**
      * @param mixed       $value
      * @param string      $table
-     * @param string      $field
+     * @param string|null $field
      * @param string|null $where
      * @param string|null $driver
      *
@@ -516,13 +456,19 @@ class Validate
     public static function databaseExists(
         $value,
         string $table,
-        string $field,
+        ?string $field = null,
         ?string $where = null,
         ?string $driver = null
     ): bool {
+        if (!$field && self::$field) {
+            $where = $field;
+            $driver = $where;
+            $field = self::$field;
+        }
+
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
-        return 1 == App::getInstance()
+        return 1 == app()
             ->resolve('db')
             ->driver($driver)
             ->query($sql, ['field' => $value])
@@ -564,99 +510,177 @@ class Validate
     }
 
     /**
-     * @param array|object $data
-     * @param array        $conditions
-     * @param bool         $exception
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function firstAndLastName(string $value): bool
+    {
+        return 2 === count(explode(' ', $value, 2));
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return bool
+     */
+    public static function phone(string $value): bool
+    {
+        $phone = Helper::onlyNumber($value);
+        $length = strlen($phone);
+
+        return in_array($length, [11, 10]);
+    }
+
+    /**
+     * @param array $data
+     * @param array $conditions
+     * @param bool  $exception
      *
      * @throws \Exception
      *
-     * @return array
+     * @return array|null
      */
-    public static function rules($data, array $conditions, bool $exception = true): array
+    public static function rules(array &$data, array $conditions, bool $exception = true): ?array
     {
-        $errors = [];
-        self::$data = Obj::toArray($data);
+        self::$data = &$data;
 
         foreach ($conditions as $field => $rules) {
-            foreach ($rules as $rule => $item) {
-                $validate = [
-                    'force' => false,
-                    'check' => true,
-                    'message' => null,
-                    'code' => E_USER_WARNING,
-                    'params' => [],
-                ];
+            self::$field = &$field;
 
-                // Check params
-                if (isset($item['params'])) {
-                    foreach ((array)$item['params'] as $value) {
-                        $validate['params'][] = $value;
+            foreach ($rules as $rule => $items) {
+                self::$rule = $rule;
+
+                if (!is_array($items) || empty($items[0])) {
+                    $items = [$items];
+                }
+
+                foreach ($items as $item) {
+                    $validate = array_merge([
+                        'code' => E_USER_ERROR,
+                        'force' => false,
+                        'check' => true,
+                        'params' => $item['params'] ?? [],
+                        'filters' => [],
+                        'message' => is_string($item) ? $item : null,
+                    ], is_array($item) ? $item : []);
+
+                    if (!$validate['check']) {
+                        continue;
                     }
 
-                    unset($item['params']);
-                }
+                    self::forceStartFieldValue($validate);
+                    self::invokableFilters($validate);
 
-                // Check message and merge rules
-                if (is_string($item)) {
-                    $validate['message'] = $item;
-                } else {
-                    $validate = array_merge($validate, $item);
-                }
-
-                if (!$validate['check']) {
-                    continue;
-                }
-
-                // Check force field
-                if (preg_match('/(.*)!!$/im', $field, $matches)) {
-                    $field = $matches[1];
-                    $validate['force'] = true;
-                }
-
-                if ($validate['force'] && !isset(self::$data[$field])) {
-                    self::$data[$field] = null;
-                }
-
-                // Run validate
-                if (array_key_exists($field, self::$data)) {
-                    array_unshift($validate['params'], self::$data[$field]);
-
-                    if (!self::runValidateMethod($rule, $validate['params'])) {
-                        $validate['message'] = $validate['message']
-                            ?? 'There is validation with undefined message return.';
-
-                        if ($exception) {
-                            throw new \Exception($validate['message'], $validate['code']);
-                        }
-
-                        $errors[$field] = [
-                            'code' => $validate['code'],
-                            'message' => $validate['message'],
-                        ];
-
+                    if (!self::invokableCallable($validate, $exception)) {
                         break;
                     }
                 }
             }
         }
 
-        return $errors;
+        return self::$errors;
     }
 
     /**
-     * @param string $rule
-     * @param array  $params
+     * @param array $validate
+     */
+    private static function forceStartFieldValue(array $validate): void
+    {
+        $data = &self::$data;
+        $field = &self::$field;
+
+        if (preg_match('/^!(?<field>.*)$/im', $field, $matches)) {
+            $field = $matches['field'];
+            $validate['force'] = true;
+        }
+
+        if ($validate['force'] && !isset($data[$field])) {
+            $data[$field] = null;
+        }
+    }
+
+    /**
+     * @param array $validate
+     */
+    private static function invokableFilters(array $validate): void
+    {
+        $data = &self::$data;
+        $field = self::$field;
+
+        if (!empty($validate['filters'])) {
+            foreach ($validate['filters'] as $filter) {
+                $data[$field] = self::invokeCallable($filter, [$data[$field]]);
+            }
+        }
+    }
+
+    /**
+     * @param string|callable $rule
+     * @param array           $params
      *
      * @return bool
      */
-    private static function runValidateMethod($rule, array $params)
+    private static function invokeCallable($rule, array $params)
     {
-        if (false !== strpos($rule, '::')) {
-            list($class, $method) = explode('::', $rule);
-
-            return (new $class())->{$method}(...$params);
+        // Verify if possibility php function
+        if (is_callable($rule)) {
+            return call_user_func_array($rule, $params);
         }
 
-        return call_user_func_array([self::class, $rule], $params);
+        $class = self::class;
+
+        // Verify if class exists by the rule
+        if (class_exists($rule) || false !== strpos($rule, '::')) {
+            list($class, $rule) = explode('::', $rule) + [1 => '__invoke'];
+        }
+
+        try {
+            return forward_static_call_array([$class, $rule], $params);
+        } catch (\Exception $e) {
+            return call_user_func_array([new $class(), $rule], $params);
+        }
+    }
+
+    /**
+     * @param array $validate
+     * @param bool  $exception
+     *
+     * @throws \Exception
+     *
+     * @return bool
+     */
+    private static function invokableCallable(array $validate, bool $exception): bool
+    {
+        $data = self::$data;
+        $rule = self::$rule;
+        $field = self::$field;
+
+        if (!array_key_exists($field, $data)) {
+            return true;
+        }
+
+        array_unshift($validate['params'], $data[$field]);
+
+        if (!self::invokeCallable($rule, $validate['params'])) {
+            if (empty($validate['message'])) {
+                $validate['message'] = "{$field} :: {$rule} return error.";
+            }
+
+            if ($exception) {
+                throw new \InvalidArgumentException(
+                    "{$field}: {$validate['message']}", $validate['code']
+                );
+            }
+
+            self::$errors[$field] = [
+                'code' => $validate['code'],
+                'message' => $validate['message'],
+            ];
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -6,21 +6,29 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 use Core\App;
 
-// Minify html, js, css etc...
-ob_start(function ($buffer) {
+/**
+ * @param string $buffer
+ *
+ * @return string
+ */
+function ob_output(string $buffer): string
+{
     if (!preg_match('/localhost|.dev|.local/', $_SERVER['HTTP_HOST'])) {
         $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
         $buffer = preg_replace('/\r\n|\r|\n|\t/m', '', $buffer);
         $buffer = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $buffer);
     }
 
-    return $buffer;
-});
+    return ob_gzhandler($buffer, 9);
+}
+
+// Minify html, js, css etc...
+ob_start('ob_output');
 
 // Cli server
 if (PHP_SAPI == 'cli-server') {
@@ -36,10 +44,7 @@ if (PHP_SAPI == 'cli-server') {
 $autoload = APP_FOLDER.'/vendor/autoload.php';
 
 if (!file_exists($autoload)) {
-    die(
-        'Run command in terminal: <br>'.
-        '<code style="background: #000; color: #fff;">composer install</code>'
-    );
+    die('composer not installed');
 }
 
 require_once "{$autoload}";
@@ -48,7 +53,8 @@ require_once "{$autoload}";
 $app = App::getInstance();
 $app->registerProviders();
 $app->registerMiddleware();
-$app->registerFolderRoutes();
+$app->registerRoutes();
+$app->registerEvents();
 $app->run();
 
 // Flush buffer

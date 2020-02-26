@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 24/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -31,43 +31,40 @@ class PostgreSqlConnection extends Connection
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultSchema(\PDO $connection, array $config): void
+    protected function setSchema(array $config): void
     {
         if (!empty($config['schema'])) {
             if (is_string($config['schema'])) {
                 $config['schema'] = explode('', $config['schema']);
             }
 
-            $connection->exec(sprintf(
+            $this->exec(sprintf(
                 'SET search_path TO %s', implode(
-                    ', ', array_map([$connection, 'quote'], $config['schema'])
+                    ', ', array_map([$this, 'quote'], $config['schema'])
                 )
             ));
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultEncoding(\PDO $connection, array $config): void
+    protected function setEncoding(array $config): void
     {
         if (!empty($config['charset'])) {
-            $connection->exec("SET client_encoding TO {$connection->quote(strtoupper($config['charset']))}");
+            $this->exec("SET client_encoding TO {$this->quote(strtoupper($config['charset']))}");
         }
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultTimezone(\PDO $connection, array $config): void
+    protected function setTimezone(array $config): void
     {
         if (!empty($config['timezone'])) {
-            $connection->exec("SET timezone TO {$connection->quote($config['timezone'])}");
+            $this->exec("SET timezone TO {$this->quote($config['timezone'])}");
         }
     }
 }

@@ -6,14 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
-use Core\App;
-use Core\Session\Flash;
 use Core\Session\Session;
+use Pimple\Container;
 
 /**
  * Class SessionProvider.
@@ -23,39 +22,26 @@ use Core\Session\Session;
 class SessionProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['session'] = function () {
-            if (!App::isCli() && 'true' == env('APP_SESSION', true)) {
-                return new Session();
-            }
-
-            return false;
-        };
-
-        $this->container['flash'] = function () {
-            if ($this->session) {
-                return new Flash();
-            }
-
-            return false;
-        };
+        return 'session';
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return \Closure
      */
-    public function boot(): void
+    public function register(): \Closure
     {
-        if ($this->session) {
-            $this->view->addGlobal('session', $this->session);
-            $this->view->addGlobal('flash', $this->flash);
-        }
+        return function (Container $container) {
+            $session = new Session();
+
+            if ($container->offsetExists('view')) {
+                $container['view']->addGlobal('session', $session);
+            }
+
+            return $session;
+        };
     }
 }

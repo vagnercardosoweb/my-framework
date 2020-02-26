@@ -21,11 +21,19 @@
 /**/docker/postgres/*
 !/**/docker/postgres/.gitkeep
 
-# Application storage
-/**/storage/cache/*
-!/**/storage/cache/.gitkeep
-/**/storage/logs/*
-!/**/storage/logs/.gitkeep
+# Cache
+/**/storage/cache/app/*
+/**/storage/cache/twig/*
+!/**/storage/cache/app/.gitkeep
+!/**/storage/cache/twig/.gitkeep
+
+# Logs
+/**/storage/logs/php/*
+!/**/storage/logs/php/.gitkeep
+/**/storage/logs/error/*
+!/**/storage/logs/error/.gitkeep
+
+# Session
 /**/storage/sessions/*
 !/**/storage/sessions/.gitkeep
 

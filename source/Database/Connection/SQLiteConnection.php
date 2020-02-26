@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 24/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -47,28 +47,25 @@ class SQLiteConnection extends Connection
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultSchema(\PDO $connection, array $config): void
+    protected function setSchema(array $config): void
     {
         // TODO
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultEncoding(\PDO $connection, array $config): void
+    protected function setEncoding(array $config): void
     {
         // TODO
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    protected function setDefaultTimezone(\PDO $connection, array $config): void
+    protected function setTimezone(array $config): void
     {
         // TODO
     }

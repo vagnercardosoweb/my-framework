@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 25/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -109,12 +109,12 @@ class Jwt
     }
 
     /**
-     * @param string $hashed
+     * @param string $value
      * @param string $algorithm
      *
      * @return string
      */
-    private function signature(string $hashed, string $algorithm = 'HS256'): string
+    private function signature(string $value, string $algorithm = 'HS256'): string
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
             throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
@@ -124,19 +124,19 @@ class Jwt
 
         switch ($function) {
             case 'hash_hmac':
-                return hash_hmac($algorithm, $hashed, $this->key, true);
+                return hash_hmac($algorithm, $value, $this->key, true);
                 break;
         }
     }
 
     /**
-     * @param string $hashed
+     * @param string $value
      * @param string $signature
      * @param string $algorithm
      *
      * @return bool
      */
-    private function validate(string $hashed, string $signature, string $algorithm = 'HS256'): bool
+    private function validate(string $value, string $signature, string $algorithm = 'HS256'): bool
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
             throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
@@ -146,7 +146,7 @@ class Jwt
 
         switch ($function) {
             case 'hash_hmac':
-                $hashed = hash_hmac($algorithm, $hashed, $this->key, true);
+                $hashed = hash_hmac($algorithm, $value, $this->key, true);
 
                 if (function_exists('hash_equals')) {
                     return hash_equals($signature, $hashed);

@@ -6,12 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 25/02/2020 Vagner Cardoso
  */
 
 namespace Core;
 
-use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
 /**
@@ -40,26 +40,21 @@ class View
     public function __construct($path, array $options = [])
     {
         $path = is_string($path) ? [$path] : $path;
-        array_push($path, ROOT);
-
         $this->loader = $this->createLoader($path);
         $this->environment = new \Twig\Environment($this->loader, $options);
     }
 
     /**
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param string                              $template
-     * @param array                               $context
-     * @param int                                 $status
+     * @param Response $response
+     * @param string   $template
+     * @param array    $context
+     * @param int      $status
      *
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return Response
      */
-    public function render(ResponseInterface $response, string $template, array $context = [], int $status = StatusCode::HTTP_OK): ResponseInterface
+    public function render(Response $response, string $template, array $context = [], int $status = StatusCode::HTTP_OK): Response
     {
-        if ($status) {
-            $response = $response->withStatus($status);
-        }
-
+        $response = $response->withStatus($status);
         $response->getBody()->write($this->fetch($template, $context));
 
         return $response;
@@ -73,23 +68,25 @@ class View
      */
     public function fetch(string $template, array $context = [])
     {
-        if ('.twig' === substr($template, -5)) {
-            $template = substr($template, 0, -5);
+        $removedExtension = $this->removeExtension($template);
+
+        if ($this->exists("{$removedExtension}/index.twig")) {
+            $template = sprintf('%s/%s', $removedExtension, 'index');
         }
 
-        $template = str_replace('.', '/', $template);
+        $template = $this->normalizeExtension($template);
 
-        if (preg_match('/^@.*/i', $template)) {
-            list($namespace, $folder) = explode('/', $template, 2);
+        return $this->environment->render($template, $context);
+    }
 
-            $path = $this->loader->getPaths(str_replace('@', '', $namespace));
-
-            if (!empty($path[0]) && file_exists("{$path[0]}/{$folder}/index.twig")) {
-                $template = "{$template}/index";
-            }
-        }
-
-        return $this->environment->render("{$template}.twig", $context);
+    /**
+     * @param string $template
+     *
+     * @return bool
+     */
+    public function exists(string $template): bool
+    {
+        return $this->loader->exists($this->normalizeExtension($template));
     }
 
     /**
@@ -113,9 +110,7 @@ class View
      */
     public function addFunction(string $name, $callable, array $options = ['is_safe' => ['all']])
     {
-        $this->environment->addFunction(
-            new \Twig\TwigFunction($name, $callable, $options)
-        );
+        $this->environment->addFunction(new \Twig\TwigFunction($name, $callable, $options));
 
         return $this;
     }
@@ -129,9 +124,7 @@ class View
      */
     public function addFilter(string $name, $callable, array $options = ['is_safe' => ['all']])
     {
-        $this->environment->addFilter(
-            new \Twig\TwigFilter($name, $callable, $options)
-        );
+        $this->environment->addFilter(new \Twig\TwigFilter($name, $callable, $options));
 
         return $this;
     }
@@ -155,6 +148,29 @@ class View
     public function getEnvironment()
     {
         return $this->environment;
+    }
+
+    /**
+     * @param string $template
+     *
+     * @return string
+     */
+    private function normalizeExtension(string $template): string
+    {
+        $template = $this->removeExtension($template);
+        $template = str_replace('.', '/', $template);
+
+        return sprintf('%s.%s', $template, 'twig');
+    }
+
+    /**
+     * @param string $template
+     *
+     * @return string
+     */
+    private function removeExtension(string $template): string
+    {
+        return preg_replace('/\.twig$/', '', $template);
     }
 
     /**

@@ -6,12 +6,11 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Mailer;
 
-use Core\App;
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
@@ -19,138 +18,161 @@ use PHPMailer\PHPMailer\PHPMailer;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class Mailer
+class Mailer extends Auth
 {
     /**
-     * @var PHPMailer
-     */
-    protected $mail;
-
-    /**
-     * @param array $options
-     */
-    public function __construct(array $options)
-    {
-        $this->validateOptions($options);
-        $this->configureDefaultMailer($options);
-    }
-
-    /**
-     * @param string   $template
-     * @param array    $context
-     * @param \Closure $callback
+     * @param string $address
+     * @param string $name
      *
      * @throws \Exception
      *
      * @return \Core\Mailer\Mailer
      */
-    public function send(string $template, array $context, \Closure $callback): Mailer
+    public function from(string $address, ?string $name = ''): Mailer
     {
-        try {
-            $message = new Message($this->mail);
-            $message->body(App::getInstance()->resolve('view')->fetch("@mail.{$template}", $context));
+        $this->mailer->setFrom($address, $name);
 
-            call_user_func_array($callback->bindTo($this->mail), [
-                $message,
-                $context,
-            ]);
-
-            // Send mailer
-            if (!$this->mail->send()) {
-                throw new \Exception($this->mail->ErrorInfo, E_USER_ERROR);
-            }
-
-            // Clear properties
-            $this->clearAll();
-
-            return $this;
-        } catch (\Exception $e) {
-            throw $e;
-        }
+        return $this;
     }
 
     /**
-     * @param array $options
-     */
-    protected function validateOptions(array &$options): void
-    {
-        if (empty($options['host'])) {
-            throw new \InvalidArgumentException('Host not configured.', E_USER_ERROR);
-        }
-
-        if (empty($options['username']) || empty($options['password'])) {
-            throw new \InvalidArgumentException('User and password not configured.', E_USER_ERROR);
-        }
-    }
-
-    /**
-     * @param array $options
-     */
-    protected function configureDefaultMailer(array $options): void
-    {
-        // PHPMailer
-        $this->mail = new PHPMailer(
-            $options['exception'] ?? true
-        );
-
-        // Settings
-        $this->mail->SMTPDebug = $options['debug'] ?? 0;
-        $this->mail->CharSet = $options['charset'] ?? PHPMailer::CHARSET_UTF8;
-        $this->mail->isSMTP();
-        $this->mail->isHTML(true);
-        $this->mail->setLanguage(
-            $options['language']['code'] ?? 'pt_br',
-            $options['language']['path'] ?? ''
-        );
-
-        // Authentication
-        $this->mail->SMTPAuth = $options['auth'] ?? true;
-
-        if (!empty($options['secure'])) {
-            $this->mail->SMTPSecure = $options['secure'];
-        }
-
-        // Server e-mail
-        $this->mail->Host = $this->buildHost($options['host']);
-        $this->mail->Port = $options['port'] ?? 587;
-        $this->mail->Username = $options['username'];
-        $this->mail->Password = $options['password'];
-
-        // Default from
-        if (!empty($options['from']['mail'])) {
-            $this->mail->From = $options['from']['mail'];
-
-            if (!empty($options['from']['name'])) {
-                $this->mail->FromName = $options['from']['name'];
-            }
-        }
-    }
-
-    /**
-     * @param string|array $host
+     * @param string $address
+     * @param string $name
      *
-     * @return string
+     * @return \Core\Mailer\Mailer
      */
-    protected function buildHost($host): string
+    public function reply(string $address, ?string $name = ''): Mailer
     {
-        if (is_array($host)) {
-            $host = implode(';', $host);
-        }
+        $this->mailer->addReplyTo($address, $name);
 
-        return $host;
+        return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $address
+     * @param string $name
+     *
+     * @return \Core\Mailer\Mailer
      */
-    protected function clearAll(): void
+    public function addCC(string $address, ?string $name = ''): Mailer
     {
-        $this->mail->clearAddresses();
-        $this->mail->clearAllRecipients();
-        $this->mail->clearAttachments();
-        $this->mail->clearBCCs();
-        $this->mail->clearCCs();
-        $this->mail->clearCustomHeaders();
-        $this->mail->clearReplyTos();
+        $this->mailer->addCC($address, $name);
+
+        return $this;
+    }
+
+    /**
+     * @param string $address
+     * @param string $name
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function addBCC(string $address, ?string $name = ''): Mailer
+    {
+        $this->mailer->addBCC($address, $name);
+
+        return $this;
+    }
+
+    /**
+     * @param string $address
+     * @param string $name
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function to(string $address, ?string $name = ''): Mailer
+    {
+        $this->mailer->addAddress($address, $name);
+
+        return $this;
+    }
+
+    /**
+     * @param string $subject
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function subject(string $subject): Mailer
+    {
+        $this->mailer->Subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @param string $name
+     * @param string $encoding
+     * @param string $type
+     * @param string $disposition
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function addFile(
+        string $path,
+        ?string $name = '',
+        ?string $encoding = PHPMailer::ENCODING_BASE64,
+        ?string $type = '',
+        ?string $disposition = 'attachment'
+    ): Mailer {
+        $this->mailer->addAttachment($path, $name, $encoding, $type, $disposition);
+
+        return $this;
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function body(string $message): Mailer
+    {
+        $this->mailer->msgHTML($message);
+
+        return $this;
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return \Core\Mailer\Mailer
+     */
+    public function altBody(string $message): Mailer
+    {
+        $this->mailer->AltBody = $message;
+
+        return $this;
+    }
+
+    /**
+     * @throws \Exception
+     *
+     * @return \PHPMailer\PHPMailer\PHPMailer
+     */
+    public function send(): PHPMailer
+    {
+        if (!$this->mailer->send()) {
+            throw new MailerException($this->mailer->ErrorInfo);
+        }
+
+        $this->clear();
+
+        return $this->mailer;
+    }
+
+    /**
+     * @return void
+     */
+    protected function clear(): void
+    {
+        $this->mailer->clearAddresses();
+        $this->mailer->clearAllRecipients();
+        $this->mailer->clearAttachments();
+        $this->mailer->clearBCCs();
+        $this->mailer->clearCCs();
+        $this->mailer->clearCustomHeaders();
+        $this->mailer->clearReplyTos();
     }
 }

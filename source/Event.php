@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -19,21 +19,29 @@ namespace Core;
 class Event
 {
     /**
+     * @var Event
+     */
+    protected static $instance;
+
+    /**
      * @var array
      */
     protected $events = [];
 
-    /**
-     * @var Event
-     */
-    private static $instance;
+    private function __construct()
+    {
+    }
+
+    private function __wakeup()
+    {
+    }
 
     /**
      * @return Event
      */
     public static function getInstance(): Event
     {
-        if (empty(self::$instance)) {
+        if (is_null(self::$instance)) {
             self::$instance = new self();
         }
 
@@ -41,88 +49,84 @@ class Event
     }
 
     /**
-     * @param string          $event
+     * @param string          $name
      * @param callable|string $callable
-     * @param int             $priority
      *
      * @throws \Exception
      *
      * @return void
      */
-    public function on(string $event, $callable, int $priority = 10): void
+    public function on(string $name, $callable): void
     {
-        if (!isset($this->events[$event])) {
-            $this->events[$event] = [[]];
+        if (!isset($this->events[$name])) {
+            $this->events[$name] = [];
         }
 
         if (is_string($callable) && class_exists($callable)) {
-            $callable = [new $callable(), '__invoke'];
+            $callable = new $callable(self::getInstance());
         } elseif (!is_callable($callable)) {
-            throw new \Exception("Callable invalid in event {$event}.", E_ERROR);
+            throw new \Exception("Callable invalid in event {$name}.");
         }
 
-        $this->events[$event][$priority][] = $callable;
+        $this->events[$name][] = $callable;
     }
 
     /**
-     * @param string $event
+     * @param string $name
      * @param ...    $params
      *
      * @return mixed
      */
-    public function emit(string $event)
+    public function emit(string $name)
     {
-        if (!isset($this->events[$event])) {
-            $this->events[$event] = [[]];
-        }
+        $result = null;
 
-        if (!empty($this->events[$event])) {
-            if (count($this->events[$event]) > 1) {
-                ksort($this->events[$event]);
+        if (!empty($this->events[$name])) {
+            if (count($this->events[$name]) > 1) {
+                ksort($this->events[$name]);
             }
 
             $params = func_get_args();
             array_shift($params);
-            $executed = [];
 
-            foreach ($this->events[$event] as $priority) {
-                foreach ($priority as $callable) {
-                    $executed[] = call_user_func_array($callable, $params);
-                }
+            foreach ($this->events[$name] as $key => $callable) {
+                $result = call_user_func_array($callable, $params);
             }
-
-            return array_shift($executed);
         }
+
+        return $result;
     }
 
     /**
-     * @param string $event
+     * @param string $name
      *
      * @return mixed
      */
-    public function events(?string $event = null)
+    public function events(string $name = null)
     {
-        if (!empty($event)) {
-            return isset($this->events[$event])
-                ? $this->events[$event]
-                : null;
+        if (!empty($name)) {
+            if (isset($this->events[$name])) {
+                return $this->events[$name];
+            }
+
+            return null;
         }
 
         return $this->events;
     }
 
     /**
-     * @param string $event
+     * @param string $name
      *
      * @return void
      */
-    public function clear(?string $event = null): void
+    public function clear(string $name = null): void
     {
-        if (!empty($event) && isset($this->events[$event])) {
-            $this->events[$event] = [[]];
+        if (!empty($name) && isset($this->events[$name])) {
+            $this->events[$name] = [];
         } else {
             foreach ($this->events as $key => $value) {
-                $this->events[$key] = [[]];
+                $this->events[$key] = [];
             }
         }
     }

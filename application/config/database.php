@@ -6,16 +6,16 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 return [
     /*
-     * Events
+     * Model events
      *
-     * tbName:creating | tbName:created
-     * tbName:updating | tbName:updated
-     * tbName:deleting | tbName:deleted
+     * table:creating | table:created
+     * table:updating | table:updated
+     * table:deleting | table:deleted
      */
 
     // Default connection driver
@@ -28,7 +28,8 @@ return [
             'database' => 'PATH_DATABASE_SQLITE', // Location database sqlite
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
-            'commands' => [], // Use pdo->exec(...command...)
+            'commands' => [], // Use pdo->exec(...command...),
+            'events' => [], // Register \Closure or Class::class
         ],
 
         'mysql' => [
@@ -45,6 +46,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
+            'events' => [], // Register \Closure or Class::class
         ],
 
         'pgsql' => [
@@ -60,6 +62,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
+            'events' => [], // Register \Closure or Class::class
         ],
 
         'sqlsrv' => [
@@ -73,6 +76,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
+            'events' => [], // Register \Closure or Class::class
         ],
     ],
 ];

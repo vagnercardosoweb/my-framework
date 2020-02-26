@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
 use Core\Helpers\Helper;
+use Core\Helpers\Path;
 use Core\Helpers\Str;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -36,18 +37,18 @@ class GenerateKeysMiddleware extends Middleware
     {
         foreach (['APP_KEY', 'API_KEY', 'DEPLOY_KEY'] as $key) {
             $value = env($key, null);
-            $value = Helper::normalizeTypeValue($value);
+            $value = Helper::normalizeValueType($value);
 
             if (empty($value)) {
+                $quote = preg_quote("={$value}", '/');
                 $random = Str::randomBytes(32);
-                $scaped = preg_quote("={$value}", '/');
 
                 file_put_contents(
-                    APP_FOLDER.'/.env',
+                    Path::app('/.env'),
                     preg_replace(
-                        "/^{$key}{$scaped}.*/m",
+                        "/^{$key}{$quote}.*/m",
                         "{$key}=vcw:{$random}",
-                        file_get_contents(APP_FOLDER.'/.env')
+                        file_get_contents(Path::app('/.env'))
                     )
                 );
             }

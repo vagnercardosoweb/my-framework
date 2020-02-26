@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
 use Core\App;
+use Core\Interfaces\ServiceProvider;
 
 /**
  * Class Provider.
@@ -31,11 +32,14 @@ use Core\App;
  * @property \Core\Logger                 $logger
  * @property \Core\Event                  $event
  * @property \Core\Database\Database      $db
- * @property \Core\Database\Connect       $connect
+ * @property \Core\Database\Database      $database
+ * @property \Core\Curl\Curl              $curl
+ * @property \Core\Redis                  $redis
+ * @property \Core\Cache\Cache            $cache
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Provider
+abstract class Provider implements ServiceProvider
 {
     /**
      * @var \Core\App
@@ -43,17 +47,11 @@ abstract class Provider
     protected $app;
 
     /**
-     * @var \Slim\Container
-     */
-    protected $container;
-
-    /**
      * @param \Core\App $app
      */
     public function __construct(App $app)
     {
         $this->app = $app;
-        $this->container = $app->getContainer();
     }
 
     /**
@@ -64,21 +62,5 @@ abstract class Provider
     public function __get(string $name)
     {
         return $this->app->resolve($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    abstract public function register(): void;
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    public function boot(): void
-    {
     }
 }

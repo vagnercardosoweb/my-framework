@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 24/02/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -39,48 +39,61 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
+     * @param string|int $value
+     *
+     * @return string|null
+     */
+    public static function removeSpaces($value): ?string
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        return trim(preg_replace('/\s+/', '', $value));
+    }
+
+    /**
      * @return string
      */
     public static function uuid(): string
     {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        $uuid = bin2hex(random_bytes(16));
+
+        return sprintf('%08s-%04s-%04x-%04x-%012s',
             // 32 bits for "time_low"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-
+            substr($uuid, 0, 8),
             // 16 bits for "time_mid"
-            mt_rand(0, 0xffff),
-
+            substr($uuid, 8, 4),
             // 16 bits for "time_hi_and_version",
             // four most significant bits holds version number 4
-            mt_rand(0, 0x0C2f) | 0x4000,
-
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
+            hexdec(substr($uuid, 12, 3)) & 0x0fff | 0x4000,
+            // 16 bits:
+            // * 8 bits for "clk_seq_hi_res",
+            // * 8 bits for "clk_seq_low",
             // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3fff) | 0x8000,
-
+            hexdec(substr($uuid, 16, 4)) & 0x3fff | 0x8000,
             // 48 bits for "node"
-            mt_rand(0, 0x2Aff), mt_rand(0, 0xffD3), mt_rand(0, 0xff4B)
+            substr($uuid, 20, 12)
         );
     }
 
     /**
-     * @param int $lenght
+     * @param int $length
      *
      * @throws \Exception
      *
      * @return string
      */
-    public static function randomBytes($lenght = 32)
+    public static function randomBytes($length = 32)
     {
-        $lenght = (intval($lenght) <= 8 ? 32 : $lenght);
+        $length = (intval($length) <= 8 ? 32 : $length);
 
         if (function_exists('random_bytes')) {
-            $hashed = bin2hex(random_bytes($lenght));
+            $hashed = bin2hex(random_bytes($length));
         } else {
-            $hashed = bin2hex(openssl_random_pseudo_bytes($lenght));
+            $hashed = bin2hex(openssl_random_pseudo_bytes($length));
         }
 
-        return mb_substr(Base64::encode($hashed), 0, $lenght);
+        return mb_substr($hashed, 0, $length);
     }
 }

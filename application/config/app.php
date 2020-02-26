@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 return [
@@ -29,26 +29,46 @@ return [
         'skeleton' => 'v1.0.0',
     ],
 
+    // Register path routes
+
+    'routes' => [
+        'app' => [
+            \Core\Helpers\Path::app('/routes/api.php'),
+            \Core\Helpers\Path::app('/routes/web.php'),
+        ],
+
+        'console' => [
+            \Core\Helpers\Path::app('/routes/console.php'),
+        ],
+    ],
+
     // Register providers
 
     'providers' => [
         \App\Providers\ViewProvider::class,
-        \App\Providers\ErrorProvider::class,
-        \App\Providers\ErrorSlackProvider::class,
-        \App\Providers\SessionProvider::class,
-        \App\Providers\DatabaseProvider::class,
-        \App\Providers\MailerProvider::class,
+        \App\Providers\CurlProvider::class,
+        \App\Providers\EventProvider::class,
+        \App\Providers\RedisProvider::class,
+        \App\Providers\CacheProvider::class,
+        \App\Providers\LoggerProvider::class,
+        \App\Providers\JwtProvider::class,
         \App\Providers\EncryptionProvider::class,
         \App\Providers\PasswordProvider::class,
-        \App\Providers\JwtProvider::class,
-        \App\Providers\LoggerProvider::class,
-        \App\Providers\EventProvider::class,
+        \App\Providers\SessionProvider::class,
+        \App\Providers\FlashProvider::class,
+        \App\Providers\DatabaseProvider::class,
+        \App\Providers\MailerProvider::class,
+        \App\Providers\ErrorProvider::class,
+        \App\Providers\PhpErrorProvider::class,
+        \App\Providers\NotFoundProvider::class,
+        \App\Providers\NotAllowedProvider::class,
+        \App\Providers\EnvironmentProvider::class,
     ],
 
     // Register middleware
 
     'middleware' => [
-        'automatic' => [
+        'app' => [
             \App\Middlewares\TrailingSlashMiddleware::class,
             \App\Middlewares\GenerateKeysMiddleware::class,
             \App\Middlewares\MaintenanceMiddleware::class,
@@ -56,5 +76,12 @@ return [
         ],
 
         'manual' => [],
+    ],
+
+    // Register events
+
+    'events' => [
+        \App\Events\ErrorSlackEvent::class,
+        \App\Events\ExampleEvent::class,
     ],
 ];

@@ -6,12 +6,11 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Phinx;
 
-use Core\App;
 use Phinx\Migration\AbstractMigration;
 
 /**
@@ -53,9 +52,7 @@ abstract class Migration extends AbstractMigration
      */
     public function __get($name)
     {
-        return App::getInstance()
-            ->resolve($name)
-        ;
+        return app()->resolve($name);
     }
 
     /**
@@ -71,7 +68,9 @@ abstract class Migration extends AbstractMigration
         $table = $table ?? $this->table;
 
         if (empty($table)) {
-            throw new \Exception(sprintf('Table not defined in %s.', get_class($this)), E_ERROR);
+            throw new \Exception(
+                sprintf('Table not defined in %s.', get_class($this))
+            );
         }
 
         return parent::table($table, array_merge([
