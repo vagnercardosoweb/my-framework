@@ -11,24 +11,21 @@
 
 use Core\App;
 
-/**
- * @param string $buffer
- *
- * @return string
- */
-function ob_output(string $buffer): string
-{
-    if (!preg_match('/localhost|.dev|.local/', $_SERVER['HTTP_HOST'])) {
-        $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
-        $buffer = preg_replace('/\r\n|\r|\n|\t/m', '', $buffer);
-        $buffer = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $buffer);
-    }
-
-    return ob_gzhandler($buffer, 9);
-}
+//function ob_output(string $buffer): string
+//{
+//    if (!preg_match('/localhost|.dev|.local/', $_SERVER['HTTP_HOST'])) {
+//        $buffer = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $buffer);
+//        $buffer = preg_replace('/\r\n|\r|\n|\t/m', '', $buffer);
+//        $buffer = preg_replace('/^\s+|\s+$|\s+(?=\s)/m', '', $buffer);
+//    }
+//
+//    ini_set('zlib.output_compression_level', 5);
+//
+//    return ob_gzhandler($buffer, 5);
+//}
 
 // Minify html, js, css etc...
-ob_start('ob_output');
+ob_start('ob_gzhandler');
 
 // Cli server
 if (PHP_SAPI == 'cli-server') {
