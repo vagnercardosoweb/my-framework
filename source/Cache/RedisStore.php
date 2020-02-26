@@ -11,6 +11,7 @@
 
 namespace Core\Cache;
 
+use Core\Helpers\Helper;
 use Core\Interfaces\CacheStore;
 
 /**
@@ -42,20 +43,20 @@ class RedisStore implements CacheStore
      *
      * @return mixed
      */
-    public function get(string $key, $default = null, int $seconds = null)
+    public function get(string $key, $default = null, int $seconds = 0)
     {
         $value = $this->redis->get($key);
 
         if (empty($value)) {
             $value = $default instanceof \Closure ? $default() : $default;
 
-            if (!is_null($seconds)) {
+            if ($seconds > 0) {
                 $this->set($key, $value, $seconds);
             }
         }
 
         return is_string($value)
-            ? $this->redis->unserialize($value)
+            ? Helper::unserialize($value)
             : $value;
     }
 
@@ -66,17 +67,15 @@ class RedisStore implements CacheStore
      *
      * @return mixed
      */
-    public function set(string $key, $value, int $seconds = null): bool
+    public function set(string $key, $value, int $seconds = 0): bool
     {
-        $value = $this->redis->serialize($value);
+        $value = Helper::serialize($value);
 
-        if (-1 === $seconds) {
+        if ($seconds <= 0) {
             return $this->redis->set($key, $value);
         }
 
-        return (bool)$this->redis->setex(
-            $key, $seconds ?? 60, $value
-        );
+        return (bool)$this->redis->setex($key, $seconds, $value);
     }
 
     /**

@@ -35,11 +35,6 @@ class Cache
     protected $config;
 
     /**
-     * @var string
-     */
-    protected $driver;
-
-    /**
      * @var array
      */
     protected $stores = [];
@@ -47,13 +42,11 @@ class Cache
     /**
      * Cache constructor.
      *
-     * @param array       $config Configuration redis ou directory file
-     * @param string|null $driver
+     * @param array $config
      */
-    public function __construct($config = null, string $driver = null)
+    public function __construct(array $config = [])
     {
         $this->config = $config;
-        $this->setDriver($driver ?? 'redis');
     }
 
     /**
@@ -75,54 +68,74 @@ class Cache
     public function store(string $driver = null): CacheStore
     {
         $driver = $driver ?? $this->getDriver();
+        $config = $this->getConfig($driver);
         $method = sprintf('create%sDriver', ucfirst($driver));
 
         if (!method_exists($this, $method)) {
-            throw new \InvalidArgumentException("Driver [{$driver}] not supported in cache.");
+            throw new \InvalidArgumentException(
+                "Driver [{$driver}] not supported in cache."
+            );
         }
 
-        if ($this->stores[$driver] instanceof CacheStore) {
-            return $this->stores[$driver];
+        if (empty($this->stores[$driver])) {
+            $this->stores[$driver] = $this->{$method}($config);
         }
-
-        $this->stores[$driver] = $this->{$method}();
 
         return $this->stores[$driver];
     }
 
     /**
-     * @return string
-     */
-    public function getDriver(): string
-    {
-        return $this->driver;
-    }
-
-    /**
      * @param string $driver
      *
-     * @return \Core\Cache\Cache
+     * @return array
      */
-    public function setDriver(string $driver): Cache
+    protected function getConfig(string $driver): array
     {
-        if (empty($this->stores[$driver])) {
-            $this->stores[$driver] = null;
-        }
-
-        $this->driver = $driver;
-
-        return $this;
+        return $this->config['stores'][$driver] ?? [];
     }
 
     /**
+     * @return string
+     */
+    protected function getDriver(): string
+    {
+        return $this->config['default'] ?? 'file';
+    }
+
+    /**
+     * @param array $config
+     *
      * @return \Core\Interfaces\CacheStore
      */
-    public function createRedisDriver(): CacheStore
+    protected function createFileDriver(array $config): CacheStore
     {
-        return new RedisStore(
-            new Redis($this->config, [
-                'prefix' => 'cache:',
-            ])
+        return new FileStore(
+            $config['path'],
+            $config['permission'] ?? null
         );
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return \Core\Interfaces\CacheStore
+     */
+    protected function createRedisDriver(array $config): CacheStore
+    {
+        $client = new Redis($config, [
+            'prefix' => $config['prefix'] ?? 'cache:',
+        ]);
+
+        return new RedisStore($client);
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return \Core\Interfaces\CacheStore
+     */
+    protected function createApcDriver(array $config): CacheStore
+    {
+        return new ApcStore($config['prefix'] ?? 'cache:');
     }
 }

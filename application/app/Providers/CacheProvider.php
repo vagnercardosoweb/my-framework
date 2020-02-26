@@ -34,7 +34,7 @@ class CacheProvider extends Provider
     public function register(): \Closure
     {
         return function () {
-            return new Cache(config('redis'));
+            return new Cache(config('cache'));
         };
     }
 }

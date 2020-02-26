@@ -218,32 +218,4 @@ class Redis extends Client
 
         unset($loop);
     }
-
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function serialize($value)
-    {
-        return is_numeric($value) && !in_array($value, [INF, -INF]) && !is_nan($value) ? $value : serialize($value);
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function unserialize($value)
-    {
-        if (is_float($value)) {
-            return $value;
-        }
-
-        try {
-            return is_numeric($value) ? (int)$value : unserialize($value);
-        } catch (\Exception $e) {
-            return $value;
-        }
-    }
 }

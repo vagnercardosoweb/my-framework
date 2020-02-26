@@ -25,7 +25,7 @@ interface CacheStore
      *
      * @return mixed
      */
-    public function get(string $key, $default = null, int $seconds = null);
+    public function get(string $key, $default = null, int $seconds = 0);
 
     /**
      * @param string $key
@@ -34,7 +34,7 @@ interface CacheStore
      *
      * @return mixed
      */
-    public function set(string $key, $value, int $seconds = null): bool;
+    public function set(string $key, $value, int $seconds = 0): bool;
 
     /**
      * @return bool
