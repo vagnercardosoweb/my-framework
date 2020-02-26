@@ -11,8 +11,8 @@
 
 namespace App\Providers;
 
-use Core\App;
 use Core\Interfaces\ServiceProvider;
+use Slim\Container;
 
 /**
  * Class Provider.
@@ -42,16 +42,16 @@ use Core\Interfaces\ServiceProvider;
 abstract class Provider implements ServiceProvider
 {
     /**
-     * @var \Core\App
+     * @var \Slim\Container
      */
-    protected $app;
+    protected $container;
 
     /**
-     * @param \Core\App $app
+     * @param \Slim\Container $container
      */
-    public function __construct(App $app)
+    public function __construct(Container $container)
     {
-        $this->app = $app;
+        $this->container = $container;
     }
 
     /**
@@ -61,6 +61,10 @@ abstract class Provider implements ServiceProvider
      */
     public function __get(string $name)
     {
-        return $this->app->resolve($name);
+        if ($this->container->has($name)) {
+            return $this->container->get($name);
+        }
+
+        return null;
     }
 }

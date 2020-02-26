@@ -188,10 +188,11 @@ class App extends SlimApp
                 );
             }
 
-            $instance = new $class($this);
+            $container = $this->getContainer();
+            $instance = new $class($container);
 
             foreach ((array)$instance->name() as $name) {
-                $this->getContainer()->offsetSet($name, $instance->register());
+                $container[$name] = $instance->register();
             }
 
             if (method_exists($instance, 'boot')) {
