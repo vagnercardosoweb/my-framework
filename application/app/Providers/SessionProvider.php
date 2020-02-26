@@ -11,8 +11,8 @@
 
 namespace App\Providers;
 
+use Core\Env;
 use Core\Session\Session;
-use Pimple\Container;
 
 /**
  * Class SessionProvider.
@@ -34,13 +34,17 @@ class SessionProvider extends Provider
      */
     public function register(): \Closure
     {
-        return function (Container $container) {
+        $session = null;
+
+        if (true === Env::get('APP_SESSION', false)) {
             $session = new Session();
 
-            if ($container->offsetExists('view')) {
-                $container['view']->addGlobal('session', $session);
+            if ($this->view) {
+                $this->view->addGlobal('session', $session);
             }
+        }
 
+        return function () use ($session) {
             return $session;
         };
     }

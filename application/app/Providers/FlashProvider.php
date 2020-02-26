@@ -12,7 +12,7 @@
 namespace App\Providers;
 
 use Core\Session\Flash;
-use Pimple\Container;
+use Core\Session\Session;
 
 /**
  * Class FlashProvider.
@@ -34,13 +34,17 @@ class FlashProvider extends Provider
      */
     public function register(): \Closure
     {
-        return function (Container $container) {
+        $flash = null;
+
+        if ($this->session instanceof Session) {
             $flash = new Flash();
 
-            if ($container->offsetExists('view')) {
-                $container['view']->addGlobal('flash', $flash);
+            if ($this->view) {
+                $this->view->addGlobal('flash', $flash);
             }
+        }
 
+        return function () use ($flash) {
             return $flash;
         };
     }
