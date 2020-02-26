@@ -6,17 +6,19 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
+
+use Core\Interfaces\ConnectionEvent;
 
 /**
  * Class Connection.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Connection
+abstract class Connection extends \PDO
 {
     /**
      * Default options.
@@ -34,32 +36,11 @@ abstract class Connection
     ];
 
     /**
-     * @return array
-     */
-    public function getAvailableDrivers(): array
-    {
-        return array_intersect(
-            $this->getSupportedDrivers(),
-            str_replace(['pdo_dblib'], 'dblib', \PDO::getAvailableDrivers())
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getSupportedDrivers(): array
-    {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
-    }
-
-    /**
      * @param array $config
      *
      * @throws \Exception
-     *
-     * @return \PDO
      */
-    public function connect(array $config): \PDO
+    public function __construct(array $config)
     {
         try {
             $this->validateConfig($config);
@@ -71,24 +52,43 @@ abstract class Connection
 
             $dsn = $config['url'] ?? $this->getDsn($config);
             $options = $this->getOptions($config);
-            $connection = new \PDO($dsn, $username, $password, $options);
 
-            $this->setDefaultStatement($connection);
-            $this->setDefaultSchema($connection, $config);
-            $this->setDefaultEncoding($connection, $config);
-            $this->setDefaultTimezone($connection, $config);
-            $this->setDefaultAttributesAndCommands($connection, $config);
+            parent::__construct($dsn, $username, $password, $options);
 
-            return $connection;
+            $this->setStatement();
+            $this->setSchema($config);
+            $this->setEncoding($config);
+            $this->setTimezone($config);
+            $this->setAttributesAndCommands($config);
+            $this->setEvents($config);
         } catch (\PDOException $e) {
-            throw new \Exception($e->getMessage(), E_ERROR);
+            throw new \Exception($e->getMessage(), $e->getCode());
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAvailableDrivers(): array
+    {
+        return array_intersect(
+            self::getSupportedDrivers(),
+            str_replace(['pdo_dblib'], 'dblib', \PDO::getAvailableDrivers())
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSupportedDrivers(): array
+    {
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
     }
 
     /**
      * @param array $config
      */
-    protected function validateConfig(array &$config): void
+    protected function validateConfig(array $config): void
     {
         $classSplit = explode('\\', get_called_class());
         $className = array_pop($classSplit);
@@ -130,49 +130,63 @@ abstract class Connection
     }
 
     /**
-     * @param \PDO $connection
+     * @return void
      */
-    protected function setDefaultStatement(\PDO $connection): void
+    protected function setStatement(): void
     {
-        $connection->setAttribute(
+        $this->setAttribute(
             \PDO::ATTR_STATEMENT_CLASS,
-            [Statement::class, [$connection]]
+            [Statement::class, [$this]]
         );
     }
 
     /**
-     * @param \PDO  $connection
      * @param array $config
      */
-    abstract protected function setDefaultSchema(\PDO $connection, array $config): void;
-
-    /**
-     * @param \PDO  $connection
-     * @param array $config
-     */
-    abstract protected function setDefaultEncoding(\PDO $connection, array $config): void;
-
-    /**
-     * @param \PDO  $connection
-     * @param array $config
-     */
-    abstract protected function setDefaultTimezone(\PDO $connection, array $config): void;
+    abstract protected function setSchema(array $config): void;
 
     /**
      * @param array $config
-     * @param \PDO  $connection
      */
-    protected function setDefaultAttributesAndCommands(\PDO $connection, array $config): void
+    abstract protected function setEncoding(array $config): void;
+
+    /**
+     * @param array $config
+     */
+    abstract protected function setTimezone(array $config): void;
+
+    /**
+     * @param array $config
+     */
+    protected function setAttributesAndCommands(array $config): void
     {
         if (!empty($config['attributes'])) {
             foreach ((array)$config['attributes'] as $key => $value) {
-                $connection->setAttribute($key, $value);
+                $this->setAttribute($key, $value);
             }
         }
 
         if (!empty($config['commands'])) {
             foreach ((array)$config['commands'] as $command) {
-                $connection->exec($command);
+                $this->exec($command);
+            }
+        }
+    }
+
+    /**
+     * @param array $config
+     */
+    protected function setEvents(array $config): void
+    {
+        if (!empty($config['events'])) {
+            foreach ((array)$config['events'] as $callable) {
+                if (!is_a($callable, ConnectionEvent::class, true)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Class %s must be instance of %s', $callable, ConnectionEvent::class)
+                    );
+                }
+
+                call_user_func(new $callable(), $this);
             }
         }
     }

@@ -1,5 +1,10 @@
 version: '3'
 
+networks:
+  mysql-network:
+  #  postgres-network:
+  redis-network:
+
 services:
   web:
     build: ./docker
@@ -7,6 +12,7 @@ services:
     restart: always
     networks:
       - mysql-network
+      - redis-network
       # - postgres-network
     depends_on:
       - mysql
@@ -26,6 +32,7 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
+    container_name: mysql
     networks:
       - mysql-network
     ports:
@@ -64,8 +71,15 @@ services:
   #      - POSTGRES_PASSWORD=root
   #      - POSTGRES_DB=development
 
-networks:
-  mysql-network:
-    driver: bridge
-  #  postgres-network:
-  #    driver: bridge
+  redis:
+    image: bitnami/redis:latest
+    restart: always
+    volumes:
+      - ./docker/redis:/bitnami/redis/data
+    networks:
+      - redis-network
+    environment:
+      - ALLOW_EMPTY_PASSWORD=no
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-docker}
+    ports:
+      - '6379:6379'

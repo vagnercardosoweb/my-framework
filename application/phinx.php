@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 25/02/2020 Vagner Cardoso
  */
 
 use Core\App;
@@ -20,11 +20,12 @@ try {
     define('BASE_URL', 'http://localhost');
 
     // Autoload
-    require_once APP_FOLDER.'/vendor/autoload.php';
+    require_once __DIR__.'/vendor/autoload.php';
 
     // Loader app
     $app = App::getInstance();
     $app->registerProviders();
+    $app->registerEvents();
 
     // Configuration:
     //

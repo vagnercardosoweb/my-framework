@@ -6,12 +6,11 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
-use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
 
@@ -62,17 +61,15 @@ class CorsMiddleware extends Middleware
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
-        /** @var ResponseInterface $response */
-        $response = $next($request, $response);
-
         /*header_remove("Cache-Control");
         header_remove("Expires");
         header_remove("Pragma");*/
 
-        return $response->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Vary', 'Origin')
-            ->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders))
-            ->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods))
-        ;
+        $response = $response->withHeader('Vary', 'Origin');
+        $response = $response->withHeader('Access-Control-Allow-Origin', '*');
+        $response = $response->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders));
+        $response = $response->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods));
+
+        return $next($request, $response);
     }
 }

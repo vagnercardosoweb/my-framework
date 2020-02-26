@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -21,19 +21,35 @@ use Core\Encryption;
 class EncryptionProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['encryption'] = function () {
-            return new Encryption(
-                (env('APP_KEY', null)
-                    ?: md5(md5(
-                            sprintf('vcw-%s', $_SERVER['HTTP_HOST'] ?? 'VCWebNetworks'))
-                    ))
-            );
+        return 'encryption';
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function () {
+            return new Encryption($this->generateKey());
         };
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateKey(): string
+    {
+        $appKey = env('APP_KEY', null);
+
+        if (empty($appKey)) {
+            $host = $_SERVER['HTTP_HOST'] ?? 'vc:key';
+            $appKey = hash('sha256', sprintf('vcw:%s', $host));
+        }
+
+        return $appKey;
     }
 }

@@ -6,17 +6,16 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
-$app->group(['prefix' => '/api', 'namespace' => 'Api/'], function () use ($app) {
-    // Deploy
-    $app->group(['prefix' => '/deploy', 'namespace' => 'Deploy/'], function () use ($app) {
+$app->group(['path' => '/api', 'namespace' => 'Api/'], function () use ($app) {
+    $app->route('get,post', '/util/zipcode/{p}', 'ZipCodeController');
+    $app->route('get,post', '/util/modal-detail', 'ModalDetailController');
+
+    $app->group(['path' => '/deploy', 'namespace' => 'Deploy/'], function () use ($app) {
         $app->route('post', '/gitlab', 'GitlabController');
         $app->route('post', '/github', 'GithubController');
         $app->route('post', '/bitbucket', 'BitbucketController');
     })->add(\App\Middlewares\CorsMiddleware::class);
-
-    // Utils
-    $app->route('*', '/util/{method:[\w\-]+}[/{params:.*}]', 'UtilController', 'api.util');
 });

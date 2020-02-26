@@ -6,16 +6,17 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 use Core\App;
-use Core\Environment;
+use Core\Env;
 use Core\Helpers\Arr;
+use Core\Helpers\CallableResolver;
 use Core\Helpers\Helper;
-use Core\Helpers\Validate;
 use Core\Logger;
 use Core\Router;
+use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
@@ -46,31 +47,25 @@ if (!function_exists('env')) {
      */
     function env(string $key, $default = null)
     {
-        return Environment::get($key, $default);
+        return Env::get($key, $default);
     }
 }
 
 if (!function_exists('asset')) {
     /**
-     * @param string $file
-     * @param bool   $baseUrl
-     * @param bool   $version
+     * @param string      $file
+     * @param string|bool $baseUrl
+     * @param bool        $version
      *
-     * @return bool|string
+     * @return string|null
      */
-    function asset(string $file, bool $baseUrl = false, bool $version = false)
+    function asset(string $file, $baseUrl = '', bool $version = false): ?string
     {
-        $file = ((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file);
-        $path = PUBLIC_FOLDER."{$file}";
-        $baseUrl = ($baseUrl ? BASE_URL : '');
-
-        if (file_exists($path)) {
-            $version = ($version ? '?v='.substr(md5_file($path), 0, 15) : '');
-
-            return "{$baseUrl}{$file}{$version}";
+        if (!is_string($baseUrl)) {
+            $baseUrl = defined('BASE_URL') ? constant('BASE_URL') : '';
         }
 
-        return false;
+        return \Core\Helpers\Asset::path($file, $baseUrl, $version);
     }
 }
 
@@ -78,28 +73,11 @@ if (!function_exists('asset_source')) {
     /**
      * @param string|array $files
      *
-     * @return bool|string
+     * @return string|null
      */
-    function asset_source($files)
+    function asset_source($files): ?string
     {
-        $contents = [];
-
-        if (!is_array($files)) {
-            $files = [$files];
-        }
-
-        foreach ($files as $file) {
-            $file = ((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file);
-            $filePath = PUBLIC_FOLDER."{$file}";
-
-            if (file_exists($filePath)) {
-                $contents[] = file_get_contents(
-                    $filePath
-                );
-            }
-        }
-
-        return implode('', $contents);
+        return \Core\Helpers\Asset::source($files);
     }
 }
 
@@ -148,7 +126,7 @@ if (!function_exists('config')) {
         if (empty($config)) {
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator(
-                    APP_FOLDER.'/config',
+                    \Core\Helpers\Path::app('/config'),
                     FilesystemIterator::SKIP_DOTS
                 )
             );
@@ -163,65 +141,59 @@ if (!function_exists('config')) {
             }
         }
 
-        return Arr::get($config, $name, $default);
+        return Helper::normalizeValueType(
+            Arr::get($config, $name, $default)
+        );
+    }
+}
+
+if (!function_exists('app')) {
+    /**
+     * @return \Core\App
+     */
+    function app(): App
+    {
+        return App::getInstance();
+    }
+}
+
+if (!function_exists('response')) {
+    /**
+     * @return \Slim\Http\Response
+     */
+    function response(): Response
+    {
+        return app()->resolve('response');
+    }
+}
+
+if (!function_exists('request')) {
+    /**
+     * @return \Slim\Http\Request
+     */
+    function request(): Request
+    {
+        return app()->resolve('request');
     }
 }
 
 if (!function_exists('logger')) {
     /**
-     * @param string $message
-     * @param array  $context
-     * @param string $type
-     * @param string $file
-     *
-     * @return Logger|bool
+     * @return Logger
      */
-    function logger(string $message, array $context = [], string $type = 'info', string $file = '')
+    function logger()
     {
-        return App::getInstance()
-            ->resolve('logger')
-            ->filename($file)
-            ->{$type}(
-                $message,
-                $context
-            );
+        return \app()->resolve('logger');
     }
 }
 
 if (!function_exists('view')) {
     /**
-     * @param string $template
-     * @param int    $status
-     * @param array  $context
-     *
-     * @return mixed
+     * @return \Core\View
      */
-    function view($template, array $context = [], $status = StatusCode::HTTP_OK)
+    function view(): Core\View
     {
-        $response = App::getInstance()->resolve('response');
-
-        return App::getInstance()
-            ->resolve('view')
-            ->render(
-                $response,
-                $template,
-                $context,
-                $status
-            )
-        ;
-    }
-}
-
-if (!function_exists('view_fetch')) {
-    function view_fetch(string $template, array $context = []): string
-    {
-        return App::getInstance()
-            ->resolve('view')
-            ->fetch(
-                $template,
-                $context
-            )
-        ;
+        return app()->resolve('view');
     }
 }
 
@@ -229,22 +201,37 @@ if (!function_exists('json')) {
     /**
      * @param mixed $data
      * @param int   $status
-     * @param int   $options
      *
      * @return \Slim\Http\Response
      */
-    function json($data, int $status = StatusCode::HTTP_OK, int $options = 0): Response
+    function json($data, int $status = StatusCode::HTTP_OK): Response
     {
-        return App::getInstance()
-            ->resolve('response')
-            ->withJson(
-                $data, $status, $options
-            )
-        ;
+        $response = app()->resolve('response');
+
+        if ($response) {
+            return $response->withJson($data, $status);
+        }
+
+        http_response_code($status);
+        header('Content-type: application/json');
+
+        $json = json_encode($data);
+
+        if (0 !== ob_get_level()) {
+            ob_clean();
+        }
+
+        echo $json;
+        exit;
     }
 }
 
 if (!function_exists('__')) {
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     function __(string $value): string
     {
         return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
@@ -285,7 +272,7 @@ if (!function_exists('empty_recursive')) {
      */
     function empty_recursive($data): bool
     {
-        return Validate::emptyArrayRecursive($data);
+        return Helper::emptyArrayRecursive($data);
     }
 }
 
@@ -297,7 +284,7 @@ if (!function_exists('params')) {
      */
     function params(string $name = '')
     {
-        $params = App::getInstance()->resolve('request')->getParams();
+        $params = app()->resolve('request')->getParams();
         $params = filter_params($params);
 
         if (empty($name)) {
@@ -358,14 +345,13 @@ if (!function_exists('path_for')) {
 if (!function_exists('header_location')) {
     /**
      * @param string $route
-     * @param bool   $replace
      * @param int    $status
      *
      * @return void
      */
-    function header_location(string $route, bool $replace = true, int $status = StatusCode::HTTP_MOVED_PERMANENTLY): void
+    function header_location(string $route, int $status = StatusCode::HTTP_MOVED_PERMANENTLY): void
     {
-        header("Location: {$route}", $replace, $status);
+        header("Location: {$route}", true, $status);
 
         exit;
     }
@@ -408,5 +394,56 @@ if (!function_exists('has_route')) {
     function has_route($routes): bool
     {
         return Router::hasCurrent($routes);
+    }
+}
+
+if (!function_exists('retry')) {
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @param int             $times
+     * @param callable|string $callback
+     * @param int             $sleep
+     * @param callable        $when
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    function retry($times, $callback, $sleep = 0, $when = null)
+    {
+        $attempts = 0;
+
+        beginning:
+        $attempts++;
+        $times--;
+
+        try {
+            return call_user_func(CallableResolver::resolve($callback), $attempts);
+        } catch (\Exception $e) {
+            if ($times < 1 || ($when && !$when($e))) {
+                throw $e;
+            }
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
+
+            goto beginning;
+        }
+    }
+}
+
+if (!function_exists('class_basename')) {
+    /**
+     * @param string|object $class
+     *
+     * @return string
+     */
+    function class_basename($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        return basename(str_replace('\\', '/', $class));
     }
 }

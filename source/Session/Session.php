@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Session;
 
 use Core\Helpers\Obj;
+use Core\Helpers\Path;
 
 /**
  * Class Session.
@@ -37,13 +38,14 @@ class Session
      */
     public function __construct()
     {
-        if ('true' != env('APP_SESSION', true)) {
-            throw new \Exception('Session is not enabled.');
-        }
-
         $this->start();
 
-        $this->storage = &$_SESSION[$this->key];
+        if (!isset($_SESSION)) {
+            $this->storage[$this->key] = [];
+        } else {
+            $this->storage = &$_SESSION[$this->key];
+        }
+
         $this->storage = Obj::fromArray($this->storage);
     }
 
@@ -97,7 +99,7 @@ class Session
             $current = $this->cookieParams();
             $cacheLimiter = env('APP_SESSION_CACHE_LIMITER', null);
             $sessionSave = env('APP_SESSION_SAVE_PATH', false);
-            $sessionName = isset($_SERVER) ? $_SERVER['HTTP_HOST'] : 'vcw:session_name';
+            $sessionName = $_SERVER['HTTP_HOST'] ?? 'vcw:session';
 
             session_set_cookie_params(
                 $current['lifetime'],
@@ -114,7 +116,7 @@ class Session
             }
 
             if ('true' == $sessionSave) {
-                session_save_path(APP_FOLDER.'/storage/sessions');
+                session_save_path(Path::storage('/sessions'));
             }
 
             session_start();
@@ -218,12 +220,10 @@ class Session
             );
         }
 
-        if ($this->active()) {
-            session_destroy();
-            session_unset();
+        session_destroy();
+        session_unset();
 
-            $this->regenerate();
-        }
+        $this->regenerate();
 
         session_write_close();
     }
@@ -237,20 +237,20 @@ class Session
     }
 
     /**
-     * @return bool
-     */
-    public function active(): bool
-    {
-        return PHP_SESSION_ACTIVE === session_status();
-    }
-
-    /**
      * @return void
      */
     public function regenerate(): void
     {
-        if ($this->active()) {
+        if (Session::active()) {
             session_regenerate_id(true);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public static function active(): bool
+    {
+        return PHP_SESSION_ACTIVE === session_status();
     }
 }

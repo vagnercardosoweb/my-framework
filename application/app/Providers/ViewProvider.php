@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -22,41 +22,37 @@ use Twig\Extension\DebugExtension;
 class ViewProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['view'] = function () {
-            return new View(
-                config('view.templates'),
-                config('view.options')
-            );
-        };
+        return 'view';
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return \Closure
      */
-    public function boot(): void
+    public function register(): \Closure
     {
-        $this->view->addExtension(new DebugExtension());
+        return function () {
+            $view = new View(
+                config('view.templates'),
+                config('view.options')
+            );
 
-        foreach (config('view.registers') as $key => $items) {
-            foreach ($items as $name => $item) {
-                switch ($key) {
-                    case 'functions':
-                        $this->view->addFunction($name, $item);
-                        break;
+            $view->addExtension(new DebugExtension());
 
-                    case 'filters':
-                        $this->view->addFilter($name, $item);
-                        break;
+            foreach (config('view.registers') as $key => $items) {
+                foreach ($items as $name => $item) {
+                    if ('functions' == $key) {
+                        $view->addFunction($name, $item);
+                    } elseif ('filters' == $key) {
+                        $view->addFilter($name, $item);
+                    }
                 }
             }
-        }
+
+            return $view;
+        };
     }
 }

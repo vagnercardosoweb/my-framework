@@ -6,10 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 25/02/2020 Vagner Cardoso
  */
 
-use App\Models\User;
+use App\Models\UserModel;
 use Core\Password\PasswordFactory;
 use Phinx\Seed\AbstractSeed;
 
@@ -33,7 +33,7 @@ class UsersSeeder extends AbstractSeed
             }
 
             for ($i = 1; $i <= 10; $i++) {
-                (new User())->create([
+                (new UserModel())->create([
                     'name' => "User {$i}",
                     'email' => "user{$i}@email.com",
                     'password' => PasswordFactory::create()->make('password'),

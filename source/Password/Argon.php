@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 22/02/2020 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -19,9 +19,9 @@ namespace Core\Password;
 class Argon extends Bcrypt
 {
     /**
-     * @return int
+     * @return int|string
      */
-    public function algorithm(): int
+    public function algorithm()
     {
         return PASSWORD_ARGON2I;
     }

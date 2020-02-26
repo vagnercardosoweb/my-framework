@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -21,13 +21,19 @@ use Core\Mailer\Mailer;
 class MailerProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['mailer'] = function () {
+        return 'mailer';
+    }
+
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function () {
             return new Mailer([
                 'debug' => config('mail.debug', 0),
                 'charset' => config('mail.charset', null),

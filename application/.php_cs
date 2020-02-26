@@ -36,6 +36,7 @@ return PhpCsFixer\Config::create()
         '@PSR2' => true,
         '@PhpCsFixer' => true,
         '@Symfony' => true,
+        'single_line_throw' => false,
         'single_line_comment_style' => true,
         'align_multiline_comment' => true, // psr-5
         'array_indentation' => true,

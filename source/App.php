@@ -6,26 +6,42 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core;
 
 use Core\Helpers\Helper;
+use Core\Helpers\Path;
+use Core\Interfaces\EventListener;
+use Core\Interfaces\Middleware;
+use Core\Interfaces\ServiceProvider;
+use Slim\App as SlimApp;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Interfaces\RouteInterface;
 
 /**
  * Class App.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class App extends \Slim\App
+class App extends SlimApp
 {
     /**
      * @var \Core\App
      */
-    private static $instance;
+    protected static $instance;
+
+    /**
+     * @var array
+     */
+    protected $groupNamespaces = [];
+
+    /**
+     * @var string
+     */
+    protected $defaultNamespace = 'App/Controllers';
 
     /**
      * App constructor.
@@ -33,7 +49,7 @@ class App extends \Slim\App
     public function __construct()
     {
         // Environment
-        Environment::load();
+        Env::load();
 
         // PHP Configuration
         $this->registerPhpConfiguration();
@@ -73,14 +89,6 @@ class App extends \Slim\App
     }
 
     /**
-     * @return bool
-     */
-    public static function isCli(): bool
-    {
-        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
-    }
-
-    /**
      * @param string|array          $methods
      * @param string                $pattern
      * @param string|\Closure       $callable
@@ -95,43 +103,7 @@ class App extends \Slim\App
         $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
         $pattern = (string)$pattern;
 
-        if ($callable instanceof \Closure) {
-            $route = $this->map($methods, $pattern, $callable);
-        } else {
-            $route = $this->map($methods, $pattern, function (Request $request, Response $response, array $params) use ($callable) {
-                list($namespace, $originalMethod) = (explode('@', $callable) + [1 => null]);
-                $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
-
-                if (!strripos($namespace, 'Controller')) {
-                    $namespace = "{$namespace}Controller";
-                }
-
-                /** @var \Slim\Route $route */
-                if ($route = $request->getAttribute('route')) {
-                    foreach (array_reverse($route->getGroups()) as $group) {
-                        if (property_exists($group, 'namespaces')) {
-                            foreach ($group->namespaces as $n) {
-                                $n = (('/' !== $n[strlen($n) - 1]) ? "{$n}/" : $n);
-                                $namespace = "{$n}{$namespace}";
-                            }
-                        }
-                    }
-                }
-
-                $namespace = 'App\\Controllers\\'.str_ireplace('/', '\\', $namespace);
-                $controller = new $namespace($request, $response, $this);
-
-                if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
-                    $method = ($originalMethod ?: 'index');
-
-                    if (!method_exists($controller, $method)) {
-                        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR);
-                    }
-                }
-
-                return call_user_func_array([$controller, $method], $params);
-            });
-        }
+        $route = $this->map($methods, $pattern, $this->handleCallableRouter($callable));
 
         if (!empty($name)) {
             $name = mb_strtolower($name);
@@ -139,26 +111,18 @@ class App extends \Slim\App
         }
 
         if (!empty($middleware)) {
-            $middlewareManual = config('app.middleware.manual', []);
-
-            if (!is_array($middleware)) {
-                $middleware = [$middleware];
-            }
-
-            sort($middleware);
-
-            foreach ($middleware as $middle) {
-                if ($middle instanceof \Closure) {
-                    $route->add($middle);
-                } else {
-                    if (array_key_exists($middle, $middlewareManual)) {
-                        $route->add($middlewareManual[$middle]);
-                    }
-                }
-            }
+            $this->addMiddlewareInRoute($route, $middleware);
         }
 
         return $route;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isCli(): bool
+    {
+        return in_array(PHP_SAPI, ['cli', 'phpdbg']);
     }
 
     /**
@@ -169,92 +133,38 @@ class App extends \Slim\App
      */
     public function group($pattern, $callable)
     {
-        $namespace = null;
+        $currentNamespaces = $this->groupNamespaces;
 
-        if (!empty($pattern) && is_array($pattern)) {
+        if (is_array($pattern)) {
             if (!empty($pattern['namespace'])) {
-                $namespace = $pattern['namespace'];
+                array_push($this->groupNamespaces, ucwords($pattern['namespace']));
             }
 
-            $pattern = (!empty($pattern['prefix'])
-                ? $pattern['prefix']
-                : '');
+            $pattern = $pattern['path'] ?? $pattern['prefix'] ?? null;
         }
 
         $group = parent::group($pattern, $callable);
 
-        if (!empty($namespace)) {
-            $group->namespaces[] = $namespace;
-        }
+        $this->groupNamespaces = $currentNamespaces;
 
         return $group;
     }
 
     /**
-     * @param string $name
-     * @param mixed  $params
+     * @param array $routes
      *
-     * @return mixed
+     * @return \Core\App
      */
-    public function resolve(string $name, ...$params)
+    public function registerRoutes(array $routes = []): App
     {
-        $container = $this->getContainer();
-
-        if ($container->has($name)) {
-            if (is_callable($container->get($name))) {
-                return call_user_func_array($container->get($name), $params);
-            }
-
-            return $container->get($name);
+        if (!$routes) {
+            $routes = config('app.routes.app', []);
         }
 
-        return false;
-    }
-
-    /**
-     * @param string|null $folder
-     *
-     * @return $this
-     */
-    public function registerFolderRoutes(?string $folder = null): self
-    {
-        $file = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
-                $folder ?: APP_FOLDER.'/routes',
-                \FilesystemIterator::SKIP_DOTS
-            )
-        );
-
-        $file->rewind();
-
-        while ($file->valid()) {
-            if ($file->isFile()) {
-                call_user_func(function ($file, $app) {
-                    require_once "{$file->getRealPath()}";
-                }, $file, $this);
-            }
-
-            $file->next();
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param array $middleware
-     *
-     * @return $this
-     */
-    public function registerMiddleware(array $middleware = []): self
-    {
-        if (!$middleware) {
-            $middleware = config('app.middleware.automatic', []);
-        }
-
-        foreach ($middleware as $name => $middle) {
-            if (class_exists($middle)) {
-                $this->add($middle);
-            }
+        foreach ($routes as $path) {
+            call_user_func(function ($path, $app) {
+                require_once "{$path}";
+            }, $path, $this);
         }
 
         return $this;
@@ -263,25 +173,121 @@ class App extends \Slim\App
     /**
      * @param array $providers
      *
-     * @return $this
+     * @return \Core\App
      */
-    public function registerProviders(array $providers = []): self
+    public function registerProviders(array $providers = []): App
     {
         if (!$providers) {
             $providers = config('app.providers', []);
         }
 
-        foreach ($providers as $provider) {
-            if (class_exists($provider)) {
-                $provider = new $provider($this);
+        foreach ($providers as $class) {
+            if (!is_a($class, ServiceProvider::class, true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Provider %s must be an instance of %s', $class, ServiceProvider::class)
+                );
+            }
 
-                foreach (['register', 'boot'] as $method) {
-                    if (method_exists($provider, $method)) {
-                        call_user_func([$provider, $method]);
-                    }
-                }
+            $instance = new $class($this);
+
+            foreach ((array)$instance->name() as $name) {
+                $this->getContainer()->offsetSet($name, $instance->register());
+            }
+
+            if (method_exists($instance, 'boot')) {
+                call_user_func([$instance, 'boot']);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @param array $middleware
+     *
+     * @return \Core\App
+     */
+    public function registerMiddleware(array $middleware = []): App
+    {
+        if (!$middleware) {
+            $middleware = config('app.middleware.app', []);
+        }
+
+        foreach ($middleware as $name => $class) {
+            if (!is_a($class, Middleware::class, true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Middleware %s must be an instance of %s', $class, Middleware::class)
+                );
+            }
+
+            $this->add($class);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array $events
+     *
+     * @return \Core\App
+     */
+    public function registerEvents(array $events = []): App
+    {
+        if (!$events) {
+            $events = config('app.events', []);
+        }
+
+        foreach ($events as $class) {
+            if (!is_a($class, EventListener::class, true)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Event %s must be an instance of %s', $class, EventListener::class)
+                );
+            }
+
+            $instance = new $class($this);
+
+            $this->resolve('event')->on(
+                $instance->name(), [$instance, 'register']
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param ...... $params
+     *
+     * @return mixed
+     */
+    public function resolve(string $name)
+    {
+        $container = $this->getContainer();
+
+        if ($container->has($name)) {
+            if (!is_callable($container->get($name))) {
+                return $container->get($name);
+            }
+
+            $params = func_get_args();
+            array_shift($params);
+
+            return call_user_func_array(
+                $container->get($name), $params
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $namespace
+     *
+     * @return \Core\App
+     */
+    public function setDefaultNamespace(string $namespace): App
+    {
+        $this->defaultNamespace = $namespace;
 
         return $this;
     }
@@ -299,10 +305,8 @@ class App extends \Slim\App
         mb_internal_encoding($charset);
         setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
 
-        // Configurations de err
-
         ini_set('log_errors', true);
-        ini_set('error_log', sprintf(env('INI_ERROR_LOG', APP_FOLDER.'/storage/logs/php-%s.log'), date('dmY')));
+        ini_set('error_log', sprintf(env('INI_ERROR_LOG', Path::app('/storage/logs/php/%s.log')), date('dmY')));
         ini_set('display_errors', env('INI_DISPLAY_ERRORS', ini_get('display_errors')));
         ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
 
@@ -317,5 +321,83 @@ class App extends \Slim\App
                 throw new \ErrorException($message, 0, $level, $file, $line);
             }
         });
+    }
+
+    /**
+     * @param string|callable $callable
+     *
+     * @return \Closure
+     */
+    private function handleCallableRouter($callable): \Closure
+    {
+        if ($callable instanceof \Closure) {
+            return $callable;
+        }
+
+        $namespace = $this->defaultNamespace;
+        $groupNamespaces = $this->groupNamespaces;
+
+        foreach ($groupNamespaces as $n) {
+            while ('/' === $n[strlen($n) - 1]) {
+                $n = substr($n, 0, -1);
+            }
+
+            $namespace .= "/{$n}";
+        }
+
+        return function (Request $request, Response $response, array $params) use ($callable, $namespace) {
+            list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
+
+            $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
+            $namespace = sprintf('%s/%s', $namespace, $name);
+            $namespace = str_ireplace('/', '\\', $namespace);
+
+            $controller = new $namespace($request, $response, $this);
+
+            if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
+                $method = $originalMethod ?? 'index';
+
+                if (!method_exists($controller, $method)) {
+                    throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR);
+                }
+            }
+
+            if (App::isCli()) {
+                $params = array_merge($params, $request->getQueryParams());
+            }
+
+            $result = call_user_func_array([$controller, $method], $params);
+
+            if (is_array($result) || $json = Helper::decodeJson($result, true)) {
+                return $response->withJson($json ?? $result);
+            }
+
+            return $result;
+        };
+    }
+
+    /**
+     * @param \Slim\Interfaces\RouteInterface $route
+     * @param                                 $middleware
+     */
+    private function addMiddlewareInRoute(RouteInterface $route, $middleware): void
+    {
+        $manual = config('app.middleware.manual', []);
+
+        if (!is_array($middleware)) {
+            $middleware = [$middleware];
+        }
+
+        sort($middleware);
+
+        foreach ($middleware as $middle) {
+            if (class_exists($middle) || $middle instanceof \Closure) {
+                $route->add($middle);
+            } else {
+                if (array_key_exists($middle, $manual)) {
+                    $route->add($manual[$middle]);
+                }
+            }
+        }
     }
 }

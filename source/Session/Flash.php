@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Session;
@@ -42,13 +42,14 @@ class Flash
      */
     public function __construct()
     {
-        if ('true' != env('APP_SESSION', true)) {
-            throw new \Exception('Session must be enabled to use flash message.');
-        }
-
         (new Session())->start();
 
-        $this->storage = &$_SESSION[$this->key];
+        if (!isset($_SESSION)) {
+            $this->storage[$this->key] = [];
+        } else {
+            $this->storage = &$_SESSION[$this->key];
+        }
+
         $this->storage = Obj::fromArray($this->storage);
 
         if (isset($this->storage) && is_object($this->storage)) {

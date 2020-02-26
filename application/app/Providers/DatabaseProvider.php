@@ -6,12 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
-use Core\Database\Connect;
+use Core\Database\Database;
 
 /**
  * Class DatabaseProvider.
@@ -21,29 +21,29 @@ use Core\Database\Connect;
 class DatabaseProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return array
      */
-    public function register(): void
+    public function name(): array
     {
-        // Connect instance
-        $connect = new Connect();
-        $connect->setDefaultConnection(config('database.default', 'mysql'));
+        return ['db', 'database'];
+    }
 
-        // Add connections config
-        foreach (config('database.connections') as $driver => $config) {
-            $connect->addConnection($config, $driver);
-        }
+    /**
+     * @return \Closure
+     */
+    public function register(): \Closure
+    {
+        return function () {
+            // Connect instance
+            $database = new Database();
+            $database->setDefaultDriver(config('database.default', 'mysql'));
 
-        // Add connect provider
-        $this->container['connect'] = function () use ($connect) {
-            return $connect;
-        };
+            // Add connections config
+            foreach (config('database.connections') as $driver => $config) {
+                $database->addConnection($driver, $config);
+            }
 
-        // Add connect default database provider (mysql)
-        $this->container['db'] = function () use ($connect) {
-            return $connect->connection();
+            return $database->connection();
         };
     }
 }

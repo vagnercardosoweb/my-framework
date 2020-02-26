@@ -6,11 +6,17 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 14/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
+if (!isset($_SERVER['DOCUMENT_ROOT'])) {
+    $documentRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+} else {
+    $documentRoot = realpath(dirname(__DIR__));
+}
+
 // Diretório raiz
-define('ROOT', str_ireplace('\\', '/', realpath(dirname(__DIR__))));
+define('ROOT', str_ireplace('\\', '/', $documentRoot));
 
 // Diretório raiz da pasta publica
 define('PUBLIC_FOLDER', ROOT.'/public_html');

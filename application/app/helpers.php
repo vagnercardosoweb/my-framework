@@ -6,11 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
-use Core\App;
-use Core\Date;
+use Core\DateTime;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
 use Core\Helpers\Str;
@@ -44,7 +43,10 @@ if (!function_exists('validate_params')) {
                     continue;
                 }
 
-                throw new \InvalidArgumentException((!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')), (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE));
+                throw new \InvalidArgumentException(
+                    (!empty($rule['message']) ? $rule['message'] : (is_string($rule) ? $rule : 'undefined')),
+                    (!empty($rule['code']) ? $rule['code'] : E_USER_NOTICE)
+                );
             }
         }
     }
@@ -84,9 +86,14 @@ if (!function_exists('json_error')) {
             'error' => [
                 'code' => $exception->getCode(),
                 'type' => error_code_type($exception->getCode()),
+                'name' => get_class($exception),
                 'status' => $status,
                 'message' => $exception->getMessage(),
-                'file' => str_replace([APP_FOLDER, PUBLIC_FOLDER, RESOURCE_FOLDER], '', $exception->getFile()),
+                'file' => str_replace([
+                    \Core\Helpers\Path::app(),
+                    \Core\Helpers\Path::public(),
+                    \Core\Helpers\Path::resource(),
+                ], '', $exception->getFile()),
                 'line' => $exception->getLine(),
             ],
         ], $data), $status);
@@ -122,7 +129,10 @@ if (!function_exists('json_success')) {
             $data['message'] = $message;
         }
 
-        return json(array_merge_recursive(['error' => false], $data), $status);
+        return json(array_merge_recursive([
+            'error' => false,
+            'status' => $status,
+        ], $data), $status);
     }
 }
 
@@ -183,6 +193,7 @@ if (!function_exists('get_image')) {
         if (!empty($id) && '0' != $id) {
             $name = mb_strtoupper($name, 'UTF-8');
             $path = "/fotos/{$table}/{$id}/{$name}";
+            $baseUrl = $baseUrl ? BASE_URL : '';
 
             foreach ([$extension, strtoupper($extension)] as $ext) {
                 if ($asset = asset("{$path}.{$ext}", $baseUrl, $version)) {
@@ -211,13 +222,13 @@ if (!function_exists('get_galeria')) {
         $images = [];
 
         // Imagens antigas
-        if (file_exists(PUBLIC_FOLDER."/{$path[1]}")) {
-            $images = array_values(array_diff(scandir(PUBLIC_FOLDER."/{$path[1]}"), ['.', '..']));
+        if (file_exists(\Core\Helpers\Path::public()."/{$path[1]}")) {
+            $images = array_values(array_diff(scandir(\Core\Helpers\Path::public()."/{$path[1]}"), ['.', '..']));
             $path = $path[1];
         } else {
             // Imagens novas
-            if (file_exists(PUBLIC_FOLDER."/{$path[0]}")) {
-                $images = array_values(array_diff(scandir(PUBLIC_FOLDER."/{$path[0]}/0"), ['.', '..']));
+            if (file_exists(\Core\Helpers\Path::public()."/{$path[0]}")) {
+                $images = array_values(array_diff(scandir(\Core\Helpers\Path::public()."/{$path[0]}/0"), ['.', '..']));
                 $path = "{$path[0]}/";
             }
         }
@@ -241,7 +252,7 @@ if (!function_exists('format_number_float')) {
      */
     function format_number_float($value)
     {
-        return Helper::formatNumberFloat($value);
+        return Helper::normalizeNumberFloat($value);
     }
 }
 
@@ -281,6 +292,8 @@ if (!function_exists('datetime')) {
      * @param string|\DateTime   $dateTime
      * @param \DateTimeZone|null $timeZone
      *
+     * @throws \Exception
+     *
      * @return \DateTime
      */
     function datetime($dateTime = 'now', DateTimeZone $timeZone = null)
@@ -291,9 +304,9 @@ if (!function_exists('datetime')) {
 
         if (!$dateTime instanceof \DateTimeInterface) {
             if (is_int($dateTime)) {
-                $dateTime = Date::createFromTimestamp($dateTime);
+                $dateTime = DateTime::createFromTimestamp($dateTime);
             } else {
-                $dateTime = new Date($dateTime, $timeZone);
+                $dateTime = new DateTime($dateTime, $timeZone);
             }
         }
 
@@ -305,6 +318,8 @@ if (!function_exists('date_for_human')) {
     /**
      * @param string $dateTime
      * @param int    $precision
+     *
+     * @throws \Exception
      *
      * @return string
      */
@@ -338,8 +353,8 @@ if (!function_exists('date_for_human')) {
         ];
 
         // Time atual
-        $currentTime = (new Date())->getTimestamp();
-        $dateTime = (new Date($dateTime))->getTimestamp();
+        $currentTime = (new DateTime())->getTimestamp();
+        $dateTime = (new DateTime($dateTime))->getTimestamp();
 
         // Quanto tempo já passou da data atual - a data passada
         if ($dateTime > $currentTime) {
@@ -376,24 +391,6 @@ if (!function_exists('date_for_human')) {
     }
 }
 
-if (!function_exists('check_phone')) {
-    /**
-     * @param string|int $phone
-     *
-     * @return bool|string
-     */
-    function check_phone(&$phone)
-    {
-        $phone = onlyNumber($phone);
-
-        if (strlen($phone) < 10 || strlen($phone) > 12) {
-            return false;
-        }
-
-        return $phone;
-    }
-}
-
 if (!function_exists('flash')) {
     /**
      * @param string          $name
@@ -403,7 +400,7 @@ if (!function_exists('flash')) {
     function flash(string $name, $value, $error = null)
     {
         /** @var \Core\Session\Flash $flash */
-        if ($flash = App::getInstance()->resolve('flash')) {
+        if ($flash = app()->resolve('flash')) {
             if (!empty($error)) {
                 $value = [
                     'type' => error_code_type($error),
@@ -456,27 +453,6 @@ if (!function_exists('get_code_video_youtube')) {
     }
 }
 
-if (!function_exists('in_web')) {
-    /**
-     * return bool.
-     */
-    function in_web()
-    {
-        /** @var \Slim\Http\Request $request */
-        $request = App::getInstance()->resolve('request');
-
-        if (!empty($request->getHeaderLine('X-Csrf-Token')) || !empty(params('_csrfToken'))) {
-            return true;
-        }
-
-        if ((empty($_SERVER['HTTP_REFERER']) && empty($_SERVER['HTTP_ORIGIN'])) && has_route('/api/')) {
-            return false;
-        }
-
-        return true;
-    }
-}
-
 if (!function_exists('placeholder')) {
     /**
      * @param string|int $dimension
@@ -492,15 +468,15 @@ if (!function_exists('placeholder')) {
     }
 }
 
-if (!function_exists('preg_replace_space')) {
+if (!function_exists('replace_string_spaces')) {
     /**
      * @param string $string
-     * @param bool   $removeEmptyTagParagraph
-     * @param bool   $removeAllEmptyTags
+     * @param bool   $removeEmptyParagraph
+     * @param bool   $removeAllEmpty
      *
      * @return string
      */
-    function preg_replace_space(string $string, bool $removeEmptyTagParagraph = false, bool $removeAllEmptyTags = false): string
+    function replace_string_spaces(string $string, bool $removeEmptyParagraph = false, bool $removeAllEmpty = false): string
     {
         // Remove comments
         $string = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $string);
@@ -513,12 +489,12 @@ if (!function_exists('preg_replace_space')) {
         $string = preg_replace('/(?<=\.)(?=[a-zA-Z])/m', ' ', $string);
 
         // Remove empty tag paragraph
-        if ($removeEmptyTagParagraph) {
+        if ($removeEmptyParagraph) {
             $string = preg_replace('/<p[^>]*>[\s\s|&nbsp;]*<\/p>/m', '', $string);
         }
 
         // Remove all empty tags
-        if ($removeAllEmptyTags) {
+        if ($removeAllEmpty) {
             $string = preg_replace('/<[\w]*[^>]*>[\s\s|&nbsp;]*<\/[\w]*>/m', '', $string);
         }
 
@@ -536,23 +512,23 @@ if (!function_exists('delete_recursive_directory')) {
     function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
     {
         if (file_exists($path)) {
-            $interator = new \RecursiveIteratorIterator(
+            $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($path),
                 $mode
             );
 
-            $interator->rewind();
+            $iterator->rewind();
 
-            while ($interator->valid()) {
-                if (!$interator->isDot()) {
-                    if ($interator->isFile()) {
-                        @unlink($interator->getPathname());
+            while ($iterator->valid()) {
+                if (!$iterator->isDot()) {
+                    if ($iterator->isFile()) {
+                        @unlink($iterator->getPathname());
                     } else {
-                        @rmdir($interator->getPathname());
+                        @rmdir($iterator->getPathname());
                     }
                 }
 
-                $interator->next();
+                $iterator->next();
             }
 
             @rmdir($path);
@@ -711,9 +687,9 @@ if (!function_exists('upload')) {
             $uploads[] = [
                 'name' => $name,
                 'path' => str_replace([
-                    PUBLIC_FOLDER,
-                    APP_FOLDER,
-                    RESOURCE_FOLDER,
+                    \Core\Helpers\Path::public(),
+                    \Core\Helpers\Path::app(),
+                    \Core\Helpers\Path::resource(),
                 ], '', $path),
                 'extension' => $extension,
                 'size' => $value['size'],

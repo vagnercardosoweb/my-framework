@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
 use Core\Event;
+use Pimple\Container;
 
 /**
  * Class EventProvider.
@@ -21,35 +22,27 @@ use Core\Event;
 class EventProvider extends Provider
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return string
      */
-    public function register(): void
+    public function name(): string
     {
-        $this->container['event'] = function () {
-            return Event::getInstance();
-        };
+        return 'event';
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return void
+     * @return \Closure
      */
-    public function boot(): void
+    public function register(): \Closure
     {
-        if ($this->view) {
-            $this->view->addFunction('event_emit', function ($event) {
-                $params = func_get_args();
-                array_shift($params);
+        return function (Container $container) {
+            $event = Event::getInstance();
 
-                return $this->event->emit($event, ...$params);
-            });
+            if ($container->offsetExists('view')) {
+                $container['view']->addFunction('event_emit', [$event, 'emit']);
+                $container['view']->addFunction('event_has', [$event, 'events']);
+            }
 
-            $this->view->addFunction('event_has', function (string $event) {
-                return $this->event->events($event);
-            });
-        }
+            return $event;
+        };
     }
 }

@@ -6,13 +6,17 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 13/02/2020 Vagner Cardoso
+ * @copyright 26/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
 
-use Core\App;
+use Core\Database\Connection\MySqlConnection;
+use Core\Database\Connection\PostgreSqlConnection;
+use Core\Database\Connection\SQLiteConnection;
+use Core\Database\Connection\SqlServerConnection;
 use Core\Database\Connection\Statement;
+use Core\Event;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
 
@@ -38,19 +42,19 @@ use Core\Helpers\Obj;
 class Database
 {
     /**
-     * @var \Core\Database\Connect
+     * @var \PDO
      */
-    private $connect;
+    protected $pdo;
 
     /**
-     * @param \Core\Database\Connect $connect
-     *
-     * @throws \Exception
+     * @var array
      */
-    public function __construct(Connect $connect)
-    {
-        $this->connect = $connect;
-    }
+    protected $connections = [];
+
+    /**
+     * @var string
+     */
+    protected $defaultDriver = 'mysql';
 
     /**
      * @param string $method
@@ -60,19 +64,44 @@ class Database
      */
     public function __call(string $method, $arguments)
     {
-        if ($this->getPdo() instanceof \PDO && method_exists($this->getPdo(), $method)) {
-            return $this->getPdo()->{$method}(...$arguments);
+        if ($this->pdo instanceof \PDO && method_exists($this->pdo, $method)) {
+            return $this->pdo->{$method}(...$arguments);
         }
 
         throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR);
     }
 
     /**
-     * @return \PDO
+     * @param string $driver
+     * @param array  $config
+     *
+     * @return $this
      */
-    public function getPdo(): \PDO
+    public function addConnection(string $driver, array $config): self
     {
-        return $this->connect->getPdo();
+        $this->connections[$driver] = $config;
+
+        return $this;
+    }
+
+    /**
+     * @param string $defaultDriver
+     *
+     * @return \Core\Database\Database
+     */
+    public function setDefaultDriver(string $defaultDriver): self
+    {
+        $this->defaultDriver = $defaultDriver;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultDriver(): string
+    {
+        return $this->defaultDriver;
     }
 
     /**
@@ -84,7 +113,7 @@ class Database
      */
     public function driver(?string $driver = null): Database
     {
-        return $this->connect->connection($driver);
+        return $this->connection($driver);
     }
 
     /**
@@ -179,29 +208,25 @@ class Database
      *
      * @throws \Exception
      *
-     * @return object|null
+     * @return array[object]|null
      */
-    public function update(string $table, $data, string $condition, $bindings = null): ?object
+    public function update(string $table, $data, string $condition, $bindings = null): ?array
     {
-        Helper::parseStr($bindings, $bindings);
-
-        $updated = $this->read($table, $condition, $bindings)->fetch();
-        $updated = Obj::fromArray($updated);
-
-        if (empty(get_object_vars($updated))) {
+        if (!$rows = $this->findAndTransformRowsObject($table, $condition, $bindings)) {
             return null;
         }
 
         $set = [];
         $data = Obj::fromArray($data);
-        $data = ($this->event("{$table}:updating", $data) ?: $data);
+        $data = ($this->event("{$table}:updating", $data, $rows) ?: $data);
+
+        Helper::parseStr($bindings, $bindings);
 
         foreach ($data as $key => $value) {
             $binding = $key;
-            $updated->{$key} = $value;
 
-            if (!empty($bindings[$binding])) {
-                $binding = sprintf("{$binding}_%s", mt_rand(1, time()));
+            foreach ($rows as &$row) {
+                $row->{$key} = $value;
             }
 
             $set[] = "{$key} = :{$binding}";
@@ -210,9 +235,9 @@ class Database
 
         $statement = sprintf("UPDATE {$table} SET %s {$condition}", implode(', ', $set));
         $this->query($statement, $bindings);
-        $this->event("{$table}:updated", $updated);
+        $this->event("{$table}:updated", $rows);
 
-        return $updated;
+        return $rows;
     }
 
     /**
@@ -240,19 +265,73 @@ class Database
      */
     public function delete(string $table, string $condition, $bindings = null): ?array
     {
-        $rows = $this->read($table, $condition, $bindings)->fetchAll();
-
-        if (empty($rows[0])) {
+        if (!$rows = $this->findAndTransformRowsObject($table, $condition, $bindings)) {
             return null;
-        }
-
-        foreach ($rows as $key => $deleted) {
-            $rows[$key] = Obj::fromArray($deleted);
         }
 
         $this->event("{$table}:deleting", $rows);
         $this->query("DELETE {$table} FROM {$table} {$condition}", $bindings);
         $this->event("{$table}:deleted", $rows);
+
+        return $rows;
+    }
+
+    /**
+     * @param string|null $driver
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Database\Database
+     */
+    public function connection(?string $driver = null): Database
+    {
+        $driver = $driver ?? $this->getDefaultDriver();
+
+        if (empty($config = $this->connections[$driver])) {
+            throw new \Exception("Database connections {$driver} does not exist configured.", E_ERROR);
+        }
+
+        if ($config instanceof \PDO) {
+            $this->pdo = $config;
+
+            return $this;
+        }
+
+        $config['driver'] = $config['driver'] ?? $driver;
+
+        if (!$this->connections[$driver] instanceof \PDO) {
+            if ('pgsql' == $config['driver']) {
+                $this->connections[$driver] = (new PostgreSqlConnection($config));
+            } elseif ('sqlsrv' == $config['driver']) {
+                $this->connections[$driver] = (new SqlServerConnection($config));
+            } elseif ('sqlite' == $config['driver']) {
+                $this->connections[$driver] = (new SQLiteConnection($config));
+            } else {
+                $this->connections[$driver] = (new MySqlConnection($config));
+            }
+        }
+
+        $this->pdo = $this->connections[$driver];
+
+        return $this;
+    }
+
+    /**
+     * @param string       $table
+     * @param string       $condition
+     * @param array|string $bindings
+     *
+     * @throws \Exception
+     *
+     * @return array|object
+     */
+    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null)
+    {
+        $rows = $this->read($table, $condition, $bindings)->fetchAll();
+
+        foreach ($rows as $key => $row) {
+            $rows[$key] = Obj::fromArray($row);
+        }
 
         return $rows;
     }
@@ -264,14 +343,12 @@ class Database
      */
     private function event(?string $name = null)
     {
-        $event = App::getInstance()->resolve('event');
+        $event = Event::getInstance();
 
-        if (!empty($name) && $event) {
-            $arguments = func_get_args();
-            array_shift($arguments);
-
+        if (!empty($name)) {
             return $event->emit(
-                (string)$name, ...$arguments
+                $name,
+                ...array_slice(func_get_args(), 1)
             );
         }
 
