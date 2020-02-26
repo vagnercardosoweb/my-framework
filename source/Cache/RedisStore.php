@@ -92,6 +92,16 @@ class RedisStore implements CacheStore
     }
 
     /**
+     * @param string|array $key
+     *
+     * @return bool
+     */
+    public function delete($key): bool
+    {
+        return (bool)$this->redis->del($key);
+    }
+
+    /**
      * @param string $key
      *
      * @return bool
@@ -121,15 +131,5 @@ class RedisStore implements CacheStore
     public function decrement(string $key, $value = 1): bool
     {
         return (bool)$this->redis->decrby($key, $value);
-    }
-
-    /**
-     * @param string|array $key
-     *
-     * @return bool
-     */
-    public function delete($key): bool
-    {
-        return (bool)$this->redis->del($key);
     }
 }

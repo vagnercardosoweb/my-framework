@@ -206,6 +206,7 @@ if (!function_exists('json')) {
      */
     function json($data, int $status = StatusCode::HTTP_OK): Response
     {
+        /** @var \Slim\Http\Response $response */
         $response = app()->resolve('response');
 
         if ($response) {
