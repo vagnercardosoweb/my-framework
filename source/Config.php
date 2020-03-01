@@ -13,6 +13,7 @@ namespace Core;
 
 use ArrayAccess;
 use Core\Helpers\Arr;
+use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
@@ -127,7 +128,7 @@ class Config implements ArrayAccess
 
         ksort($config, SORT_NATURAL);
 
-        self::$items = $config;
+        self::$items = self::normalize($config);
 
         return self::$items;
     }
@@ -233,5 +234,23 @@ class Config implements ArrayAccess
     public function offsetUnset($key)
     {
         self::set($key, null);
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected static function normalize(array $config): array
+    {
+        foreach ($config as $key => $value) {
+            if (is_array($value)) {
+                $config[$key] = self::normalize($value);
+            } else {
+                $config[$key] = Helper::normalizeValueType($value);
+            }
+        }
+
+        return $config;
     }
 }
