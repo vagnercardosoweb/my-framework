@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -184,20 +184,18 @@ class Database
      */
     public function query(string $sql, $bindings = null, array $driverOptions = []): Statement
     {
-        try {
-            if (empty($sql)) {
-                throw new \InvalidArgumentException('Parameter $sql can not be empty.', E_ERROR);
-            }
-
-            // Execute sql
-            $statement = $this->prepare($sql, $driverOptions);
-            $statement->bindValues($bindings);
-            $statement->execute();
-
-            return $statement;
-        } catch (\PDOException $e) {
-            throw $e;
+        if (empty($sql)) {
+            throw new \InvalidArgumentException(
+                'Parameter $sql can not be empty.'
+            );
         }
+
+        // Execute sql
+        $statement = $this->prepare($sql, $driverOptions);
+        $statement->bindValues($bindings);
+        $statement->execute();
+
+        return $statement;
     }
 
     /**
