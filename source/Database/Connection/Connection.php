@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 29/02/2020 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
 
+use Core\Helpers\CallableResolver;
 use Core\Interfaces\ConnectionEvent;
 
 /**
@@ -180,13 +181,9 @@ abstract class Connection extends \PDO
     {
         if (!empty($config['events'])) {
             foreach ((array)$config['events'] as $callable) {
-                if (!is_a($callable, ConnectionEvent::class, true)) {
-                    throw new \InvalidArgumentException(
-                        sprintf('Class %s must be instance of %s', $callable, ConnectionEvent::class)
-                    );
-                }
+                $callable = CallableResolver::resolve($callable, $this, ConnectionEvent::class);
 
-                call_user_func(new $callable(), $this);
+                call_user_func($callable, $this);
             }
         }
     }
