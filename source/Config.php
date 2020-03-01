@@ -64,6 +64,26 @@ class Config implements ArrayAccess
     }
 
     /**
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function getMany($keys)
+    {
+        $config = [];
+
+        foreach ($keys as $key => $default) {
+            if (is_numeric($key)) {
+                throw new \UnexpectedValueException('the key must be a string');
+            }
+
+            $config[$key] = Arr::get(self::$items, $key, $default);
+        }
+
+        return $config;
+    }
+
+    /**
      * @param string|null $path
      *
      * @throws \Exception
