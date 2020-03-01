@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -163,7 +163,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         $this->data = $data;
         $this->reset = [];
-        $this->statement = null;
         $this->statement = null;
     }
 
