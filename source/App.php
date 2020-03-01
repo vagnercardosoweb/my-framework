@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace Core;
 
+use Core\Helpers\CallableResolver;
 use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use Core\Interfaces\EventListener;
@@ -239,17 +240,17 @@ class App extends SlimApp
         }
 
         foreach ($events as $class) {
-            if (!is_a($class, EventListener::class, true)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Event %s must be an instance of %s', $class, EventListener::class)
-                );
+            if (!$event = $this->resolve('event')) {
+                break;
             }
 
-            $instance = new $class($this->getContainer());
-
-            $this->resolve('event')->on(
-                $instance->name(), [$instance, 'register']
+            $callable = CallableResolver::resolve(
+                sprintf('%s:register', $class),
+                $this->getContainer(),
+                EventListener::class
             );
+
+            $event->on($callable[0]->name(), $callable);
         }
 
         return $this;
