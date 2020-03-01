@@ -11,7 +11,6 @@
 
 use Core\App;
 use Core\Env;
-use Core\Helpers\Arr;
 use Core\Helpers\CallableResolver;
 use Core\Helpers\Helper;
 use Core\Logger;
@@ -109,41 +108,6 @@ if (!function_exists('onlyNumber')) {
     function onlyNumber($value)
     {
         return Helper::onlyNumber($value);
-    }
-}
-
-if (!function_exists('config')) {
-    /**
-     * @param mixed  $default
-     * @param string $name
-     *
-     * @return mixed
-     */
-    function config(string $name = '', $default = null)
-    {
-        static $config = [];
-
-        if (empty($config)) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator(
-                    \Core\Helpers\Path::app('/config'),
-                    FilesystemIterator::SKIP_DOTS
-                )
-            );
-
-            $iterator->rewind();
-
-            while ($iterator->valid()) {
-                $basename = $iterator->getBasename('.php');
-                $content = include "{$iterator->getRealPath()}";
-                $config[$basename] = $content;
-                $iterator->next();
-            }
-        }
-
-        return Helper::normalizeValueType(
-            Arr::get($config, $name, $default)
-        );
     }
 }
 
