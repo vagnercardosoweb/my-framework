@@ -86,7 +86,7 @@ class App extends SlimApp
      */
     public static function onlyApi(): bool
     {
-        return 'true' == env('APP_ONLY_API', false);
+        return true === Env::get('APP_ONLY_API', false);
     }
 
     /**
