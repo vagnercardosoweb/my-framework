@@ -10,6 +10,7 @@
  */
 
 use Core\App;
+use Core\Config;
 use Core\Env;
 use Core\Helpers\CallableResolver;
 use Core\Helpers\Helper;
@@ -47,6 +48,23 @@ if (!function_exists('env')) {
     function env(string $key, $default = null)
     {
         return Env::get($key, $default);
+    }
+}
+
+if (!function_exists('config')) {
+    /**
+     * @param string|null $key
+     * @param null        $default
+     *
+     * @return mixed
+     */
+    function config(?string $key = null, $default = null)
+    {
+        if (empty($key)) {
+            return Config::all();
+        }
+
+        return Config::get($key, $default);
     }
 }
 
