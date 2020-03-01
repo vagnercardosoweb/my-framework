@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
+use Core\Config;
 use Core\View;
 use Twig\Extension\DebugExtension;
 
@@ -36,13 +37,13 @@ class ViewProvider extends Provider
     {
         return function () {
             $view = new View(
-                config('view.templates'),
-                config('view.options')
+                Config::get('view.templates'),
+                Config::get('view.options')
             );
 
             $view->addExtension(new DebugExtension());
 
-            foreach (config('view.registers') as $key => $items) {
+            foreach (Config::get('view.registers') as $key => $items) {
                 foreach ($items as $name => $item) {
                     if ('functions' == $key) {
                         $view->addFunction($name, $item);

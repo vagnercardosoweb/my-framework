@@ -11,22 +11,21 @@
 
 namespace App\Providers;
 
-use Core\Cache\Cache;
 use Core\Config;
 
 /**
- * Class CacheProvider.
+ * Class ConfigProvider.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class CacheProvider extends Provider
+class ConfigProvider extends Provider
 {
     /**
      * @return string|array
      */
     public function name()
     {
-        return 'cache';
+        return 'config';
     }
 
     /**
@@ -35,7 +34,7 @@ class CacheProvider extends Provider
     public function register(): \Closure
     {
         return function () {
-            return new Cache(Config::get('cache'));
+            return new Config();
         };
     }
 }

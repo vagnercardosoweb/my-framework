@@ -11,6 +11,7 @@
 
 namespace Core\Database;
 
+use Core\Config;
 use Core\Database\Connection\Statement;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
@@ -282,7 +283,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         if (!empty($this->limit) && is_int($this->limit)) {
             $this->offset = $this->offset ?: '0';
 
-            if (in_array(config('database.default'), ['dblib', 'sqlsrv'])) {
+            if (in_array(Config::get('database.default'), ['dblib', 'sqlsrv'])) {
                 $sql .= "OFFSET {$this->offset} ROWS FETCH NEXT {$this->limit} ROWS ONLY";
             } else {
                 $sql .= "LIMIT {$this->limit} OFFSET {$this->offset}";

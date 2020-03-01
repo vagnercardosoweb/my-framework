@@ -65,7 +65,7 @@ class App extends SlimApp
                 'displayErrorDetails' => ('development' === Env::get('APP_ENV', 'development')),
                 'addContentLengthHeader' => true,
                 'routerCacheFile' => false,
-            ], config('app.slim', [])),
+            ], Config::get('app.slim', [])),
         ]);
     }
 
@@ -159,7 +159,7 @@ class App extends SlimApp
     public function registerRoutes(array $routes = []): App
     {
         if (!$routes) {
-            $routes = config('app.routes.app', []);
+            $routes = Config::get('app.routes.app', []);
         }
 
         foreach ($routes as $path) {
@@ -197,7 +197,7 @@ class App extends SlimApp
     public function registerProviders(array $providers = []): App
     {
         if (!$providers) {
-            $providers = config('app.providers', []);
+            $providers = Config::get('app.providers', []);
         }
 
         foreach ($providers as $class) {
@@ -230,7 +230,7 @@ class App extends SlimApp
     public function registerMiddleware(array $middleware = []): App
     {
         if (!$middleware) {
-            $middleware = config('app.middleware.app', []);
+            $middleware = Config::get('app.middleware.app', []);
         }
 
         foreach ($middleware as $name => $class) {
@@ -254,7 +254,7 @@ class App extends SlimApp
     public function registerEvents(array $events = []): App
     {
         if (!$events) {
-            $events = config('app.events', []);
+            $events = Config::get('app.events', []);
         }
 
         foreach ($events as $class) {
@@ -402,7 +402,7 @@ class App extends SlimApp
      */
     private function addMiddlewareInRoute(RouteInterface $route, $middleware): void
     {
-        $manual = config('app.middleware.manual', []);
+        $manual = Config::get('app.middleware.manual', []);
 
         if (!is_array($middleware)) {
             $middleware = [$middleware];

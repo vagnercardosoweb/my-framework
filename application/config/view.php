@@ -45,7 +45,7 @@ return [
     'registers' => [
         'functions' => [
             'asset' => 'asset',
-            'config' => 'config',
+            'config' => 'Core\Config::Get',
             'is_route' => 'is_route',
             'path_for' => 'path_for',
             'has_route' => 'has_route',

@@ -11,6 +11,7 @@
 
 namespace App\Events;
 
+use Core\Config;
 use Core\Env;
 use Core\Helpers\Helper;
 use Core\Helpers\Path;
@@ -137,7 +138,7 @@ class ErrorSlackEvent extends Event
                 ->setHeaders('Content-Type', 'application/json')
                 ->post(Env::get('SLACK_ERROR_URL'), json_encode([
                     'text' => $text,
-                    'username' => config('client.name'),
+                    'username' => Config::get('client.name'),
                     'mrkdwn' => true,
                 ]))
             ;

@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
+use Core\Config;
 use Core\Database\Database;
 
 /**
@@ -36,10 +37,10 @@ class DatabaseProvider extends Provider
         return function () {
             // Connect instance
             $database = new Database();
-            $database->setDefaultDriver(config('database.default', 'mysql'));
+            $database->setDefaultDriver(Config::get('database.default', 'mysql'));
 
             // Add connections config
-            foreach (config('database.connections') as $driver => $config) {
+            foreach (Config::get('database.connections') as $driver => $config) {
                 $database->addConnection($driver, $config);
             }
 

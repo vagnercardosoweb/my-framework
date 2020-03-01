@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 28/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Controllers;
@@ -40,6 +40,7 @@ use Slim\Http\StatusCode;
  * @property \Core\Curl\Curl              $curl
  * @property \Core\Redis                  $redis
  * @property \Core\Cache\Cache            $cache
+ * @property \Core\Config $config
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
@@ -107,17 +108,6 @@ abstract class Controller
     public function viewFetch(string $template, array $context = []): string
     {
         return $this->view->fetch($template, $context);
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    public function config(string $name = '', $default = null)
-    {
-        return config($name, $default);
     }
 
     /**

@@ -47,6 +47,7 @@ return [
     // Register providers
 
     'providers' => [
+        \App\Providers\ConfigProvider::class,
         \App\Providers\ViewProvider::class,
         \App\Providers\CurlProvider::class,
         \App\Providers\EventProvider::class,
