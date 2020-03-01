@@ -159,9 +159,9 @@ if (!function_exists('app')) {
 
 if (!function_exists('response')) {
     /**
-     * @return \Slim\Http\Response
+     * @return \Slim\Http\Response|null
      */
-    function response(): Response
+    function response(): ?Response
     {
         return app()->resolve('response');
     }
