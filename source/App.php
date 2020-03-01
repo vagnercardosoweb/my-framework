@@ -172,6 +172,24 @@ class App extends SlimApp
     }
 
     /**
+     * @return \Core\App
+     */
+    public function registerRoutesFolder()
+    {
+        $routes = [];
+
+        foreach (glob_recursive(Path::app('/routes/**')) as $route) {
+            if (is_file($route) && !is_dir($route)) {
+                $routes[] = $route;
+            }
+        }
+
+        $this->registerRoutes($routes);
+
+        return $this;
+    }
+
+    /**
      * @param array $providers
      *
      * @return \Core\App
