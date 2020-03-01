@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 return [
@@ -29,7 +29,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...),
-            'events' => [], // Register \Closure or Class::class
+            'events' => [], // Register Class::class instance of ConnectionEvent
         ],
 
         'mysql' => [
@@ -46,7 +46,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
-            'events' => [], // Register \Closure or Class::class
+            'events' => [], // Register Class::class instance of ConnectionEvent
         ],
 
         'pgsql' => [
@@ -62,7 +62,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
-            'events' => [], // Register \Closure or Class::class
+            'events' => [], // Register Class::class instance of ConnectionEvent
         ],
 
         'sqlsrv' => [
@@ -76,7 +76,7 @@ return [
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
-            'events' => [], // Register \Closure or Class::class
+            'events' => [], // Register Class::class instance of ConnectionEvent
         ],
     ],
 ];
