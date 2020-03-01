@@ -6,12 +6,11 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Events;
 
-use Core\Curl\Curl;
 use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use Core\Session\Session;
@@ -133,11 +132,14 @@ class ErrorSlackEvent extends Event
         $text = implode(PHP_EOL, $text);
 
         try {
-            (new Curl())->post(env('SLACK_ERROR_URL'), json_encode([
-                'text' => $text,
-                'username' => config('client.name'),
-                'mrkdwn' => true,
-            ]));
+            $this->curl
+                ->setHeaders('Content-Type', 'application/json')
+                ->post(env('SLACK_ERROR_URL'), json_encode([
+                    'text' => $text,
+                    'username' => config('client.name'),
+                    'mrkdwn' => true,
+                ]))
+            ;
         } catch (\Exception $e) {
             $this->logger->filename('slack')->error($e->getMessage(), $error);
         }
