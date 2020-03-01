@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -43,14 +43,7 @@ class CorsMiddleware extends Middleware
     /**
      * @var array
      */
-    protected $allowedMethods = [
-        'GET',
-        'POST',
-        'PUT',
-        'DELETE',
-        'PATCH',
-        'OPTIONS',
-    ];
+    protected $allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'];
 
     /**
      * @param \Slim\Http\Request  $request  PSR7 request
@@ -61,15 +54,17 @@ class CorsMiddleware extends Middleware
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
+        /** @var Response $response */
+        $response = $next($request, $response);
+
         /*header_remove("Cache-Control");
         header_remove("Expires");
         header_remove("Pragma");*/
 
-        $response = $response->withHeader('Vary', 'Origin');
-        $response = $response->withHeader('Access-Control-Allow-Origin', '*');
-        $response = $response->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders));
-        $response = $response->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods));
-
-        return $next($request, $response);
+        return $response->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Vary', 'Origin')
+            ->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders))
+            ->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods))
+        ;
     }
 }

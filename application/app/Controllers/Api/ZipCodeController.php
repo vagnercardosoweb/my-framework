@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Controllers\Api;
@@ -48,7 +48,13 @@ class ZipCodeController extends Controller
         }
 
         // Format address
-        $body->endereco = "{$body->logradouro} - {$body->bairro}, {$body->localidade} - {$body->uf}, {$zipCode}, Brasil";
+        $body->endereco = sprintf('%s - %s, %s - %s, %s, Brasil',
+            $body->logradouro,
+            $body->bairro,
+            $body->localidade,
+            $body->uf,
+            $zipCode
+        );
 
         // Google Maps
         if ($googleMapsKey = env('GOOGLE_GEOCODE_API_KEY', null)) {
