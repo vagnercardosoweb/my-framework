@@ -492,15 +492,14 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function save($data = null, bool $validate = true): self
     {
+        if (is_array($data) || is_object($data)) {
+            $this->data($data, $validate);
+        }
+
         if ($rowExist = $this->fetchById($this->getPrimaryValue())) {
-            $this->clear();
             $rowExist->update($data, $validate);
 
             return $rowExist;
-        }
-
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
         }
 
         return $this->create($data, $validate);
