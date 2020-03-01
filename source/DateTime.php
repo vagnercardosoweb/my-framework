@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 29/02/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -14,7 +14,7 @@ namespace Core;
 use Core\Helpers\Helper;
 
 /**
- * Class Date.
+ * Class DateTime.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */

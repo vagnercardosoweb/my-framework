@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 28/02/2020 Vagner Cardoso
  */
 
 namespace App\Controllers;
@@ -61,7 +61,7 @@ abstract class Controller
     protected $container;
 
     /**
-     * BaseController constructor.
+     * Controller constructor.
      *
      * @param \Slim\Http\Request  $request
      * @param \Slim\Http\Response $response
