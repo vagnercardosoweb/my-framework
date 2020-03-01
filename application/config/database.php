@@ -9,6 +9,8 @@
  * @copyright 01/03/2020 Vagner Cardoso
  */
 
+use Core\Env;
+
 return [
     /*
      * Model events
@@ -19,7 +21,7 @@ return [
      */
 
     // Default connection driver
-    'default' => env('DB_DRIVER', 'mysql'),
+    'default' => Env::get('DB_DRIVER', 'mysql'),
 
     // Defines the types of connections that will be accepted
     'connections' => [
@@ -34,15 +36,15 @@ return [
 
         'mysql' => [
             'driver' => 'mysql',
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', 3306),
-            'username' => env('DB_USER', null),
-            'password' => env('DB_PASS', null),
+            'host' => Env::get('DB_HOST', 'localhost'),
+            'port' => Env::get('DB_PORT', 3306),
+            'username' => Env::get('DB_USER', null),
+            'password' => Env::get('DB_PASS', null),
             'notPassword' => true,
-            'database' => env('DB_DATABASE', null),
-            'charset' => env('DB_CHARSET', 'utf8mb4'),
-            'collation' => env('DB_COLLATE', 'utf8mb4_unicode_ci'),
-            'timezone' => env('APP_TIMEZONE', null),
+            'database' => Env::get('DB_DATABASE', null),
+            'charset' => Env::get('DB_CHARSET', 'utf8mb4'),
+            'collation' => Env::get('DB_COLLATE', 'utf8mb4_unicode_ci'),
+            'timezone' => Env::get('APP_TIMEZONE', null),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
@@ -51,14 +53,14 @@ return [
 
         'pgsql' => [
             'driver' => 'pgsql',
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', 5432),
-            'username' => env('DB_USER', null),
-            'password' => env('DB_PASS', null),
-            'database' => env('DB_DATABASE', null),
+            'host' => Env::get('DB_HOST', 'localhost'),
+            'port' => Env::get('DB_PORT', 5432),
+            'username' => Env::get('DB_USER', null),
+            'password' => Env::get('DB_PASS', null),
+            'database' => Env::get('DB_DATABASE', null),
             'schema' => ['public'],
-            'charset' => env('DB_CHARSET', 'utf8'),
-            'timezone' => env('APP_TIMEZONE', null),
+            'charset' => Env::get('DB_CHARSET', 'utf8'),
+            'timezone' => Env::get('APP_TIMEZONE', null),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
@@ -67,12 +69,12 @@ return [
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', 1433),
-            'username' => env('DB_USER', null),
-            'password' => env('DB_PASS', null),
-            'database' => env('DB_DATABASE', null),
-            'charset' => env('DB_CHARSET', 'utf8'),
+            'host' => Env::get('DB_HOST', '127.0.0.1'),
+            'port' => Env::get('DB_PORT', 1433),
+            'username' => Env::get('DB_USER', null),
+            'password' => Env::get('DB_PASS', null),
+            'database' => Env::get('DB_DATABASE', null),
+            'charset' => Env::get('DB_CHARSET', 'utf8'),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)

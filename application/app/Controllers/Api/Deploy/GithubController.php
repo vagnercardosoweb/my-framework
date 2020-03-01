@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
 
 use App\Controllers\Controller;
+use Core\Env;
 use Core\Helpers\Path;
 
 /**
@@ -34,6 +35,7 @@ class GithubController extends Controller
         $signature = $this->request->getHeaderLine('X-Hub-Signature');
         $event = $this->request->getHeaderLine('X-GitHub-Event');
         $contentType = $this->request->getHeaderLine('Content-Type');
+        $deployKey = Env::get('DEPLOY_KEY', null);
 
         if ('ping' === $event) {
             return $this->jsonSuccess('Ping successfully!');
@@ -50,7 +52,7 @@ class GithubController extends Controller
         // Signature
         list($algo, $hash) = explode('=', $signature);
 
-        if (!hash_equals(hash_hmac($algo, $rawBody, env('API_KEY', null)), $hash)) {
+        if (!hash_equals(hash_hmac($algo, $rawBody, $deployKey), $hash)) {
             throw new \Exception("Invalid signature {$algo}={$hash}");
         }
 

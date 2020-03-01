@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
+use Core\Env;
 use Core\Exception\UnauthorizedException;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -75,7 +76,7 @@ class TokenMiddleware extends Middleware
             try {
                 $payload = $this->jwt->decode($token);
             } catch (\Exception $e) {
-                if ($token !== env('API_KEY', null)) {
+                if ($token !== Env::get('API_KEY', null)) {
                     throw new UnauthorizedException('Acesso negado! Essa requisição precisa de autorização.');
                 }
             }

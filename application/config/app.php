@@ -6,8 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
+
+use Core\Env;
 
 return [
     // Slim 3+ Settings
@@ -17,7 +19,7 @@ return [
         'responseChunkSize' => 4096,
         'outputBuffering' => 'append',
         'determineRouteBeforeAppMiddleware' => true,
-        'displayErrorDetails' => ('development' == env('APP_ENV', 'development')),
+        'displayErrorDetails' => ('development' === Env::get('APP_ENV', 'development')),
         'addContentLengthHeader' => true,
         'routerCacheFile' => false,
     ],

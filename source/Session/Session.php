@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace Core\Session;
 
+use Core\Env;
 use Core\Helpers\Obj;
 use Core\Helpers\Path;
 
@@ -97,8 +98,8 @@ class Session
     {
         if (!session_id() && PHP_SESSION_NONE === session_status()) {
             $current = $this->cookieParams();
-            $cacheLimiter = env('APP_SESSION_CACHE_LIMITER', null);
-            $sessionSave = env('APP_SESSION_SAVE_PATH', false);
+            $cacheLimiter = Env::get('APP_SESSION_CACHE_LIMITER', null);
+            $sessionSave = Env::get('APP_SESSION_SAVE_PATH', false);
             $sessionName = $_SERVER['HTTP_HOST'] ?? 'vcw:session';
 
             session_set_cookie_params(
@@ -115,7 +116,7 @@ class Session
                 session_cache_limiter($cacheLimiter);
             }
 
-            if ('true' == $sessionSave) {
+            if (true === $sessionSave) {
                 session_save_path(Path::storage('/sessions'));
             }
 

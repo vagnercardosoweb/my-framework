@@ -12,6 +12,7 @@
 namespace App\Controllers\Api;
 
 use App\Controllers\Controller;
+use Core\Env;
 
 /**
  * Class ZipCodeControllerController.
@@ -57,7 +58,7 @@ class ZipCodeController extends Controller
         );
 
         // Google Maps
-        if ($googleMapsKey = env('GOOGLE_GEOCODE_API_KEY', null)) {
+        if ($googleMapsKey = Env::get('GOOGLE_GEOCODE_API_KEY', null)) {
             $map = $this->curl->get('https://maps.google.com/maps/api/geocode/json', [
                 'key' => $googleMapsKey,
                 'sensor' => true,

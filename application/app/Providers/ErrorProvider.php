@@ -12,6 +12,7 @@
 namespace App\Providers;
 
 use Core\App;
+use Core\Env;
 use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use Core\Router;
@@ -81,19 +82,19 @@ class ErrorProvider extends Provider
                 $errors['error']['sha1'] = sha1(json_encode($errors['error']));
 
                 // Logger error
-                if (!empty($container['logger']) && 'true' == env('APP_ERROR_LOGGER')) {
+                if (!empty($container['logger']) && true === Env::get('APP_ERROR_LOGGER')) {
                     /** @var \Core\Logger $logger */
                     $logger = $container['logger']->filename('error');
 
-                    if ('true' === env('APP_ERROR_HTML')) {
+                    if (true === Env::get('APP_ERROR_HTML', false)) {
                         $logger->setHtmlFormatter();
                     }
 
-                    if (!empty(Helper::normalizeValueType(env('LOGGER_SLACK_WEBHOOK_URL', null)))) {
+                    if (!empty(Helper::normalizeValueType(Env::Get('LOGGER_SLACK_WEBHOOK_URL', null)))) {
                         $logger->setSlackWebHookHandler(
-                            env('LOGGER_SLACK_WEBHOOK_URL'),
-                            Helper::normalizeValueType(env('LOGGER_SLACK_CHANNEL', null)),
-                            Helper::normalizeValueType(env('LOGGER_SLACK_USERNAME', null))
+                            Env::Get('LOGGER_SLACK_WEBHOOK_URL'),
+                            Helper::normalizeValueType(Env::Get('LOGGER_SLACK_CHANNEL', null)),
+                            Helper::normalizeValueType(Env::Get('LOGGER_SLACK_USERNAME', null))
                         );
                     }
 

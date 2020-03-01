@@ -11,6 +11,7 @@
 
 namespace App\Events;
 
+use Core\Env;
 use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use Core\Session\Session;
@@ -39,11 +40,11 @@ class ErrorSlackEvent extends Event
      */
     public function register($errors = null)
     {
-        if (!$this->event || 'production' !== env('APP_ENV')) {
+        if (!$this->event || 'production' !== Env::get('APP_ENV')) {
             return;
         }
 
-        if (!empty($errors['error']) && !empty(env('SLACK_ERROR_URL', ''))) {
+        if (!empty($errors['error']) && !empty(Env::get('SLACK_ERROR_URL', ''))) {
             unset($errors['error']['trace']);
 
             if (!empty($errors['error']['sha1'])) {
@@ -74,7 +75,7 @@ class ErrorSlackEvent extends Event
         $time = time();
 
         if ($fileTime <= $time) {
-            touch($filename, ($time + env('SLACK_ERROR_INTERVAL', 60)));
+            touch($filename, ($time + Env::get('SLACK_ERROR_INTERVAL', 60)));
 
             return true;
         }
@@ -134,7 +135,7 @@ class ErrorSlackEvent extends Event
         try {
             $this->curl
                 ->setHeaders('Content-Type', 'application/json')
-                ->post(env('SLACK_ERROR_URL'), json_encode([
+                ->post(Env::get('SLACK_ERROR_URL'), json_encode([
                     'text' => $text,
                     'username' => config('client.name'),
                     'mrkdwn' => true,

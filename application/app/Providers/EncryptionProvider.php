@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
 
 use Core\Encryption;
+use Core\Env;
 
 /**
  * Class EncryptionProvider.
@@ -43,7 +44,7 @@ class EncryptionProvider extends Provider
      */
     protected function generateKey(): string
     {
-        $appKey = env('APP_KEY', null);
+        $appKey = Env::get('APP_KEY', null);
 
         if (empty($appKey)) {
             $host = $_SERVER['HTTP_HOST'] ?? 'vc:key';

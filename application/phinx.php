@@ -6,10 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 use Core\App;
+use Core\Env;
+use Core\Phinx\Migration;
 
 try {
     // Constants
@@ -32,7 +34,7 @@ try {
     // @see https://book.cakephp.org/3.0/en/phinx/configuration.html
 
     return [
-        'migration_base_class' => \Core\Phinx\Migration::class,
+        'migration_base_class' => Migration::class,
 
         'templates' => [
             'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
@@ -45,29 +47,29 @@ try {
 
         'environments' => [
             'default_migration_table' => 'migrations',
-            'default_database' => env('DB_DRIVER', 'mysql'),
+            'default_database' => Env::get('DB_DRIVER', 'mysql'),
 
             'mysql' => [
                 'adapter' => 'mysql',
-                'host' => env('DB_HOST', 'localhost'),
-                'port' => env('DB_PORT', '3306'),
-                'name' => env('DB_DATABASE', ''),
-                'user' => env('DB_USER', ''),
-                'pass' => env('DB_PASS', ''),
-                'charset' => env('DB_CHARSET', 'utf8'),
-                'collation' => env('DB_COLLATE', 'utf8_general_ci'),
+                'host' => Env::get('DB_HOST', 'localhost'),
+                'port' => Env::get('DB_PORT', '3306'),
+                'name' => Env::get('DB_DATABASE', null),
+                'user' => Env::get('DB_USER', null),
+                'pass' => Env::get('DB_PASS', null),
+                'charset' => Env::get('DB_CHARSET', 'utf8'),
+                'collation' => Env::get('DB_COLLATE', 'utf8_general_ci'),
                 'table_prefix' => false,
                 'table_suffix' => false,
             ],
 
             'pgsql' => [
                 'adapter' => 'pgsql',
-                'host' => env('DB_HOST', 'localhost'),
-                'port' => env('DB_PORT', '3306'),
-                'name' => env('DB_DATABASE', ''),
-                'user' => env('DB_USER', ''),
-                'pass' => env('DB_PASS', ''),
-                'charset' => env('DB_CHARSET', 'utf8'),
+                'host' => Env::get('DB_HOST', 'localhost'),
+                'port' => Env::get('DB_PORT', '3306'),
+                'name' => Env::get('DB_DATABASE', null),
+                'user' => Env::get('DB_USER', null),
+                'pass' => Env::get('DB_PASS', null),
+                'charset' => Env::get('DB_CHARSET', 'utf8'),
                 'collation' => false,
                 'table_prefix' => false,
                 'table_suffix' => false,
@@ -75,11 +77,11 @@ try {
 
             'sqlsrv' => [
                 'adapter' => 'sqlsrv',
-                'host' => env('DB_HOST', '127.0.0.1'),
-                'port' => env('DB_PORT', '1433'),
-                'name' => env('DB_DATABASE', ''),
-                'user' => env('DB_USER', ''),
-                'pass' => env('DB_PASS', ''),
+                'host' => Env::get('DB_HOST', '127.0.0.1'),
+                'port' => Env::get('DB_PORT', '1433'),
+                'name' => Env::get('DB_DATABASE', null),
+                'user' => Env::get('DB_USER', null),
+                'pass' => Env::get('DB_PASS', null),
                 'charset' => 65001, // \PDO::SQLSRV_ENCODING_UTF8
                 'collation' => false,
                 'table_prefix' => false,

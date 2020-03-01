@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
 
 use App\Controllers\Controller;
+use Core\Env;
 use Core\Helpers\Path;
 
 /**
@@ -32,9 +33,9 @@ class GitlabController extends Controller
     {
         // Headers
         $token = $this->request->getHeaderLine('X-Gitlab-Token');
-        $event = $this->request->getHeaderLine('X-Gitlab-Event');
+        $deployKey = Env::get('DEPLOY_KEY', null);
 
-        if (empty($token) || $token !== env('DEPLOY_KEY')) {
+        if (empty($token) || $token !== $deployKey) {
             throw new \InvalidArgumentException('Token invalid.');
         }
 

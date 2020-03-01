@@ -6,9 +6,10 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
+use Core\Env;
 use Core\Helpers\Path;
 
 return [
@@ -19,7 +20,7 @@ return [
         'charset' => 'UTF-8',
         'strict_variables' => false,
         'autoescape' => 'html',
-        'cache' => ('production' == env('APP_ENV') ? Path::storage('/cache/twig') : false),
+        'cache' => ('production' === Env::get('APP_ENV') ? Path::storage('/cache/twig') : false),
         'auto_reload' => true,
         'optimizations' => -1,
     ],

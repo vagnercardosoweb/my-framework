@@ -62,7 +62,7 @@ class App extends SlimApp
                 'responseChunkSize' => 4096,
                 'outputBuffering' => 'append',
                 'determineRouteBeforeAppMiddleware' => true,
-                'displayErrorDetails' => ('development' == env('APP_ENV', 'development')),
+                'displayErrorDetails' => ('development' === Env::get('APP_ENV', 'development')),
                 'addContentLengthHeader' => true,
                 'routerCacheFile' => false,
             ], config('app.slim', [])),
@@ -317,20 +317,20 @@ class App extends SlimApp
      */
     private function registerPhpConfiguration(): void
     {
-        $charset = env('APP_CHARSET', 'UTF-8');
-        $locale = env('APP_LOCALE', 'pt_BR');
+        $charset = Env::get('APP_CHARSET', 'UTF-8');
+        $locale = Env::get('APP_LOCALE', 'pt_BR');
 
         ini_set('default_charset', $charset);
-        date_default_timezone_set(env('APP_TIMEZONE', 'America/Sao_Paulo'));
+        date_default_timezone_set(Env::get('APP_TIMEZONE', 'America/Sao_Paulo'));
         mb_internal_encoding($charset);
         setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
 
         ini_set('log_errors', true);
-        ini_set('error_log', sprintf(env('INI_ERROR_LOG', Path::app('/storage/logs/php/%s.log')), date('dmY')));
-        ini_set('display_errors', env('INI_DISPLAY_ERRORS', ini_get('display_errors')));
-        ini_set('display_startup_errors', env('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
+        ini_set('error_log', sprintf(Env::get('INI_ERROR_LOG', Path::storage('/logs/php/%s.log')), date('dmY')));
+        ini_set('display_errors', Env::get('INI_DISPLAY_ERRORS', ini_get('display_errors')));
+        ini_set('display_startup_errors', Env::get('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
 
-        if ('development' == env('APP_ENV', 'development')) {
+        if ('development' === Env::get('APP_ENV', 'development')) {
             error_reporting(E_ALL);
         } else {
             error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);

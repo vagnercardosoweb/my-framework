@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
 
+use Core\Env;
 use Core\Exception\ResponseException;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -34,7 +35,7 @@ class MaintenanceMiddleware extends Middleware
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
-        if ('true' == env('APP_MAINTENANCE', false)) {
+        if (true === Env::get('APP_MAINTENANCE', false)) {
             throw new ResponseException('Error 503 (Service Unavailable)', StatusCode::HTTP_SERVICE_UNAVAILABLE);
         }
 
