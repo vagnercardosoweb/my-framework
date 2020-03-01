@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 use Core\App;
@@ -169,9 +169,9 @@ if (!function_exists('response')) {
 
 if (!function_exists('request')) {
     /**
-     * @return \Slim\Http\Request
+     * @return \Slim\Http\Request|null
      */
-    function request(): Request
+    function request(): ?Request
     {
         return app()->resolve('request');
     }
@@ -206,11 +206,8 @@ if (!function_exists('json')) {
      */
     function json($data, int $status = StatusCode::HTTP_OK): Response
     {
-        /** @var \Slim\Http\Response $response */
-        $response = app()->resolve('response');
-
-        if ($response) {
-            return $response->withJson($data, $status);
+        if (response()) {
+            return response()->withJson($data, $status);
         }
 
         http_response_code($status);
@@ -285,7 +282,7 @@ if (!function_exists('params')) {
      */
     function params(string $name = '')
     {
-        $params = app()->resolve('request')->getParams();
+        $params = request()->getParams();
         $params = filter_params($params);
 
         if (empty($name)) {
