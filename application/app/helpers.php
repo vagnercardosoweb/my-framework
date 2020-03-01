@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 use Core\DateTime;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
+use Core\Helpers\Path;
 use Core\Helpers\Str;
 use Core\Helpers\Upload;
 use Slim\Http\StatusCode;
@@ -138,42 +139,13 @@ if (!function_exists('json_success')) {
 
 if (!function_exists('error_code_type')) {
     /**
-     * @param string|int $type
+     * @param string|int $code
      *
      * @return string
      */
-    function error_code_type($type)
+    function error_code_type($code)
     {
-        if (is_string($type) && E_USER_SUCCESS !== $type) {
-            $type = E_USER_ERROR;
-        }
-
-        switch ($type) {
-            case E_USER_NOTICE:
-            case E_NOTICE:
-                $result = 'info';
-                break;
-
-            case E_USER_WARNING:
-            case E_WARNING:
-                $result = 'warning';
-                break;
-
-            case E_USER_ERROR:
-            case E_ERROR:
-            case '0':
-                $result = 'danger';
-                break;
-
-            case E_USER_SUCCESS:
-                $result = 'success';
-                break;
-
-            default:
-                $result = 'danger';
-        }
-
-        return $result;
+        return Core\Exception\Exception::getErrorType($code);
     }
 }
 
@@ -222,13 +194,13 @@ if (!function_exists('get_galeria')) {
         $images = [];
 
         // Imagens antigas
-        if (file_exists(\Core\Helpers\Path::public()."/{$path[1]}")) {
-            $images = array_values(array_diff(scandir(\Core\Helpers\Path::public()."/{$path[1]}"), ['.', '..']));
+        if (file_exists(Path::public("/{$path[1]}"))) {
+            $images = array_values(array_diff(scandir(Path::public("/{$path[1]}")), ['.', '..']));
             $path = $path[1];
         } else {
             // Imagens novas
-            if (file_exists(\Core\Helpers\Path::public()."/{$path[0]}")) {
-                $images = array_values(array_diff(scandir(\Core\Helpers\Path::public()."/{$path[0]}/0"), ['.', '..']));
+            if (file_exists(Path::public("/{$path[0]}"))) {
+                $images = array_values(array_diff(scandir(Path::public("/{$path[0]}/0")), ['.', '..']));
                 $path = "{$path[0]}/";
             }
         }
@@ -272,6 +244,8 @@ if (!function_exists('database_format_datetime')) {
     /**
      * @param string|null $dateTime
      * @param string      $type
+     *
+     * @throws \Exception
      *
      * @return string
      */
@@ -512,6 +486,7 @@ if (!function_exists('delete_recursive_directory')) {
     function delete_recursive_directory(string $path, int $mode = \RecursiveIteratorIterator::CHILD_FIRST): void
     {
         if (file_exists($path)) {
+            /** @var \DirectoryIterator $iterator */
             $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($path),
                 $mode

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 01/03/2020 Vagner Cardoso
  */
 
 namespace Core\Exception;
@@ -39,6 +39,45 @@ class Exception extends \Exception
         parent::__construct($message, $code);
 
         $this->statusCode = $statusCode;
+    }
+
+    /**
+     * @param int|string $code
+     *
+     * @return string
+     */
+    public static function getErrorType($code)
+    {
+        if (is_string($code) && E_USER_SUCCESS !== $code) {
+            $code = E_USER_ERROR;
+        }
+
+        switch ($code) {
+            case E_USER_NOTICE:
+            case E_NOTICE:
+                $result = 'info';
+                break;
+
+            case E_USER_WARNING:
+            case E_WARNING:
+                $result = 'warning';
+                break;
+
+            case E_USER_ERROR:
+            case E_ERROR:
+            case '0':
+                $result = 'danger';
+                break;
+
+            case E_USER_SUCCESS:
+                $result = 'success';
+                break;
+
+            default:
+                $result = 'danger';
+        }
+
+        return $result;
     }
 
     /**
