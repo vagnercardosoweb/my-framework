@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 05/03/2020 Vagner Cardoso
  */
 
 namespace App\Controllers;
@@ -40,7 +40,7 @@ use Slim\Http\StatusCode;
  * @property \Core\Curl\Curl              $curl
  * @property \Core\Redis                  $redis
  * @property \Core\Cache\Cache            $cache
- * @property \Core\Config $config
+ * @property \Core\Config                 $config
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */

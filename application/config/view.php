@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 05/03/2020 Vagner Cardoso
  */
 
 use Core\Env;
@@ -45,7 +45,7 @@ return [
     'registers' => [
         'functions' => [
             'asset' => 'asset',
-            'config' => 'Core\Config::Get',
+            'config' => 'Core\Config::get',
             'is_route' => 'is_route',
             'path_for' => 'path_for',
             'has_route' => 'has_route',
