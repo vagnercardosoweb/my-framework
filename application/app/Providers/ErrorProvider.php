@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 05/03/2020 Vagner Cardoso
  */
 
 namespace App\Providers;
@@ -90,11 +90,11 @@ class ErrorProvider extends Provider
                         $logger->setHtmlFormatter();
                     }
 
-                    if (!empty(Helper::normalizeValueType(Env::Get('LOGGER_SLACK_WEBHOOK_URL', null)))) {
+                    if (!empty(Helper::normalizeValueType(Env::get('LOGGER_SLACK_WEBHOOK_URL', null)))) {
                         $logger->setSlackWebHookHandler(
-                            Env::Get('LOGGER_SLACK_WEBHOOK_URL'),
-                            Helper::normalizeValueType(Env::Get('LOGGER_SLACK_CHANNEL', null)),
-                            Helper::normalizeValueType(Env::Get('LOGGER_SLACK_USERNAME', null))
+                            Env::get('LOGGER_SLACK_WEBHOOK_URL'),
+                            Helper::normalizeValueType(Env::get('LOGGER_SLACK_CHANNEL', null)),
+                            Helper::normalizeValueType(Env::get('LOGGER_SLACK_USERNAME', null))
                         );
                     }
 
