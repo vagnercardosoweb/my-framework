@@ -28,7 +28,7 @@ class Asset
     public static function path(string $path, string $baseUrl = '', bool $version = false): ?string
     {
         $path = ((!empty($path[0]) && '/' !== $path[0]) ? "/{$path}" : $path);
-        $absolutePath = Path::public($path);
+        $absolutePath = Path::public_html($path);
 
         if (!file_exists($absolutePath)) {
             return null;
@@ -54,7 +54,7 @@ class Asset
         }
 
         foreach ($files as $file) {
-            $file = Path::public(((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file));
+            $file = Path::public_html(((!empty($file[0]) && '/' !== $file[0]) ? "/{$file}" : $file));
 
             if (file_exists($file)) {
                 $contents[] = file_get_contents($file);

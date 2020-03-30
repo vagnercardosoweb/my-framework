@@ -47,36 +47,6 @@ class Env
     }
 
     /**
-     * @return array
-     */
-    public static function adapters(): array
-    {
-        return [
-            new ApacheAdapter(),
-            new EnvConstAdapter(),
-            new ServerConstAdapter(),
-            new PutenvAdapter(),
-        ];
-    }
-
-    /**
-     * @return \Dotenv\Repository\RepositoryInterface
-     */
-    public static function repository(): RepositoryInterface
-    {
-        if (null === static::$repository) {
-            static::$repository = RepositoryBuilder::create()
-                ->withReaders(self::adapters())
-                ->withWriters(self::adapters())
-                ->immutable()
-                ->make()
-            ;
-        }
-
-        return static::$repository;
-    }
-
-    /**
      * @param string $key
      * @param mixed  $default
      *
@@ -98,9 +68,39 @@ class Env
     }
 
     /**
+     * @return array
+     */
+    protected static function adapters(): array
+    {
+        return [
+            new ApacheAdapter(),
+            new EnvConstAdapter(),
+            new ServerConstAdapter(),
+            new PutenvAdapter(),
+        ];
+    }
+
+    /**
+     * @return \Dotenv\Repository\RepositoryInterface
+     */
+    protected static function repository(): RepositoryInterface
+    {
+        if (null === static::$repository) {
+            static::$repository = RepositoryBuilder::create()
+                ->withReaders(self::adapters())
+                ->withWriters(self::adapters())
+                ->immutable()
+                ->make()
+            ;
+        }
+
+        return static::$repository;
+    }
+
+    /**
      * @return string
      */
-    private static function path(): string
+    protected static function path(): string
     {
         $env = \Core\Helpers\Path::app('/.env');
         $example = \Core\Helpers\Path::app('/.env.example');

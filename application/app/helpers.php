@@ -92,7 +92,7 @@ if (!function_exists('json_error')) {
                 'message' => $exception->getMessage(),
                 'file' => str_replace([
                     \Core\Helpers\Path::app(),
-                    \Core\Helpers\Path::public(),
+                    \Core\Helpers\Path::public_html(),
                     \Core\Helpers\Path::resource(),
                 ], '', $exception->getFile()),
                 'line' => $exception->getLine(),
@@ -194,13 +194,13 @@ if (!function_exists('get_galeria')) {
         $images = [];
 
         // Imagens antigas
-        if (file_exists(Path::public("/{$path[1]}"))) {
-            $images = array_values(array_diff(scandir(Path::public("/{$path[1]}")), ['.', '..']));
+        if (file_exists(Path::public_html("/{$path[1]}"))) {
+            $images = array_values(array_diff(scandir(Path::public_html("/{$path[1]}")), ['.', '..']));
             $path = $path[1];
         } else {
             // Imagens novas
-            if (file_exists(Path::public("/{$path[0]}"))) {
-                $images = array_values(array_diff(scandir(Path::public("/{$path[0]}/0")), ['.', '..']));
+            if (file_exists(Path::public_html("/{$path[0]}"))) {
+                $images = array_values(array_diff(scandir(Path::public_html("/{$path[0]}/0")), ['.', '..']));
                 $path = "{$path[0]}/";
             }
         }
@@ -662,7 +662,7 @@ if (!function_exists('upload')) {
             $uploads[] = [
                 'name' => $name,
                 'path' => str_replace([
-                    \Core\Helpers\Path::public(),
+                    \Core\Helpers\Path::public_html(),
                     \Core\Helpers\Path::app(),
                     \Core\Helpers\Path::resource(),
                 ], '', $path),

@@ -119,7 +119,7 @@ class Logger extends Monolog
             $useAttachment,
             $iconEmoji,
             $useShortAttachment,
-            $includeContextAndExtra,
+            $includeContextAndExtra
         ));
     }
 

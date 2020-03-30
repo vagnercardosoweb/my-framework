@@ -23,7 +23,7 @@ class Path
      *
      * @return string
      */
-    public static function public(?string $path = null): string
+    public static function public_html(?string $path = null): string
     {
         return self::make('PUBLIC_FOLDER', 'public_html', self::root(), $path);
     }

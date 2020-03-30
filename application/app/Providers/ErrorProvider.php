@@ -67,7 +67,7 @@ class ErrorProvider extends Provider
                         'file' => str_replace([
                             Path::app(),
                             Path::resource(),
-                            Path::public(),
+                            Path::public_html(),
                         ], '', $exception->getFile()),
                         'line' => $exception->getLine(),
                         'trace' => explode("\n", $exception->getTraceAsString()),
