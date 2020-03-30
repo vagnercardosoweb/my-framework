@@ -39,11 +39,11 @@ class GenerateKeysMiddleware extends Middleware
         foreach (['APP_KEY', 'API_KEY', 'DEPLOY_KEY'] as $key) {
             $value = Env::get($key, null);
             $value = Helper::normalizeValueType($value);
-            $pathEnv = Path::app('/.env');
 
-            if (empty($value) && !file_exists($pathEnv)) {
+            if (empty($value)) {
                 $quote = preg_quote("={$value}", '/');
                 $random = Str::randomBytes(32);
+                $pathEnv = Path::app('/.env');
 
                 file_put_contents(
                     $pathEnv,
