@@ -44,6 +44,7 @@ return [
 
     'registers' => [
         'functions' => [
+            'env' => 'Core\Env::get',
             'asset' => 'asset',
             'config' => 'Core\Config::get',
             'is_route' => 'is_route',
@@ -68,8 +69,10 @@ return [
         ],
 
         'filters' => [
-            'is_string' => 'is_string',
+            'str_slug' => 'Core\Helpers\Str::slug',
+            'str_limit' => 'Core\Helpers\Str::limit',
             'is_array' => 'is_array',
+            'is_string' => 'is_string',
             'get_day_string' => 'get_day_string',
             'get_month_string' => 'get_month_string',
         ],
