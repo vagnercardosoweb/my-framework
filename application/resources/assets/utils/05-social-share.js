@@ -59,17 +59,17 @@ $(document).ready(function () {
     return mounted;
   };
 
-  // vc-share="https://www.facebook.com/sharer/sharer.php?u=URL }}"
-  // vc-share="https://twitter.com/intent/tweet?text=TEXT&url=URL&hashtags=HASHTAG&via=VIA(NOME_PAGE)"
-  // vc-share="https://plus.google.com/share?url=URL&hl=pt-BR"
-  // vc-share="https://api.whatsapp.com/send?text=TEXT|URL_ENCODE"
+  // data-share="https://www.facebook.com/sharer/sharer.php?u=URL }}"
+  // data-share="https://twitter.com/intent/tweet?text=TEXT&url=URL&hashtags=HASHTAG&via=VIA(NOME_PAGE)"
+  // data-share="https://plus.google.com/share?url=URL&hl=pt-BR"
+  // data-share="https://api.whatsapp.com/send?text=TEXT|URL_ENCODE"
 
   /* Realiza o compartilhamento para as redes sociais. */
-  $(document).on('click', '*[vc-share]', function (event) {
+  $(document).on('click', '*[data-share]', function (event) {
     event.preventDefault(event);
 
     /* Variáveis */
-    var url = ($(this).attr('vc-share') || $(this).attr('href') || $(this).data('href')) || '';
+    var url = ($(this).attr('data-share') || $(this).attr('href') || $(this).data('href')) || '';
     var width = 600;
     var height = 600;
 

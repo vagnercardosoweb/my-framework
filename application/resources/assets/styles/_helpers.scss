@@ -94,13 +94,13 @@ $socialColors: map_merge(
   position: relative;
 
   .vc-error-field {
-    border-color: #dc3545;
+    border-color: #dc3545!important;
   }
 
   .vc-error-box {
     //background: #a94442;
     //color: #fff;
-    color: #dc3545;
+    color: #dc3545!important;
     margin-top: 5px;
     font-size: convertPx(10);
   }
