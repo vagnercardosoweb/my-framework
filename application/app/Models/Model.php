@@ -35,6 +35,7 @@ use Core\Database\Model as BaseModel;
  * @property \Core\Curl\Curl              $curl
  * @property \Core\Redis                  $redis
  * @property \Core\Cache\Cache            $cache
+ * @property \Core\Config                 $config
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
