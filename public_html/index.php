@@ -34,7 +34,7 @@ define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
 
 // Define a URL base da aplicação
 $schema = 'http';
-$host = $_SERVER['HTTP_HOST'];
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 
 if (
     (!empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS']) ||
