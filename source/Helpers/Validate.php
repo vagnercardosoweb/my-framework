@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 03/04/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -623,8 +623,8 @@ class Validate
      */
     private static function invokeCallable($rule, array $params)
     {
-        // Verify if possibility php function
-        if (is_callable($rule)) {
+        /// Verify if possibility php function
+        if (is_callable($rule) && !strrpos($rule, '::')) {
             return call_user_func_array($rule, $params);
         }
 
