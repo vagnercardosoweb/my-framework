@@ -100,7 +100,7 @@ class App extends SlimApp
      */
     public function route($methods, $pattern, $callable, $name = null, $middleware = null)
     {
-        $methods = '*' == $methods ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] : $methods;
+        $methods = '*' == $methods ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] : $methods;
         $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
         $pattern = (string)$pattern;
 
