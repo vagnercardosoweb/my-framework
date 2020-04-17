@@ -668,9 +668,7 @@ class Validate
             }
 
             if ($exception) {
-                throw new \InvalidArgumentException(
-                    "{$field}: {$validate['message']}", $validate['code']
-                );
+                throw new \InvalidArgumentException($validate['message'], $validate['code']);
             }
 
             self::$errors[$field] = [
