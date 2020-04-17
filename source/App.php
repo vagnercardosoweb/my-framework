@@ -366,33 +366,37 @@ class App extends SlimApp
         }
 
         return function (Request $request, Response $response, array $params) use ($callable, $namespace) {
-            list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
+            try {
+                list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
 
-            $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
-            $namespace = sprintf('%s/%s', $namespace, $name);
-            $namespace = str_ireplace('/', '\\', $namespace);
+                $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
+                $namespace = sprintf('%s/%s', $namespace, $name);
+                $namespace = str_ireplace('/', '\\', $namespace);
 
-            $controller = new $namespace($request, $response, $this);
+                $controller = new $namespace($request, $response, $this);
 
-            if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
-                $method = $originalMethod ?? 'index';
+                if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
+                    $method = $originalMethod ?? 'index';
 
-                if (!method_exists($controller, $method)) {
-                    throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR);
+                    if (!method_exists($controller, $method)) {
+                        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class($controller), $method), E_ERROR);
+                    }
                 }
+
+                if (App::isCli()) {
+                    $params = array_merge($params, $request->getQueryParams());
+                }
+
+                $result = call_user_func_array([$controller, $method], $params);
+
+                if (is_array($result) || $json = Helper::decodeJson($result, true)) {
+                    return $response->withJson($json ?? $result);
+                }
+
+                return $result;
+            } catch (\Exception $e) {
+                return json_error($e);
             }
-
-            if (App::isCli()) {
-                $params = array_merge($params, $request->getQueryParams());
-            }
-
-            $result = call_user_func_array([$controller, $method], $params);
-
-            if (is_array($result) || $json = Helper::decodeJson($result, true)) {
-                return $response->withJson($json ?? $result);
-            }
-
-            return $result;
         };
     }
 
