@@ -273,7 +273,7 @@ class Validate
      *
      * @return bool
      */
-    public static function between($value, $min = null, $max = null, bool $length = false): bool
+    public static function between($value, $min = PHP_INT_MIN, $max = PHP_INT_MAX, bool $length = false): bool
     {
         if ($length) {
             $value = strlen($value);
@@ -291,11 +291,8 @@ class Validate
             );
         }
 
-        return filter_var($value, FILTER_VALIDATE_INT, [
-            'options' => [
-                'min_range' => $min ?? PHP_INT_MIN,
-                'max_range' => $max ?? PHP_INT_MAX,
-            ],
+        return filter_var($value, is_int($value) ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT, [
+            'options' => ['min_range' => $min, 'max_range' => $max],
         ]);
     }
 
