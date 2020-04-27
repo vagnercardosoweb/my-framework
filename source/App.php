@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 27/04/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -395,7 +395,10 @@ class App extends SlimApp
 
                 return $result;
             } catch (\Exception $e) {
-                return json_error($e);
+                return call_user_func_array(
+                    $this->get('errorHandler'),
+                    [$request, $response, $e]
+                );
             }
         };
     }
