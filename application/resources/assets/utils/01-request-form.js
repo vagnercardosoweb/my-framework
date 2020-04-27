@@ -602,9 +602,9 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
             error =
               'Não conseguimos identificar o erro! Favor entre em contato para que possamos verificar.';
           }
-
-          console.log(xhr, exception);
         }
+
+        console.log(xhr, exception);
 
         showMessage({ error: { message: error } }, message);
       }

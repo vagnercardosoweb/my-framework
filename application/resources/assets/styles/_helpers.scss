@@ -39,6 +39,20 @@ $socialColors: map_merge(
     background-color: #{$value} !important;
   }
 
+  .btn-#{$color} {
+    color: #ffffff;
+    background-color: #{$value};
+    border-color: #{$value};
+    border-radius: 8px;
+
+    &:hover,
+    &:focus,
+    &:active {
+      color: #ffffff;
+      background: darken($value, 8%);
+    }
+  }
+
   /* buttons */
   .btn-outline-#{$color} {
     color: #{$value};
