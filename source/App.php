@@ -162,6 +162,10 @@ class App extends SlimApp
             $routes = Config::get('app.routes.app', []);
         }
 
+        $this->options('/{routes:.*}', function ($request, $response) {
+            return $response->withStatus(200);
+        });
+
         foreach ($routes as $path) {
             call_user_func(function ($path, $app) {
                 require_once "{$path}";
