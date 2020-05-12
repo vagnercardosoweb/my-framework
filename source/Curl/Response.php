@@ -27,6 +27,11 @@ class Response implements \JsonSerializable
     private $body;
 
     /**
+     * @var mixed
+     */
+    private $pureBody;
+
+    /**
      * @var object
      */
     private $info;
@@ -48,6 +53,7 @@ class Response implements \JsonSerializable
         $this->body = $this->buildBody($body);
         $this->info = (object)$info ?: null;
         $this->error = $this->buildError($error);
+        $this->pureBody = $body;
     }
 
     /**
@@ -120,6 +126,14 @@ class Response implements \JsonSerializable
     }
 
     /**
+     * @return mixed
+     */
+    public function getPureBody()
+    {
+        return $this->pureBody;
+    }
+
+    /**
      * @return object|null
      */
     public function getInfo(): ?object
@@ -142,17 +156,15 @@ class Response implements \JsonSerializable
      */
     private function buildBody(string $body)
     {
-        $result = $body;
-
-        if ($xml = Helper::parseXml($result)) {
-            $result = $xml;
+        if ($xml = Helper::parseXml($body)) {
+            return $xml;
         }
 
-        if ($json = Helper::decodeJson($result)) {
-            $result = $json;
+        if ($json = Helper::decodeJson($body)) {
+            return $json;
         }
 
-        return $result ?? null;
+        return $body;
     }
 
     /**
