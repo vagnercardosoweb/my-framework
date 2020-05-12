@@ -536,7 +536,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return $this|array[$this]|null
+     * @return $this|$this[]|null
      */
     public function fetchById($id, ?int $fetchStyle = null)
     {
@@ -564,7 +564,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return array[$this]
+     * @return $this[]
      */
     public function fetchAll($fetchStyle = null, $fetchArgument = null)
     {
@@ -599,7 +599,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return $this
+     * @return $this|null
      */
     public function fetch($fetchStyle = null): ?self
     {
@@ -648,7 +648,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return array[this]|null
+     * @return $this[]|null
      */
     public function update($data = null, bool $validate = true): ?array
     {
@@ -741,7 +741,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return $this|array[$this]
+     * @return $this|$this[]
      */
     public function fetchBy(string $column, $value, bool $oneResult = false, ?int $fetchStyle = null)
     {
@@ -802,7 +802,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @throws \Exception
      *
-     * @return array[$this]|null
+     * @return $this[]|null
      */
     public function delete(?int $id = null): ?array
     {
@@ -872,7 +872,10 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     {
         $this->statement = $this->db
             ->driver($this->driver)
-            ->query($this->getQuery(), $this->bindings)
+            ->query(
+                $this->getQuery(),
+                $this->bindings
+            )
         ;
 
         $this->clear();
