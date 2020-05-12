@@ -166,8 +166,11 @@ class Helper
         $bytes = $bytes / pow(1000, $base);
 
         return number_format(
-                round($bytes, $precision), 2, ',', ''
-            ).' '.$units[$base];
+            round($bytes, $precision),
+            2,
+            ',',
+            ''
+        ).' '.$units[$base];
     }
 
     /**
@@ -283,11 +286,21 @@ class Helper
 
     /**
      * @param string $xml
+     * @param string $className
+     * @param int    $option
+     * @param string $ns
+     * @param bool   $isPrefix
      *
      * @return \SimpleXMLElement|null
      */
-    public static function parseXml(string $xml): ?\SimpleXMLElement
-    {
+    public static function parseXml(
+        string $xml,
+        string
+        $className = 'SimpleXMLElement',
+        int $option = 0,
+        string $ns = '',
+        bool $isPrefix = false
+    ) {
         $xml = trim($xml);
 
         if (empty($xml)) {
@@ -299,7 +312,7 @@ class Helper
         }
 
         libxml_use_internal_errors(true);
-        $xml = simplexml_load_string($xml);
+        $xml = simplexml_load_string($xml, $className, $option, $ns, $isPrefix);
         $errors = libxml_get_errors();
         libxml_clear_errors();
 
