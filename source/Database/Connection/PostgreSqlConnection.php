@@ -41,9 +41,8 @@ class PostgreSqlConnection extends Connection
             }
 
             $this->exec(sprintf(
-                'SET search_path TO %s', implode(
-                    ', ', array_map([$this, 'quote'], $config['schema'])
-                )
+                'SET search_path TO %s',
+                implode(', ', array_map([$this, 'quote'], $config['schema']))
             ));
         }
     }

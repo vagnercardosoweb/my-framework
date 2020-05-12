@@ -95,19 +95,27 @@ abstract class Connection extends \PDO
         $className = array_pop($classSplit);
 
         if (empty($config['host'])) {
-            throw new \InvalidArgumentException(sprintf('%s: host not configured.', $className), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('%s: host not configured.', $className)
+            );
         }
 
         if (empty($config['username'])) {
-            throw new \InvalidArgumentException(sprintf('%s: username not configured.', $className), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('%s: username not configured.', $className)
+            );
         }
 
         if (empty($config['password']) && empty($config['notPassword'])) {
-            throw new \InvalidArgumentException(sprintf('%s: password not configured.', $className), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('%s: password not configured.', $className)
+            );
         }
 
         if (empty($config['database']) && empty($config['notDatabase'])) {
-            throw new \InvalidArgumentException(sprintf('%s: database not configured.', $className), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('%s: database not configured.', $className)
+            );
         }
     }
 

@@ -68,7 +68,9 @@ class Database
             return $this->pdo->{$method}(...$arguments);
         }
 
-        throw new \BadMethodCallException(sprintf('Call to undefined method %s::%s()', get_class(), $method), E_USER_ERROR);
+        throw new \BadMethodCallException(
+            sprintf('Call to undefined method %s::%s()', get_class(), $method)
+        );
     }
 
     /**
@@ -206,7 +208,7 @@ class Database
      *
      * @throws \Exception
      *
-     * @return array[object]|null
+     * @return object[]|null
      */
     public function update(string $table, $data, string $condition, $bindings = null): ?array
     {
@@ -259,7 +261,7 @@ class Database
      *
      * @throws \Exception
      *
-     * @return array[object]|null
+     * @return object[]|null
      */
     public function delete(string $table, string $condition, $bindings = null): ?array
     {
@@ -286,7 +288,10 @@ class Database
         $driver = $driver ?? $this->getDefaultDriver();
 
         if (empty($config = $this->connections[$driver])) {
-            throw new \Exception("Database connections {$driver} does not exist configured.", E_ERROR);
+            throw new \Exception(
+                "Database connections {$driver} " .
+                "does not exist configured."
+            );
         }
 
         if ($config instanceof \PDO) {
@@ -321,7 +326,7 @@ class Database
      *
      * @throws \Exception
      *
-     * @return array|object
+     * @return object[]
      */
     private function findAndTransformRowsObject(string $table, string $condition, $bindings = null)
     {
