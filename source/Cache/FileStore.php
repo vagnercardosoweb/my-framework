@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core\Cache;
@@ -211,6 +211,8 @@ class FileStore implements CacheStore
             $expiration = substr($data, 0, 10);
             $content = Helper::unserialize(substr($data, 10));
         } catch (\Exception $e) {
+            $this->delete($key);
+
             return $this->emptyPayload();
         }
 
