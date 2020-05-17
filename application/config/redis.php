@@ -13,6 +13,14 @@ use Core\Env;
 
 return [
     /*
+     * Observation:
+     *
+     * to use redis you must install the dependency.
+     *
+     * composer require predis/predis
+     */
+
+    /*
      * @se https://github.com/nrk/predis/wiki/Connection-Parameters
      *
      * Any configuration you add here following the same parameter name will be valid

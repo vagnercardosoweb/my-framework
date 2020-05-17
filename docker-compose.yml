@@ -12,11 +12,12 @@ services:
     restart: always
     networks:
       - mysql-network
-      - redis-network
+      # - redis-network
       # - postgres-network
     depends_on:
       - mysql
       # - postgres
+      # - redis
     ports:
       - '80:80'
       - '443:443'
@@ -47,6 +48,7 @@ services:
 
   #  phpmyadmin:
   #    image: phpmyadmin/phpmyadmin
+  #    container_name: phpmyadmin
   #    networks:
   #      - mysql-network
   #    depends_on:
@@ -60,6 +62,7 @@ services:
   #  postgres:
   #    image: postgres
   #    restart: always
+  #    container_name: postgres
   #    networks:
   #      - postgres-network
   #    ports:
@@ -71,15 +74,16 @@ services:
   #      - POSTGRES_PASSWORD=root
   #      - POSTGRES_DB=development
 
-  redis:
-    image: bitnami/redis:latest
-    restart: always
-    volumes:
-      - ./docker/redis:/bitnami/redis/data
-    networks:
-      - redis-network
-    environment:
-      - ALLOW_EMPTY_PASSWORD=no
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-docker}
-    ports:
-      - '6379:6379'
+  #  redis:
+  #    image: bitnami/redis:latest
+  #    restart: always
+  #    container_name: redis
+  #    volumes:
+  #      - ./docker/redis:/bitnami/redis/data
+  #    networks:
+  #      - redis-network
+  #    environment:
+  #      - ALLOW_EMPTY_PASSWORD=no
+  #      - REDIS_PASSWORD=${REDIS_PASSWORD:-docker}
+  #    ports:
+  #      - '6379:6379'

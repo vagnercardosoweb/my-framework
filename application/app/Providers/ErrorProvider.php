@@ -90,11 +90,11 @@ class ErrorProvider extends Provider
                         $logger->setHtmlFormatter();
                     }
 
-                    if (!empty(Helper::normalizeValueType(Env::get('LOGGER_SLACK_WEBHOOK_URL', null)))) {
+                    if (!empty(Env::get('LOGGER_SLACK_WEBHOOK_URL', null))) {
                         $logger->setSlackWebHookHandler(
                             Env::get('LOGGER_SLACK_WEBHOOK_URL'),
-                            Helper::normalizeValueType(Env::get('LOGGER_SLACK_CHANNEL', null)),
-                            Helper::normalizeValueType(Env::get('LOGGER_SLACK_USERNAME', null))
+                            Env::get('LOGGER_SLACK_CHANNEL', null),
+                            Env::get('LOGGER_SLACK_USERNAME', null)
                         );
                     }
 

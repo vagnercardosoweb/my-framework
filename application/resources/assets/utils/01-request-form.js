@@ -77,7 +77,7 @@ function checkElementConfirm(element) {
     var verify = confirm(
       element.attr('vc-confirm').length > 0
         ? element.attr('vc-confirm')
-        : 'Essa ação é irreversível.\nDeseja continuar?'
+        : 'Essa ação é irreversível.\nDeseja continuar?',
     );
 
     if (verify === false) {
@@ -100,7 +100,7 @@ function checkFormRequired(form) {
   var errors = 0;
 
   /* Verifica se existe campos obrigatório no formulário antes de enviar a requisição */
-  form.find(':input[required]').each(function(key, element) {
+  form.find(':input[required]').each(function (key, element) {
     // Variávies
     var value = $(element).val() || false;
     var message = '';
@@ -165,13 +165,13 @@ function mountFormData(form, formData) {
   }
 
   /* Percorre todos elemento */
-  form.find('*').each(function(key, element) {
+  form.find('*').each(function (key, element) {
     if ($(element).attr('name')) {
       if ($(element).prop('type') === 'checkbox') {
         //if ($(element).prop('checked') !== false) {
         formData.append(
           $(element).attr('name'),
-          $(element).prop('checked') !== false ? $(element).val() : ''
+          $(element).prop('checked') !== false ? $(element).val() : '',
         );
         //}
       } else if ($(element).prop('type') === 'radio') {
@@ -182,7 +182,7 @@ function mountFormData(form, formData) {
         var files = $(element).prop('files');
 
         if (files !== undefined && files.length > 0) {
-          $.each(files, function(key, file) {
+          $.each(files, function (key, file) {
             formData.append($(element).attr('name'), file, file.name);
           });
         }
@@ -229,10 +229,10 @@ function redirectAndReload(json) {
     ) {
       loadPage(
         (window.history.state && window.history.state.content) ||
-          '#content-ajax',
+        '#content-ajax',
         json.location,
         true,
-        true
+        true,
       );
     } else {
       window.location.href = json.location;
@@ -248,10 +248,10 @@ function redirectAndReload(json) {
     ) {
       loadPage(
         (window.history.state && window.history.state.content) ||
-          '#content-ajax',
+        '#content-ajax',
         '',
         true,
-        true
+        true,
       );
     } else {
       window.location.reload();
@@ -283,13 +283,13 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
   /* Variáveis */
   var html = element.html();
   var loadding =
-    element.attr('vc-loading') !== undefined
-      ? element.attr('vc-loading')
-        ? element.attr('vc-loading')
-        : 'Aguarde...'
-      : change
-      ? false
-      : html;
+        element.attr('vc-loading') !== undefined
+          ? element.attr('vc-loading')
+          ? element.attr('vc-loading')
+          : 'Aguarde...'
+          : change
+          ? false
+          : html;
   var message;
   var headers = {};
 
@@ -389,7 +389,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
     contentType: false,
     processData: false,
 
-    xhr: function() {
+    xhr: function () {
       var xhr = $.ajaxSettings.xhr();
 
       /* Upload progress */
@@ -398,12 +398,12 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
 
         xhr.upload.addEventListener(
           'progress',
-          function(e) {
+          function (e) {
             if (e.lengthComputable && enableUpload) {
               var diffTime = new Date().getTime() - startTime;
               var uploadPercent = parseInt((e.loaded / e.total) * 100);
               var durationTime =
-                ((100 - uploadPercent) * diffTime) / uploadPercent;
+                    ((100 - uploadPercent) * diffTime) / uploadPercent;
               // var calculateTimeFormat = calculateTimeUpload(durationTime);
 
               if (uploadPercent === 100) {
@@ -415,14 +415,14 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
               }
             }
           },
-          false
+          false,
         );
       }
 
       return xhr;
     },
 
-    beforeSend: function() {
+    beforeSend: function () {
       /* Limpa mensagens */
       if (message !== undefined && message.length > 0 && !modal) {
         message.fadeOut(0).html('');
@@ -442,8 +442,8 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
       }
     },
 
-    success: function(json) {
-      window.setTimeout(function() {
+    success: function (json) {
+      window.setTimeout(function () {
         /* Adiciona no localStorage */
         if (json.storage) {
           if (json.storage[0] === 'remove') {
@@ -458,7 +458,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
           element.attr('disabled', false);
 
           if (typeof json.object === 'object') {
-            $.each(json.object, function(key, value) {
+            $.each(json.object, function (key, value) {
               if (modal) {
                 modal.find('#' + key).html(value);
               } else {
@@ -505,7 +505,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
         /* Ações diversas */
         if (json.switch) {
           if (typeof json.switch === 'object') {
-            $.each(json.switch, function(key, value) {
+            $.each(json.switch, function (key, value) {
               switch (key) {
                 /* Hide */
                 case 'scrolltop':
@@ -513,7 +513,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
                     {
                       scrollTop: $(value).offset().top - 20,
                     },
-                    500
+                    500,
                   );
                   break;
 
@@ -535,7 +535,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
                 /* Eval */
                 case 'eval':
                   if (typeof value === 'object') {
-                    $.each(value, function(k, v) {
+                    $.each(value, function (k, v) {
                       eval(v);
                     });
                   } else {
@@ -552,7 +552,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
       }, 0);
     },
 
-    complete: function() {
+    complete: function () {
       /* Adiciona o html padrão do elemento clicado/modificado */
       if (loadding) {
         element.html(html);
@@ -568,13 +568,13 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
 
       /* Carrega js armazenado */
       if (typeof loadHtmlSuccessCallbacks !== 'undefined') {
-        loadHtmlSuccessCallbacks.forEach(function(callback) {
+        loadHtmlSuccessCallbacks.forEach(function (callback) {
           callback();
         });
       }
     },
 
-    error: function(xhr, exception) {
+    error: function (xhr, exception) {
       var json = parseJSON(xhr.responseText);
 
       if (json) {
@@ -612,7 +612,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
   });
 
   /* Aborta requisição */
-  $(document).on('click', '*[vc-abort]', function() {
+  $(document).on('click', '*[vc-abort]', function () {
     /* Desativa o upload */
     enableUpload = false;
 
@@ -640,9 +640,9 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
 }
 
 /* Carrega o documento */
-$(document).ready(function() {
+$(document).ready(function () {
   /* Dispara o request ao realizar uma mudança (change) */
-  $(document).on('change', '*[vc-change]', function(event) {
+  $(document).on('change', '*[vc-change]', function (event) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -676,7 +676,7 @@ $(document).ready(function() {
     /* FormData */
     formData.append(
       json.name || 'value',
-      elementChange.val() !== undefined ? elementChange.val() : ''
+      elementChange.val() !== undefined ? elementChange.val() : '',
     );
     formData.append('_METHOD', method);
 
@@ -684,7 +684,7 @@ $(document).ready(function() {
   });
 
   /* Dispara o request ao submeter o formulário (submit) */
-  $(document).on('submit', 'form[vc-form]', function(event) {
+  $(document).on('submit', 'form[vc-form]', function (event) {
     /* Desabilita ações default */
     event.preventDefault(event);
     event.stopPropagation(event);
@@ -716,13 +716,13 @@ $(document).ready(function() {
         elementForm.attr('method') || 'POST',
         elementForm,
         false,
-        false
+        false,
       );
     }
   });
 
   /* Dispara o request ao clicar (click) */
-  $(document).on('click', '*:not(form[vc-form])', function(event) {
+  $(document).on('click', '*:not(form[vc-form])', function (event) {
     /* Variavéis */
     var elementClicked = $(this);
     var formData = new FormData();
@@ -747,10 +747,10 @@ $(document).ready(function() {
 
       /* Form */
       var form =
-        elementClicked.attr('vc-form') &&
-        elementClicked.attr('vc-form').length > 0
-          ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
-          : elementClicked.closest('form');
+            elementClicked.attr('vc-form') &&
+            elementClicked.attr('vc-form').length > 0
+              ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
+              : elementClicked.closest('form');
 
       /* Método */
       formData.append('_METHOD', form.attr('method') || 'POST');
@@ -759,8 +759,8 @@ $(document).ready(function() {
       if (form.length <= 0) {
         alert(
           'Formulário com ([name="' +
-            elementClicked.attr('vc-form') +
-            '"]) não foi encontrado em seu documento html.'
+          elementClicked.attr('vc-form') +
+          '"]) não foi encontrado em seu documento html.',
         );
 
         return false;
@@ -782,14 +782,14 @@ $(document).ready(function() {
         'POST',
         form,
         false,
-        false
+        false,
       );
     }
 
     /* REQUEST :: Verbos HTTP */
-    $.each(['get', 'post', 'put', 'delete', 'options', 'ajax'], function(
+    $.each(['get', 'post', 'put', 'delete', 'options', 'ajax'], function (
       index,
-      http
+      http,
     ) {
       var elementHttp = elementClicked.attr('vc-' + http);
 
@@ -843,7 +843,7 @@ $(document).ready(function() {
           elementHttpJson.method !== 'GET' ? 'POST' : 'GET',
           {},
           false,
-          false
+          false,
         );
       }
     });
@@ -851,9 +851,9 @@ $(document).ready(function() {
 });
 
 /* Executa apos o carregamento da página */
-$(window).on('load', function() {
+$(window).on('load', function () {
   /* Dispara o request após carregar a página (after load) */
-  $.each($(document).find('*[vc-after-load]'), function(index, element) {
+  $.each($(document).find('*[vc-after-load]'), function (index, element) {
     /* FormData*/
     var formData = new FormData();
 
@@ -873,7 +873,7 @@ $(window).on('load', function() {
       'POST',
       {},
       false,
-      false
+      false,
     );
   });
 });

@@ -1,20 +1,20 @@
 /* Váriaveis */
-$siteColor: #3c8dbc !default;
-$socialColors: () !default;
-$socialColors: map_merge(
+$siteColor: #3C8DBC !default;
+$newColors: () !default;
+$newColors: map_merge(
     (
-      'facebook': '#3b5998',
-      'instagram': '#517fa4',
-      'twitter': '#00aced',
-      'google': '#dd4b39',
-      'youtube': '#bb0000',
-      'skype': '#00aff0',
-      'whatsapp': '#34af23',
-      'linkdin': '#007bb6',
-      'dropbox': '#007ee5',
+      'facebook': #3B5998,
+      'instagram': #517FA4,
+      'twitter': #00ACED,
+      'google': #DD4B39,
+      'youtube': #BB0000,
+      'skype': #00AFF0,
+      'whatsapp': #34AF23,
+      'linkdin': #007BB6,
+      'dropbox': #007EE5,
       'site': $siteColor,
     ),
-    $socialColors
+    $newColors
 );
 
 /* Functions */
@@ -28,7 +28,7 @@ $socialColors: map_merge(
 }
 
 /* COLORS :: Coloreds && Grays */
-@each $color, $value in map_merge(map_merge($colors, $grays), $socialColors) {
+@each $color, $value in map_merge(map_merge($colors, $grays), $newColors) {
   /* text colors */
   .text-#{$color} {
     color: #{$value} !important;
@@ -40,7 +40,7 @@ $socialColors: map_merge(
   }
 
   .btn-#{$color} {
-    color: #ffffff;
+    color: #FFFFFF;
     background-color: #{$value};
     border-color: #{$value};
     border-radius: 8px;
@@ -48,7 +48,7 @@ $socialColors: map_merge(
     &:hover,
     &:focus,
     &:active {
-      color: #ffffff;
+      color: #FFFFFF;
       background: darken($value, 8%);
     }
   }
@@ -62,7 +62,7 @@ $socialColors: map_merge(
     &:hover,
     &:focus,
     &:active {
-      color: #ffffff !important;
+      color: #FFFFFF !important;
       background-color: #{$value} !important;
       border-color: #{$value} !important;
       box-shadow: none !important;
@@ -79,7 +79,7 @@ $socialColors: map_merge(
 
       &.active {
         .page-link {
-          color: #ffffff;
+          color: #FFFFFF;
           background: #{$value};
           border-color: #{$value};
         }
@@ -108,13 +108,13 @@ $socialColors: map_merge(
   position: relative;
 
   .vc-error-field {
-    border-color: #dc3545!important;
+    border-color: #DC3545 !important;
   }
 
   .vc-error-box {
     //background: #a94442;
     //color: #fff;
-    color: #dc3545!important;
+    color: #DC3545 !important;
     margin-top: 5px;
     font-size: convertPx(10);
   }

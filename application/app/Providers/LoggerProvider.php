@@ -35,7 +35,7 @@ class LoggerProvider extends Provider
     public function register(): \Closure
     {
         return function () {
-            return new Logger('app', Path::app('/storage/logs'));
+            return new Logger('app', Path::storage('/logs'));
         };
     }
 }

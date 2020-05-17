@@ -64,7 +64,9 @@ class Event
 
         if (is_string($callable) && class_exists($callable)) {
             $callable = new $callable(self::getInstance());
-        } elseif (!is_callable($callable)) {
+        }
+
+        if (!is_callable($callable)) {
             throw new \Exception("Callable invalid in event {$name}.");
         }
 

@@ -11,7 +11,7 @@
 
 namespace App\Models;
 
-use Core\Database\Model as BaseModel;
+use Core\Database\Model;
 
 /**
  * Class Model.
@@ -39,7 +39,7 @@ use Core\Database\Model as BaseModel;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Model extends BaseModel
+abstract class BaseModel extends Model
 {
     /**
      * @param mixed|null $data
@@ -52,7 +52,7 @@ abstract class Model extends BaseModel
             $data = $this->data;
         }
 
-        if ($data instanceof Model) {
+        if ($data instanceof BaseModel) {
             $data = $data->data;
         }
 

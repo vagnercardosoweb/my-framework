@@ -91,9 +91,9 @@ if (!function_exists('json_error')) {
                 'status' => $status,
                 'message' => $exception->getMessage(),
                 'file' => str_replace([
-                    \Core\Helpers\Path::app(),
-                    \Core\Helpers\Path::public_html(),
-                    \Core\Helpers\Path::resource(),
+                    Path::app(),
+                    Path::public_html(),
+                    Path::resource(),
                 ], '', $exception->getFile()),
                 'line' => $exception->getLine(),
             ],
@@ -607,17 +607,17 @@ if (!function_exists('upload')) {
             // Checa extension
             if (in_array($extension, $extImages)) {
                 if (!in_array($extension, $extImages)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.', E_USER_ERROR);
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extImages)).'</b> são aceita para enviar sua imagem.');
                 }
             } else {
                 if (!in_array($extension, $extensions)) {
-                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.', E_USER_ERROR);
+                    throw new \Exception('Opsss, apenas as extenções <b>'.strtoupper(implode(', ', $extensions)).'</b> são aceita para enviar seu arquivo.');
                 }
             }
 
             // Checa tamanho
             if (($value['size'] > $maxFilesize = Upload::getPhpMaxFilesize()) || 1 == $value['error']) {
-                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.', E_USER_ERROR);
+                throw new \Exception('Opsss, seu upload ultrapassou o limite de tamanho de <b>'.Helper::convertBytesForHuman($maxFilesize).'</b>.');
             }
 
             // Cria pasta
@@ -662,9 +662,9 @@ if (!function_exists('upload')) {
             $uploads[] = [
                 'name' => $name,
                 'path' => str_replace([
-                    \Core\Helpers\Path::public_html(),
-                    \Core\Helpers\Path::app(),
-                    \Core\Helpers\Path::resource(),
+                    Path::public_html(),
+                    Path::app(),
+                    Path::resource(),
                 ], '', $path),
                 'extension' => $extension,
                 'size' => $value['size'],

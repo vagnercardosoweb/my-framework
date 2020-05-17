@@ -33,9 +33,9 @@ class BitbucketController extends Controller
     {
         // Token
         $token = $this->getParams('token');
-        $deployKey = Env::get('DEPLOY_KEY', null);
+        $deployToken = Env::get('DEPLOY_KEY', Env::get('DEPLOY_TOKEN', null));
 
-        if ($token !== $deployKey) {
+        if ($token !== $deployToken) {
             throw new \InvalidArgumentException('Token invalid.');
         }
 

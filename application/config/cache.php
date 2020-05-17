@@ -17,6 +17,10 @@ return [
      * Default cache store
      *
      * Supported: "redis", "file", "apc"
+     *
+     * If you want the redis driver, you must install the dependency
+     *
+     * composer require predis/predis
      */
 
     'default' => Env::get('CACHE_DRIVER', 'file'),

@@ -53,6 +53,8 @@ class Str extends \Illuminate\Support\Str
     }
 
     /**
+     * @throws \Exception
+     *
      * @return string
      */
     public static function uuid(): string

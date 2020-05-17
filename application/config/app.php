@@ -76,6 +76,7 @@ return [
             \App\Middlewares\GenerateKeysMiddleware::class,
             \App\Middlewares\MaintenanceMiddleware::class,
             \App\Middlewares\OldParamMiddleware::class,
+            // \App\Middlewares\CorsMiddleware::class
         ],
 
         'manual' => [],

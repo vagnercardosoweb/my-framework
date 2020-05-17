@@ -10,13 +10,19 @@
  */
 
 return [
-    // Configuração do site
+    // Nome do site do cliente
 
-    'name' => 'VCWeb Networks', // Nome do site do cliente
-    'subname' => '', // Slogan do site do cliente
-    'description' => '', // Descrição do site do cliente
-    'abstract' => '',
-    'keywords' => '',
+    'name' => 'VCWeb Networks',
+
+    // Slogan do site do cliente
+
+    'subname' => null,
+
+    // Descrição do site do cliente
+
+    'description' => null,
+    'abstract' => null,
+    'keywords' => null,
 
     // Google Plus
 
@@ -35,14 +41,17 @@ return [
     ],
 
     // Twitter
+    // https://www.twitter.com/?????
 
-    'twitter' => '', // https://www.twitter.com/?????
+    'twitter' => '',
 
     // Youtube
+    // https://www.youtube.com/user/?????
 
-    'youtube' => '', // https://www.youtube.com/user/?????
+    'youtube' => '',
 
     // Instagram
+    // https://www.instagram.com/?????
 
-    'instagram' => '', // https://www.instagram.com/?????
+    'instagram' => '',
 ];

@@ -40,7 +40,7 @@ class Jwt
         $this->key = (string)$key;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException('Jwt empty key.', E_USER_ERROR);
+            throw new \InvalidArgumentException('Jwt empty key.');
         }
     }
 
@@ -75,34 +75,34 @@ class Jwt
         $split = explode('.', $token);
 
         if (3 != count($split)) {
-            throw new \InvalidArgumentException('The token does not contain a valid format.', E_USER_ERROR);
+            throw new \InvalidArgumentException('The token does not contain a valid format.');
         }
 
         // Separate the token
         list($header64, $payload64, $signature) = $split;
 
         if (!$header = json_decode(base64_decode($header64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException('Invalid header encoding.', E_USER_ERROR);
+            throw new \UnexpectedValueException('Invalid header encoding.');
         }
 
         if (!$payload = json_decode(base64_decode($payload64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException('Invalid payload encoding.', E_USER_ERROR);
+            throw new \UnexpectedValueException('Invalid payload encoding.');
         }
 
         if (!$signature = base64_decode($signature)) {
-            throw new \UnexpectedValueException('Invalid signature encoding.', E_USER_ERROR);
+            throw new \UnexpectedValueException('Invalid signature encoding.');
         }
 
         if (empty($header['alg'])) {
-            throw new \UnexpectedValueException('Empty algorithm.', E_USER_ERROR);
+            throw new \UnexpectedValueException('Empty algorithm.');
         }
 
         if (!array_key_exists($header['alg'], $this->algorithms)) {
-            throw new \UnexpectedValueException("Algorithm {$header['alg']} is not supported.", E_USER_ERROR);
+            throw new \UnexpectedValueException("Algorithm {$header['alg']} is not supported.");
         }
 
         if (!$this->validate("{$header64}.{$payload64}", $signature, $header['alg'])) {
-            throw new \Exception('Signature verification failed.', E_USER_ERROR);
+            throw new \Exception('Signature verification failed.');
         }
 
         return $payload;
@@ -117,7 +117,9 @@ class Jwt
     private function signature(string $value, string $algorithm = 'HS256'): string
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                "Algorithm {$algorithm} is not supported."
+            );
         }
 
         list($function, $algorithm) = $this->algorithms[$algorithm];
@@ -139,7 +141,7 @@ class Jwt
     private function validate(string $value, string $signature, string $algorithm = 'HS256'): bool
     {
         if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.", E_USER_ERROR);
+            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.");
         }
 
         list($function, $algorithm) = $this->algorithms[$algorithm];

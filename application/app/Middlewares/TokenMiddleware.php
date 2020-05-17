@@ -43,7 +43,7 @@ class TokenMiddleware extends Middleware
 
         // Verifica se tem o header || CSRF || Autenticado
         if (empty($authorization)) {
-            $token = ($request->getHeaderLine('X-Csrf-Token') ?? $request->getParam('_csrfToken') ?? $request->getParam('jwtToken'));
+            $token = $this->getToken($request);
 
             if (empty($token) && $this->auth) {
                 $token = 'encrypted session';
@@ -98,5 +98,25 @@ class TokenMiddleware extends Middleware
         }
 
         return $next($request, $response);
+    }
+
+    /**
+     * @param \Slim\Http\Request $request
+     *
+     * @return string
+     */
+    private function getToken(Request $request)
+    {
+        if ($request->getHeaderLine('X-Csrf-Token')) {
+            return $request->getHeaderLine('X-Csrf-Token');
+        }
+
+        if ($request->getParam('_csrfToken')) {
+            return $request->getParam('_csrfToken');
+        }
+
+        if ($request->getParam('jwtToken')) {
+            return $request->getParam('jwtToken');
+        }
     }
 }

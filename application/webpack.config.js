@@ -4,14 +4,15 @@ const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const DEV_TOOL = NODE_ENV === 'development' ? 'source-map' : false;
 const ASSETS_PATH = path.join(__dirname, 'resources', 'assets');
 
-const reactComponents = require('./resources/assets/react');
-const publicDir = path.resolve(__dirname, '..', 'public_html');
+const publicFolder = path.resolve(__dirname, '..', 'public_html');
+const compileReactComponent = require('./resources/assets/react');
 
 const outputFilename = ({
   chunk: {
@@ -31,10 +32,10 @@ module.exports = {
   devtool: DEV_TOOL,
   entry: {
     web: path.resolve(ASSETS_PATH, 'app.js'),
-    ...reactComponents,
+    ...compileReactComponent,
   },
   output: {
-    path: publicDir,
+    path: publicFolder,
     filename: outputFilename,
     publicPath: '/',
   },
@@ -45,6 +46,7 @@ module.exports = {
     ],
   },
   plugins: [
+    new VueLoaderPlugin(),
     new webpack.ProgressPlugin(),
     new MiniCssExtractPlugin({
       filename: 'assets/[name]/app.css',
@@ -53,10 +55,14 @@ module.exports = {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
+      'global.$': 'jquery',
       'window.$': 'jquery',
+      'global.jQuery': 'jquery',
       'window.jQuery': 'jquery',
     }),
-    new VueLoaderPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['static/*'],
+    }),
   ],
   module: {
     rules: [

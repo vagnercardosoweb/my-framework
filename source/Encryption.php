@@ -50,7 +50,7 @@ class Encryption
      */
     public function encrypt($value, bool $serialize = true): ?string
     {
-        $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
+        $iv = $this->generateRandomBytes(openssl_cipher_iv_length($this->cipher));
 
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
@@ -144,13 +144,31 @@ class Encryption
      */
     protected function validMac(array $payload): bool
     {
-        $bytes = random_bytes(16);
+        $bytes = $this->generateRandomBytes(16);
         $calculated = $this->calculateMac($payload, $bytes);
 
         return hash_equals(
             hash_hmac('sha256', $payload['mac'], $bytes, true),
             $calculated
         );
+    }
+
+    /**
+     * @param int $length
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    protected function generateRandomBytes($length = 16)
+    {
+        if (function_exists('random_bytes')) {
+            $bytes = random_bytes($length);
+        } else {
+            $bytes = openssl_random_pseudo_bytes($length);
+        }
+
+        return $bytes;
     }
 
     /**
@@ -162,7 +180,10 @@ class Encryption
     protected function calculateMac(array $payload, $bytes): string
     {
         return hash_hmac(
-            'sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true
+            'sha256',
+            $this->hash($payload['iv'], $payload['value']),
+            $bytes,
+            true
         );
     }
 }

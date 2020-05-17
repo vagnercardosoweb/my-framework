@@ -18,7 +18,7 @@ use Core\Helpers\Validate;
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class UserModel extends Model
+class UserModel extends BaseModel
 {
     /**
      * @var string
@@ -91,7 +91,7 @@ class UserModel extends Model
         }
 
         // Password
-        if (!empty($data['password'])) {
+        if (!empty($data['password']) && 'unknown' === $this->hash->info($data['password'])['algoName']) {
             $data['password'] = $this->hash->make($data['password']);
         }
     }

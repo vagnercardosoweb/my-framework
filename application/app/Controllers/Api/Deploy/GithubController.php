@@ -35,7 +35,7 @@ class GithubController extends Controller
         $signature = $this->request->getHeaderLine('X-Hub-Signature');
         $event = $this->request->getHeaderLine('X-GitHub-Event');
         $contentType = $this->request->getHeaderLine('Content-Type');
-        $deployKey = Env::get('DEPLOY_KEY', null);
+        $deployToken = Env::get('DEPLOY_KEY', Env::get('DEPLOY_TOKEN', null));
 
         if ('ping' === $event) {
             return $this->jsonSuccess('Ping successfully!');
@@ -52,7 +52,7 @@ class GithubController extends Controller
         // Signature
         list($algo, $hash) = explode('=', $signature);
 
-        if (!hash_equals(hash_hmac($algo, $rawBody, $deployKey), $hash)) {
+        if (!hash_equals(hash_hmac($algo, $rawBody, $deployToken), $hash)) {
             throw new \Exception("Invalid signature {$algo}={$hash}");
         }
 

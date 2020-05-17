@@ -238,7 +238,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     public function getQuery(bool $replaceBindings = false): string
     {
         if (empty($this->table)) {
-            throw new \InvalidArgumentException(sprintf('[getQuery] `%s::table` is empty.', get_called_class()), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('[getQuery] `%s::table` is empty.', get_called_class())
+            );
         }
 
         if (method_exists($this, '_conditions')) {
@@ -542,7 +544,10 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     {
         if ($this->primaryKey && $id) {
             if (is_array($id)) {
-                array_unshift($this->where, sprintf("AND {$this->table}.{$this->primaryKey} IN (%s)", implode(',', $id)));
+                array_unshift(
+                    $this->where,
+                    sprintf("AND {$this->table}.{$this->primaryKey} IN (%s)", implode(',', $id))
+                );
 
                 return $this->fetchAll($fetchStyle);
             }
@@ -652,14 +657,16 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function update($data = null, bool $validate = true): ?array
     {
-        if (is_array($data) || is_object($data)) {
+        if (!empty($data) && is_array($data) || is_object($data)) {
             $this->data($data, $validate);
         }
 
         $this->mountWherePrimaryKey();
 
         if (empty($this->where)) {
-            throw new \InvalidArgumentException(sprintf('[update] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('[update] `%s::where()` is empty.', get_called_class())
+            );
         }
 
         $rows = $this->db
@@ -813,7 +820,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->mountWherePrimaryKey();
 
         if (empty($this->where)) {
-            throw new \InvalidArgumentException(sprintf('[delete] `%s::where()` is empty.', get_called_class()), E_USER_ERROR);
+            throw new \InvalidArgumentException(
+                sprintf('[delete] `%s::where()` is empty.', get_called_class())
+            );
         }
 
         $rows = $this->db

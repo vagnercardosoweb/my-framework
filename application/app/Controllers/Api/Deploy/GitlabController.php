@@ -33,9 +33,9 @@ class GitlabController extends Controller
     {
         // Headers
         $token = $this->request->getHeaderLine('X-Gitlab-Token');
-        $deployKey = Env::get('DEPLOY_KEY', null);
+        $deployToken = Env::get('DEPLOY_KEY', Env::get('DEPLOY_TOKEN', null));
 
-        if (empty($token) || $token !== $deployKey) {
+        if (empty($token) || $token !== $deployToken) {
             throw new \InvalidArgumentException('Token invalid.');
         }
 

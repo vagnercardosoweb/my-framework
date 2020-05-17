@@ -31,7 +31,7 @@ class Router
     {
         $baseUrl = defined('BASE_URL') ? constant('BASE_URL') : '';
         $router = str_replace($baseUrl, '', self::pathFor($name));
-        $current = app()->resolve('request')->getUri()->getPath();
+        $current = request()->getUri()->getPath();
 
         if ('/' !== substr($current, 0, 1)) {
             $current = "/{$current}";

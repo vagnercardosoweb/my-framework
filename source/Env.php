@@ -12,6 +12,7 @@
 namespace Core;
 
 use Core\Helpers\Helper;
+use Core\Helpers\Path;
 use Dotenv\Dotenv;
 use Dotenv\Repository\Adapter\ApacheAdapter;
 use Dotenv\Repository\Adapter\EnvConstAdapter;
@@ -102,8 +103,8 @@ class Env
      */
     protected static function path(): string
     {
-        $env = \Core\Helpers\Path::app('/.env');
-        $example = \Core\Helpers\Path::app('/.env.example');
+        $env = Path::app('/.env');
+        $example = Path::app('/.env.example');
 
         if (!file_exists($env) && file_exists($example)) {
             file_put_contents($env, file_get_contents($example));
