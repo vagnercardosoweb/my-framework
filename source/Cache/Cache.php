@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core\Cache;
@@ -67,8 +67,11 @@ class Cache
      */
     public function store(string $driver = null): CacheStore
     {
-        $driver = $driver ?? $this->getDriver();
-        $config = $this->getConfig($driver);
+        if (is_null($driver)) {
+            $driver = $this->getDefaultDriver();
+        }
+
+        $config = $this->getStoreConfig($driver);
         $method = sprintf('create%sDriver', ucfirst($driver));
 
         if (!method_exists($this, $method)) {
@@ -77,7 +80,7 @@ class Cache
             );
         }
 
-        if (empty($this->stores[$driver])) {
+        if (!$this->stores[$driver] instanceof CacheStore) {
             $this->stores[$driver] = $this->{$method}($config);
         }
 
@@ -89,15 +92,21 @@ class Cache
      *
      * @return array
      */
-    protected function getConfig(string $driver): array
+    protected function getStoreConfig(string $driver): array
     {
-        return $this->config['stores'][$driver] ?? [];
+        if (!isset($this->config['stores'][$driver])) {
+            throw new \InvalidArgumentException(
+                "Driver [{$driver}] does not have the settings defined."
+            );
+        }
+
+        return $this->config['stores'][$driver];
     }
 
     /**
      * @return string
      */
-    protected function getDriver(): string
+    protected function getDefaultDriver(): string
     {
         return $this->config['default'] ?? 'file';
     }
@@ -109,10 +118,7 @@ class Cache
      */
     protected function createFileDriver(array $config): CacheStore
     {
-        return new FileStore(
-            $config['path'],
-            $config['permission'] ?? null
-        );
+        return new FileStore($config['path'], $config['permission'] ?? null);
     }
 
     /**

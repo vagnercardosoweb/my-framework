@@ -34,10 +34,10 @@ class FileStore implements CacheStore
     /**
      * FileStore constructor.
      *
-     * @param $directory
-     * @param $permission
+     * @param string   $directory
+     * @param int|null $permission
      */
-    public function __construct(string $directory, int $permission = null)
+    public function __construct(string $directory, ?int $permission = null)
     {
         $this->directory = $directory;
         $this->permission = $permission;

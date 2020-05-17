@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core\Cache;
@@ -81,9 +81,7 @@ class ApcStore implements CacheStore
     {
         $key = $this->generateKey($key);
 
-        return $this->apcu
-            ? apcu_store($key, $value, $seconds)
-            : apc_store($key, $value, $seconds);
+        return $this->apcu ? apcu_store($key, $value, $seconds) : apc_store($key, $value, $seconds);
     }
 
     /**
@@ -91,9 +89,7 @@ class ApcStore implements CacheStore
      */
     public function flush(): bool
     {
-        return $this->apcu
-            ? apcu_clear_cache()
-            : apc_clear_cache('user');
+        return $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
     }
 
     /**
@@ -105,9 +101,7 @@ class ApcStore implements CacheStore
     {
         $key = $this->generateKey($key);
 
-        return $this->apcu
-            ? apcu_exists($key)
-            : apc_exists($key);
+        return $this->apcu ? apcu_exists($key) : apc_exists($key);
     }
 
     /**
@@ -120,9 +114,7 @@ class ApcStore implements CacheStore
     {
         $key = $this->generateKey($key);
 
-        return $this->apcu
-            ? apcu_inc($key, $value)
-            : apc_inc($key, $value);
+        return $this->apcu ? apcu_inc($key, $value) : apc_inc($key, $value);
     }
 
     /**
@@ -135,9 +127,7 @@ class ApcStore implements CacheStore
     {
         $key = $this->generateKey($key);
 
-        return $this->apcu
-            ? apcu_dec($key, $value)
-            : apc_dec($key, $value);
+        return $this->apcu ? apcu_dec($key, $value) : apc_dec($key, $value);
     }
 
     /**
@@ -149,9 +139,7 @@ class ApcStore implements CacheStore
     {
         $key = $this->generateKey($key);
 
-        return $this->apcu
-            ? apcu_delete($key)
-            : apc_delete($key);
+        return $this->apcu ? apcu_delete($key) : apc_delete($key);
     }
 
     /**
