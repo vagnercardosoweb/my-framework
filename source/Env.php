@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 28/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -36,15 +36,13 @@ class Env
     /**
      * @param string|string[]|null $names
      *
-     * @return array
+     * @return array<string|string|null>
      */
-    public static function load($names = '.env'): array
+    public static function load($names = '.env'): ?array
     {
-        return Dotenv::create(
-            self::repository(),
-            self::path(),
-            $names
-        )->load();
+        $dirEnv = dirname(self::path());
+
+        return Dotenv::create(self::repository(), $dirEnv, $names)->load();
     }
 
     /**
@@ -66,6 +64,21 @@ class Env
         }
 
         return is_string($value) ? trim($value) : $value;
+    }
+
+    /**
+     * @return string
+     */
+    public static function path(): string
+    {
+        $env = Path::app('/.env');
+        $example = Path::app('/.env.example');
+
+        if (!file_exists($env) && file_exists($example)) {
+            file_put_contents($env, file_get_contents($example));
+        }
+
+        return $env;
     }
 
     /**
@@ -96,20 +109,5 @@ class Env
         }
 
         return static::$repository;
-    }
-
-    /**
-     * @return string
-     */
-    protected static function path(): string
-    {
-        $env = Path::app('/.env');
-        $example = Path::app('/.env.example');
-
-        if (!file_exists($env) && file_exists($example)) {
-            file_put_contents($env, file_get_contents($example));
-        }
-
-        return str_replace('.env', '/', $env);
     }
 }

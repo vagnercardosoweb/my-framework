@@ -183,10 +183,7 @@ class Statement extends \PDOStatement
 
                 $key = (is_string($key) ? ":{$key}" : ((int)$key + 1));
                 $value = !empty($value) || '0' == $value ? filter_var($value, FILTER_DEFAULT) : null;
-                $this->bindValue($key, $value, (is_int($value)
-                    ? \PDO::PARAM_INT
-                    : (is_bool($value) ? \PDO::PARAM_BOOL
-                        : \PDO::PARAM_STR)));
+                $this->bindValue($key, $value, (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR)));
                 $this->bindings[$key] = $value;
             }
         }

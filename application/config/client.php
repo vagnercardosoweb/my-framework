@@ -27,31 +27,31 @@ return [
     // Google Plus
 
     'google' => [
-        'author' => '', // ID do Usuário
-        'page' => '', // ID da Página
+        'author' => null, // ID do Usuário
+        'page' => null, // ID da Página
     ],
 
     // Facebook
 
     'facebook' => [
-        'app' => '', // Opcional APP do facebook
-        'author' => '', // https://www.facebook.com/?????
-        'page' => '', // https://www.facebook.com/?????
-        'pageId' => '', // ID do Facebook Pages
+        'app' => null, // Opcional APP do facebook
+        'author' => null, // https://www.facebook.com/?????
+        'page' => null, // https://www.facebook.com/?????
+        'pageId' => null, // ID do Facebook Pages
     ],
 
     // Twitter
     // https://www.twitter.com/?????
 
-    'twitter' => '',
+    'twitter' => null,
 
     // Youtube
     // https://www.youtube.com/user/?????
 
-    'youtube' => '',
+    'youtube' => null,
 
     // Instagram
     // https://www.instagram.com/?????
 
-    'instagram' => '',
+    'instagram' => null,
 ];

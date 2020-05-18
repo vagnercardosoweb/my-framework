@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core\Password;
@@ -56,7 +56,9 @@ abstract class Password
         );
 
         if (false === $hashed) {
-            throw new \RuntimeException(sprintf('%s password not supported.', __CLASS__));
+            throw new \RuntimeException(
+                sprintf('%s password not supported.', __CLASS__)
+            );
         }
 
         return $hashed;

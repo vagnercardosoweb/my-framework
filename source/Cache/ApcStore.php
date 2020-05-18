@@ -72,6 +72,16 @@ class ApcStore implements CacheStore
 
     /**
      * @param string $key
+     *
+     * @return string
+     */
+    protected function generateKey(string $key): string
+    {
+        return sprintf('%s%s', $this->prefix, $key);
+    }
+
+    /**
+     * @param string $key
      * @param mixed  $value
      * @param int    $seconds
      *
@@ -140,15 +150,5 @@ class ApcStore implements CacheStore
         $key = $this->generateKey($key);
 
         return $this->apcu ? apcu_delete($key) : apc_delete($key);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function generateKey(string $key): string
-    {
-        return sprintf('%s%s', $this->prefix, $key);
     }
 }

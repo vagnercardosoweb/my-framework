@@ -175,7 +175,7 @@ class App extends SlimApp
             try {
                 list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
 
-                $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
+                $method = mb_strtolower($request->getMethod()) . ucfirst($originalMethod);
                 $namespace = sprintf('%s/%s', $namespace, $name);
                 $namespace = str_ireplace('/', '\\', $namespace);
 

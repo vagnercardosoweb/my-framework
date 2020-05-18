@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 17/05/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -38,7 +38,9 @@ class Encryption
         $this->cipher = $cipher;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException('Encryption empty key.', E_ERROR);
+            throw new \InvalidArgumentException(
+                'Encryption empty key.'
+            );
         }
     }
 

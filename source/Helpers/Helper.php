@@ -166,11 +166,8 @@ class Helper
         $bytes = $bytes / pow(1000, $base);
 
         return number_format(
-            round($bytes, $precision),
-            2,
-            ',',
-            ''
-        ).' '.$units[$base];
+                round($bytes, $precision), 2, ',', ''
+            ).' '.$units[$base];
     }
 
     /**

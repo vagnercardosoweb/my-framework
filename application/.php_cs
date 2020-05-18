@@ -45,7 +45,7 @@ return PhpCsFixer\Config::create()
         'concat_space' => ['spacing' => 'none'],
         'compact_nullable_typehint' => true,
         'declare_equal_normalize' => ['space' => 'single'],
-    'general_phpdoc_annotation_remove' => ['annotations' => ['author']],
+        // 'general_phpdoc_annotation_remove' => ['annotations' => ['author']],
         'increment_style' => ['style' => 'post'],
         'list_syntax' => ['syntax' => 'long'],
         'no_short_echo_tag' => true,

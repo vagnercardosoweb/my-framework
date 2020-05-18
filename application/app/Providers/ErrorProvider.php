@@ -13,7 +13,6 @@ namespace App\Providers;
 
 use Core\App;
 use Core\Env;
-use Core\Helpers\Helper;
 use Core\Helpers\Path;
 use Core\Router;
 use Slim\Container;

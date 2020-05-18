@@ -64,11 +64,34 @@ class Jwt
     }
 
     /**
+     * @param string $value
+     * @param string $algorithm
+     *
+     * @return string
+     */
+    private function signature(string $value, string $algorithm = 'HS256'): string
+    {
+        if (!array_key_exists($algorithm, $this->algorithms)) {
+            throw new \InvalidArgumentException(
+                "Algorithm {$algorithm} is not supported."
+            );
+        }
+
+        list($function, $algorithm) = $this->algorithms[$algorithm];
+
+        switch ($function) {
+            case 'hash_hmac':
+                return hash_hmac($algorithm, $value, $this->key, true);
+                break;
+        }
+    }
+
+    /**
      * @param string $token
      *
+     * @return array
      * @throws \Exception
      *
-     * @return array
      */
     public function decode(string $token): array
     {
@@ -106,29 +129,6 @@ class Jwt
         }
 
         return $payload;
-    }
-
-    /**
-     * @param string $value
-     * @param string $algorithm
-     *
-     * @return string
-     */
-    private function signature(string $value, string $algorithm = 'HS256'): string
-    {
-        if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException(
-                "Algorithm {$algorithm} is not supported."
-            );
-        }
-
-        list($function, $algorithm) = $this->algorithms[$algorithm];
-
-        switch ($function) {
-            case 'hash_hmac':
-                return hash_hmac($algorithm, $value, $this->key, true);
-                break;
-        }
     }
 
     /**

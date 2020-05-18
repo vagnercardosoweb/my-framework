@@ -43,7 +43,7 @@ class CorsMiddleware extends Middleware
     /**
      * @var array
      */
-    protected $allowedMethods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'];
+    protected $allowedMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'];
 
     /**
      * @param \Slim\Http\Request  $request  PSR7 request
@@ -57,14 +57,15 @@ class CorsMiddleware extends Middleware
         /** @var Response $response */
         $response = $next($request, $response);
 
-        /*header_remove("Cache-Control");
-        header_remove("Expires");
-        header_remove("Pragma");*/
-
-        return $response->withHeader('Access-Control-Allow-Origin', '*')
-            ->withHeader('Vary', 'Origin')
+        $response = $response->withHeader('Access-Control-Allow-Origin', '*')
             ->withHeader('Access-Control-Allow-Headers', implode(', ', $this->allowedHeaders))
             ->withHeader('Access-Control-Allow-Methods', implode(', ', $this->allowedMethods))
         ;
+
+        if ('options' === strtolower($request->getMethod())) {
+            $response = $response->withStatus(200);
+        }
+
+        return $response;
     }
 }
