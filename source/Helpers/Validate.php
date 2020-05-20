@@ -425,27 +425,8 @@ class Validate
     /**
      * @param mixed       $value
      * @param string      $table
-     * @param string|null $field
      * @param string|null $where
-     * @param string      $driver
-     *
-     * @return bool
-     */
-    public static function databaseNotExists(
-        $value,
-        string $table,
-        ?string $field = null,
-        ?string $where = null,
-        ?string $driver = null
-    ): bool {
-        return !self::databaseExists($value, $table, $field, $where, $driver);
-    }
-
-    /**
-     * @param mixed       $value
-     * @param string      $table
      * @param string|null $field
-     * @param string|null $where
      * @param string|null $driver
      *
      * @return bool
@@ -453,13 +434,11 @@ class Validate
     public static function databaseExists(
         $value,
         string $table,
-        ?string $field = null,
         ?string $where = null,
+        ?string $field = null,
         ?string $driver = null
     ): bool {
-        if (!$field && self::$field) {
-            $where = $field;
-            $driver = $where;
+        if (!$field) {
             $field = self::$field;
         }
 
@@ -471,6 +450,25 @@ class Validate
             ->query($sql, ['field' => $value])
             ->fetch(\PDO::FETCH_OBJ)
             ->total;
+    }
+
+    /**
+     * @param mixed       $value
+     * @param string      $table
+     * @param string|null $where
+     * @param string|null $field
+     * @param string|null $driver
+     *
+     * @return bool
+     */
+    public static function databaseNotExists(
+        $value,
+        string $table,
+        ?string $where = null,
+        ?string $field = null,
+        ?string $driver = null
+    ): bool {
+        return !self::databaseExists($value, $table, $where, $field, $driver);
     }
 
     /**
@@ -533,13 +531,18 @@ class Validate
      * @param array $data
      * @param array $conditions
      * @param bool  $exception
+     * @param bool  $forceAll
      *
      * @throws \Exception
      *
      * @return array|null
      */
-    public static function rules(array &$data, array $conditions, bool $exception = true): ?array
-    {
+    public static function rules(
+        array &$data,
+        array $conditions,
+        bool $exception = true,
+        bool $forceAll = false
+    ): ?array {
         self::$data = &$data;
 
         foreach ($conditions as $field => $rules) {
@@ -555,7 +558,7 @@ class Validate
                 foreach ($items as $item) {
                     $validate = array_merge([
                         'code' => E_USER_ERROR,
-                        'force' => false,
+                        'force' => $forceAll,
                         'check' => true,
                         'params' => $item['params'] ?? [],
                         'filters' => [],
