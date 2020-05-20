@@ -122,52 +122,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param string $name
-     *
-     * @return mixed
-     */
-    public function __get(string $name)
-    {
-        if ($provider = app()->resolve($name)) {
-            return $provider;
-        }
-
-        if (isset($this->data->{$name})) {
-            return $this->data->{$name};
-        }
-
-        return null;
-    }
-
-    /**
-     * @param string $name
-     * @param mixed  $value
-     */
-    public function __set(string $name, $value): void
-    {
-        $this->data = Obj::fromArray($this->data);
-        $this->data->{$name} = $value;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->data->{$name});
-    }
-
-    /**
-     * @param string $name
-     */
-    public function __unset(string $name): void
-    {
-        unset($this->data->{$name});
-    }
-
-    /**
      * @return object
      */
     public function toObject(): object
@@ -187,7 +141,35 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param string $name
-     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        if ($provider = app()->resolve($name)) {
+            return $provider;
+        }
+
+        if (isset($this->data->{$name})) {
+            return $this->data->{$name};
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function __set(string $name, $value): void
+    {
+        $this->data = Obj::fromArray($this->data);
+        $this->data->{$name} = $value;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
      */
     public function offsetSet($name, $value): void
     {
@@ -206,10 +188,28 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param string $name
+     *
+     * @return bool
+     */
+    public function __isset(string $name): bool
+    {
+        return isset($this->data->{$name});
+    }
+
+    /**
+     * @param string $name
      */
     public function offsetUnset($name): void
     {
         $this->__unset($name);
+    }
+
+    /**
+     * @param string $name
+     */
+    public function __unset(string $name): void
+    {
+        unset($this->data->{$name});
     }
 
     /**
@@ -229,13 +229,32 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * @return int
      * @throws \Exception
      *
-     * @return int
      */
     public function rowCount(): int
     {
         return $this->buildSqlStatement()->rowCount();
+    }
+
+    /**
+     * @return \Core\Database\Connection\Statement
+     * @throws \Exception
+     *
+     */
+    protected function buildSqlStatement(): Statement
+    {
+        $this->statement = $this->db
+            ->driver($this->driver)
+            ->query(
+                $this->getQuery(),
+                $this->bindings
+            );
+
+        $this->clear();
+
+        return $this->statement;
     }
 
     /**
@@ -308,8 +327,44 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * @param string|array $string
+     *
+     * @return string
+     */
+    protected function normalizeProperty($string): string
+    {
+        if (is_array($string)) {
+            $string = implode(' ', $string);
+        }
+
+        return preg_replace(
+            '/^(and|or)/i', '', trim($string)
+        );
+    }
+
+    /**
+     * @param string $sql
+     *
+     * @return string
+     */
+    protected function replaceQueryBindings($sql)
+    {
+        $keys = array_keys($this->bindings);
+        $keys = explode(',', ':'.implode(',:', $keys));
+        $values = array_map(function ($bind) {
+            if (!is_numeric($bind)) {
+                $bind = $this->db->quote($bind);
+            }
+
+            return $bind;
+        }, array_values($this->bindings));
+
+        return str_replace($keys, $values, $sql);
+    }
+
+    /**
      * @param array $properties
-     * @param bool  $reset
+     * @param bool $reset
      *
      * @return $this
      */
@@ -362,19 +417,18 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param string $column
      *
+     * @return int
      * @throws \Exception
      *
-     * @return int
      */
     public function count(string $column = '1'): int
     {
         $fetch = $this->select("COUNT({$column}) AS count")
             ->order('count DESC')->limit(1)
             ->buildSqlStatement()
-            ->fetch(\PDO::FETCH_OBJ)
-        ;
+            ->fetch(\PDO::FETCH_OBJ);
 
-        return $fetch ? (int)$fetch->count : 0;
+        return $fetch ? (int) $fetch->count : 0;
     }
 
     /**
@@ -386,7 +440,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     public function limit($limit, $offset = 0): self
     {
         if (is_numeric($limit)) {
-            $this->limit = (int)$limit;
+            $this->limit = (int) $limit;
 
             if (is_numeric($offset)) {
                 $this->offset($offset);
@@ -403,7 +457,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function offset($offset): self
     {
-        $this->offset = (int)$offset;
+        $this->offset = (int) $offset;
 
         return $this;
     }
@@ -418,6 +472,25 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->mountProperty($order, 'order');
 
         return $this;
+    }
+
+    /**
+     * @param string|array|null $conditions
+     * @param string $property
+     *
+     * @return void
+     */
+    protected function mountProperty($conditions, $property): void
+    {
+        if (!is_array($this->{$property})) {
+            $this->{$property} = [];
+        }
+
+        foreach ((array) $conditions as $condition) {
+            if (!empty($condition) && !array_search($condition, $this->{$property})) {
+                $this->{$property}[] = trim((string) $condition);
+            }
+        }
     }
 
     /**
@@ -444,7 +517,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     public function table(?string $table = null)
     {
         if (!empty($table)) {
-            $this->table = (string)$table;
+            $this->table = (string) $table;
 
             return $this;
         }
@@ -491,9 +564,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param \Closure $callback
      *
+     * @return mixed
      * @throws \Exception
      *
-     * @return mixed
      */
     public function transaction(\Closure $callback)
     {
@@ -504,11 +577,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object $data
-     * @param bool         $validate
-     *
-     * @throws \Exception
+     * @param bool $validate
      *
      * @return $this
+     * @throws \Exception
+     *
      */
     public function save($data = [], bool $validate = true): self
     {
@@ -523,11 +596,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param int|array $id
-     * @param int       $fetchStyle
-     *
-     * @throws \Exception
+     * @param int $fetchStyle
      *
      * @return $this|$this[]|null
+     * @throws \Exception
+     *
      */
     public function fetchById($id, ?int $fetchStyle = null)
     {
@@ -553,12 +626,12 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param int   $fetchStyle
+     * @param int $fetchStyle
      * @param mixed $fetchArgument
      *
+     * @return $this[]
      * @throws \Exception
      *
-     * @return $this[]
      */
     public function fetchAll($fetchStyle = null, $fetchArgument = null)
     {
@@ -591,9 +664,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param int $fetchStyle
      *
+     * @return $this|null
      * @throws \Exception
      *
-     * @return $this|null
      */
     public function fetch($fetchStyle = null): ?self
     {
@@ -638,11 +711,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object $data
-     * @param bool         $validate
-     *
-     * @throws \Exception
+     * @param bool $validate
      *
      * @return $this[]|null
+     * @throws \Exception
+     *
      */
     public function update($data = [], bool $validate = true): ?array
     {
@@ -662,8 +735,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
                 $this->data,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            )
-        ;
+            );
 
         $this->clear();
 
@@ -682,7 +754,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param array|object $data
-     * @param bool         $validate
+     * @param bool $validate
      *
      * @return $this
      */
@@ -705,12 +777,23 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * @return void
+     */
+    protected function mountWherePrimaryKey(): void
+    {
+        if (!empty($this->getPrimaryValue())) {
+            $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkey";
+            $this->bindings['pkey'] = $this->getPrimaryValue();
+        }
+    }
+
+    /**
      * @param array|object $data
-     * @param bool         $validate
-     *
-     * @throws \Exception
+     * @param bool $validate
      *
      * @return $this
+     * @throws \Exception
+     *
      */
     public function create($data = [], bool $validate = true): self
     {
@@ -718,8 +801,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         $lastInsertId = $this->db
             ->driver($this->driver)
-            ->create($this->table, $this->data)
-        ;
+            ->create($this->table, $this->data);
 
         $new = clone $this;
 
@@ -741,12 +823,35 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param mixed  $value
      * @param string $column
+     * @param mixed $value
+     * @param bool $oneResult
+     * @param int|null $fetchStyle
+     *
+     * @return $this|$this[]
      *
      * @throws \Exception
      *
+     * @deprecated use method whereBy
+     */
+    public function fetchBy(string $column, $value, bool $oneResult = false, ?int $fetchStyle = null)
+    {
+        $this->whereBy($column, $value);
+
+        if ($oneResult) {
+            return $this->fetch($fetchStyle);
+        }
+
+        return $this->fetchAll($fetchStyle);
+    }
+
+    /**
+     * @param mixed $value
+     * @param string $column
+     *
      * @return $this
+     * @throws \Exception
+     *
      */
     public function whereBy(string $column, $value): self
     {
@@ -801,9 +906,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     /**
      * @param int|null $id
      *
+     * @return $this[]|null
      * @throws \Exception
      *
-     * @return $this[]|null
      */
     public function delete(?int $id = null): ?array
     {
@@ -825,8 +930,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
                 $this->table,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            )
-        ;
+            );
 
         if (!$rows) {
             return null;
@@ -842,9 +946,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * @return \Core\Database\Connection\Statement
      * @throws \Exception
      *
-     * @return \Core\Database\Connection\Statement
      */
     public function getStatement(): Statement
     {
@@ -864,91 +968,5 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         $this->driver = $driver;
 
         return $this;
-    }
-
-    /**
-     * @throws \Exception
-     *
-     * @return \Core\Database\Connection\Statement
-     */
-    protected function buildSqlStatement(): Statement
-    {
-        $this->statement = $this->db
-            ->driver($this->driver)
-            ->query(
-                $this->getQuery(),
-                $this->bindings
-            )
-        ;
-
-        $this->clear();
-
-        return $this->statement;
-    }
-
-    /**
-     * @param string|array $string
-     *
-     * @return string
-     */
-    protected function normalizeProperty($string): string
-    {
-        if (is_array($string)) {
-            $string = implode(' ', $string);
-        }
-
-        return preg_replace(
-            '/^(and|or)/i', '', trim($string)
-        );
-    }
-
-    /**
-     * @param string $sql
-     *
-     * @return string
-     */
-    protected function replaceQueryBindings($sql)
-    {
-        $keys = array_keys($this->bindings);
-        $keys = explode(',', ':'.implode(',:', $keys));
-        $values = array_map(function ($bind) {
-            if (!is_numeric($bind)) {
-                $bind = $this->db->quote($bind);
-            }
-
-            return $bind;
-        }, array_values($this->bindings));
-
-        return str_replace($keys, $values, $sql);
-    }
-
-    /**
-     * @param string|array|null $conditions
-     * @param string            $property
-     *
-     * @return void
-     */
-    protected function mountProperty($conditions, $property): void
-    {
-        if (!is_array($this->{$property})) {
-            $this->{$property} = [];
-        }
-
-        foreach ((array)$conditions as $condition) {
-            if (!empty($condition) && !array_search($condition, $this->{$property})) {
-                $this->{$property}[] = trim((string)$condition);
-            }
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function mountWherePrimaryKey(): void
-    {
-        if (!empty($this->getPrimaryValue())) {
-            $this->where[] = "AND {$this->table}.{$this->getPrimaryKey()} = :pkey";
-            $this->bindings['pkey'] = $this->getPrimaryValue();
-        }
     }
 }
