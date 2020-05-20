@@ -28,18 +28,18 @@
     "ext-simplexml": "*",
     "ext-zlib": "*",
     "ext-redis": "*",
-    "illuminate/support": "6.15.1",
-    "monolog/monolog": "2.0.2",
-    "phpmailer/phpmailer": "6.1.4",
-    "robmorgan/phinx": "0.11.4",
-    "slim/slim": "3.12.3",
-    "symfony/var-dumper": "5.0.4",
-    "twig/twig": "3.0.3",
-    "vlucas/phpdotenv": "4.1.0",
+    "illuminate/support": "^7.0",
+    "monolog/monolog": "^2.0",
+    "phpmailer/phpmailer": "^6.1",
+    "robmorgan/phinx": "^0.12",
+    "slim/slim": "^3.12",
+    "symfony/var-dumper": "^5.0",
+    "twig/twig": "^3.0",
+    "vlucas/phpdotenv": "^4.1",
     "predis/predis": "^1.1"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.15"
+    "friendsofphp/php-cs-fixer": "^2.16"
   },
   "autoload": {
     "files": [

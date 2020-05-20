@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/02/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -292,8 +292,7 @@ class Helper
      */
     public static function parseXml(
         string $xml,
-        string
-        $className = 'SimpleXMLElement',
+        string $className = 'SimpleXMLElement',
         int $option = 0,
         string $ns = '',
         bool $isPrefix = false

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 27/04/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -70,37 +70,6 @@ class App extends SlimApp
     }
 
     /**
-     * @return void
-     */
-    private function registerPhpConfiguration(): void
-    {
-        $charset = Env::get('APP_CHARSET', 'UTF-8');
-        $locale = Env::get('APP_LOCALE', 'pt_BR');
-
-        ini_set('default_charset', $charset);
-        date_default_timezone_set(Env::get('APP_TIMEZONE', 'America/Sao_Paulo'));
-        mb_internal_encoding($charset);
-        setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
-
-        ini_set('log_errors', true);
-        ini_set('error_log', sprintf(Env::get('INI_ERROR_LOG', Path::storage('/logs/php/%s.log')), date('dmY')));
-        ini_set('display_errors', Env::get('INI_DISPLAY_ERRORS', ini_get('display_errors')));
-        ini_set('display_startup_errors', Env::get('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
-
-        if ('development' === Env::get('APP_ENV', 'development')) {
-            error_reporting(E_ALL);
-        } else {
-            error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
-        }
-
-        set_error_handler(function ($level, $message, $file = '', $line = 0) {
-            if (error_reporting() & $level) {
-                throw new \ErrorException($message, 0, $level, $file, $line);
-            }
-        });
-    }
-
-    /**
      * @return \Core\App
      */
     public static function getInstance()
@@ -150,98 +119,11 @@ class App extends SlimApp
     }
 
     /**
-     * @param string|callable $callable
-     *
-     * @return \Closure
-     */
-    private function handleCallableRouter($callable): \Closure
-    {
-        if ($callable instanceof \Closure) {
-            return $callable;
-        }
-
-        $namespace = $this->defaultNamespace;
-        $groupNamespaces = $this->groupNamespaces;
-
-        foreach ($groupNamespaces as $n) {
-            while ('/' === $n[strlen($n) - 1]) {
-                $n = substr($n, 0, -1);
-            }
-
-            $namespace .= "/{$n}";
-        }
-
-        return function (Request $request, Response $response, array $params) use ($callable, $namespace) {
-            try {
-                list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
-
-                $method = mb_strtolower($request->getMethod()) . ucfirst($originalMethod);
-                $namespace = sprintf('%s/%s', $namespace, $name);
-                $namespace = str_ireplace('/', '\\', $namespace);
-
-                $controller = new $namespace($request, $response, $this);
-
-                if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
-                    $method = $originalMethod ?? 'index';
-
-                    if (!method_exists($controller, $method)) {
-                        throw new \BadMethodCallException(
-                            sprintf('Call to undefined method %s::%s()', get_class($controller), $method)
-                        );
-                    }
-                }
-
-                if (App::isCli()) {
-                    $params = array_merge($params, $request->getQueryParams());
-                }
-
-                $result = call_user_func_array([$controller, $method], $params);
-
-                if (is_array($result) || $json = Helper::decodeJson($result, true)) {
-                    return $response->withJson($json ?? $result);
-                }
-
-                return $result;
-            } catch (\Exception $e) {
-                return call_user_func_array(
-                    $this->get('errorHandler'),
-                    [$request, $response, $e]
-                );
-            }
-        };
-    }
-
-    /**
      * @return bool
      */
     public static function isCli(): bool
     {
         return in_array(PHP_SAPI, ['cli', 'phpdbg']);
-    }
-
-    /**
-     * @param \Slim\Interfaces\RouteInterface $route
-     * @param                                 $middleware
-     */
-    private function addMiddlewareInRoute(RouteInterface $route, $middleware): void
-    {
-        $manual = Config::get('app.middleware.manual', []);
-
-        if (!is_array($middleware)) {
-            $middleware = [$middleware];
-        }
-
-        sort($middleware);
-
-        foreach ($middleware as $middle) {
-            if (class_exists($middle) || $middle instanceof \Closure) {
-                $route->add($middle);
-            } else {
-                if (array_key_exists($middle, $manual)) {
-                    $route->add($manual[$middle]);
-                }
-            }
-        }
     }
 
     /**
@@ -298,9 +180,9 @@ class App extends SlimApp
             $routes = Config::get('app.routes.app', []);
         }
 
-        $this->options('/{routes:.*}', function ($request, $response) {
+        /*$this->options('/{routes:.*}', function ($request, $response) {
             return $response->withStatus(200);
-        });
+        });*/
 
         foreach ($routes as $path) {
             call_user_func(function ($path, $app) {
@@ -432,5 +314,123 @@ class App extends SlimApp
         $this->defaultNamespace = $namespace;
 
         return $this;
+    }
+
+    /**
+     * @return void
+     */
+    private function registerPhpConfiguration(): void
+    {
+        $charset = Env::get('APP_CHARSET', 'UTF-8');
+        $locale = Env::get('APP_LOCALE', 'pt_BR');
+
+        ini_set('default_charset', $charset);
+        date_default_timezone_set(Env::get('APP_TIMEZONE', 'America/Sao_Paulo'));
+        mb_internal_encoding($charset);
+        setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
+
+        ini_set('log_errors', true);
+        ini_set('error_log', sprintf(Env::get('INI_ERROR_LOG', Path::storage('/logs/php/%s.log')), date('dmY')));
+        ini_set('display_errors', Env::get('INI_DISPLAY_ERRORS', ini_get('display_errors')));
+        ini_set('display_startup_errors', Env::get('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
+
+        if ('development' === Env::get('APP_ENV', 'development')) {
+            error_reporting(E_ALL);
+        } else {
+            error_reporting(E_ALL ^ E_NOTICE ^ E_DEPRECATED);
+        }
+
+        set_error_handler(function ($level, $message, $file = '', $line = 0) {
+            if (error_reporting() & $level) {
+                throw new \ErrorException($message, 0, $level, $file, $line);
+            }
+        });
+    }
+
+    /**
+     * @param string|callable $callable
+     *
+     * @return \Closure
+     */
+    private function handleCallableRouter($callable): \Closure
+    {
+        if ($callable instanceof \Closure) {
+            return $callable;
+        }
+
+        $namespace = $this->defaultNamespace;
+        $groupNamespaces = $this->groupNamespaces;
+
+        foreach ($groupNamespaces as $n) {
+            while ('/' === $n[strlen($n) - 1]) {
+                $n = substr($n, 0, -1);
+            }
+
+            $namespace .= "/{$n}";
+        }
+
+        return function (Request $request, Response $response, array $params) use ($callable, $namespace) {
+            try {
+                list($name, $originalMethod) = (explode('@', $callable) + [1 => null]);
+
+                $method = mb_strtolower($request->getMethod()).ucfirst($originalMethod);
+                $namespace = sprintf('%s/%s', $namespace, $name);
+                $namespace = str_ireplace('/', '\\', $namespace);
+
+                $controller = new $namespace($request, $response, $this);
+
+                if (!Helper::objectMethodExists($controller, [$method, '__call', '__callStatic'])) {
+                    $method = $originalMethod ?? 'index';
+
+                    if (!method_exists($controller, $method)) {
+                        throw new \BadMethodCallException(
+                            sprintf('Call to undefined method %s::%s()', get_class($controller), $method)
+                        );
+                    }
+                }
+
+                if (App::isCli()) {
+                    $params = array_merge($params, $request->getQueryParams());
+                }
+
+                $result = call_user_func_array([$controller, $method], $params);
+
+                if (is_array($result) || $json = Helper::decodeJson($result, true)) {
+                    return $response->withJson($json ?? $result);
+                }
+
+                return $result;
+            } catch (\Exception $e) {
+                return call_user_func_array(
+                    $this->get('errorHandler'),
+                    [$request, $response, $e]
+                );
+            }
+        };
+    }
+
+    /**
+     * @param \Slim\Interfaces\RouteInterface $route
+     * @param                                 $middleware
+     */
+    private function addMiddlewareInRoute(RouteInterface $route, $middleware): void
+    {
+        $manual = Config::get('app.middleware.manual', []);
+
+        if (!is_array($middleware)) {
+            $middleware = [$middleware];
+        }
+
+        sort($middleware);
+
+        foreach ($middleware as $middle) {
+            if (class_exists($middle) || $middle instanceof \Closure) {
+                $route->add($middle);
+            } else {
+                if (array_key_exists($middle, $manual)) {
+                    $route->add($manual[$middle]);
+                }
+            }
+        }
     }
 }

@@ -6,10 +6,11 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 use Core\Env;
+use Core\Helpers\Path;
 
 return [
     // Slim 3+ Settings
@@ -35,12 +36,12 @@ return [
 
     'routes' => [
         'app' => [
-            \Core\Helpers\Path::app('/routes/api.php'),
-            \Core\Helpers\Path::app('/routes/web.php'),
+            Path::app('/routes/api.php'),
+            Path::app('/routes/web.php'),
         ],
 
         'console' => [
-            \Core\Helpers\Path::app('/routes/console.php'),
+            Path::app('/routes/console.php'),
         ],
     ],
 

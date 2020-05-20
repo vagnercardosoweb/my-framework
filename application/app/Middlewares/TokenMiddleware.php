@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -65,11 +65,6 @@ class TokenMiddleware extends Middleware
             $token = trim($matches[1]);
         }
 
-        // Verifica se o type do token é válido
-        if (!in_array($type, ['Basic', 'Bearer'])) {
-            throw new UnauthorizedException('Acesso negado! Tipo do token não foi aceito.');
-        }
-
         // Tenta descriptografar o token e caso contrário verifica
         // se é acesso normal e se o token é aceito
         if (!$payload = $this->encryption->decrypt($token)) {
@@ -77,14 +72,16 @@ class TokenMiddleware extends Middleware
                 $payload = $this->jwt->decode($token);
             } catch (\Exception $e) {
                 if ($token !== Env::get('API_KEY', null)) {
-                    throw new UnauthorizedException('Acesso negado! Essa requisição precisa de autorização.');
+                    throw new UnauthorizedException(
+                        'Acesso negado! Realize a autenticação para continuar.'
+                    );
                 }
             }
         }
 
         // Verifica se o token está expirado
         if (!empty($payload['expired']) && $payload['expired'] < time()) {
-            throw new UnauthorizedException('Acesso negado! Token expirado.');
+            throw new UnauthorizedException('Acesso negado! Token foi expirado.');
         }
 
         // Remove container auth
@@ -93,7 +90,8 @@ class TokenMiddleware extends Middleware
         // Busca o usuário caso tenha o id no payload
         if (!empty($payload['id'])) {
             $this->container['auth'] = function () {
-                // get user logged
+                // TODO
+                // GET USER DATA
             };
         }
 

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 17/05/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace Core\Cache;
@@ -68,16 +68,6 @@ class ApcStore implements CacheStore
         }
 
         return $value;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function generateKey(string $key): string
-    {
-        return sprintf('%s%s', $this->prefix, $key);
     }
 
     /**
@@ -150,5 +140,15 @@ class ApcStore implements CacheStore
         $key = $this->generateKey($key);
 
         return $this->apcu ? apcu_delete($key) : apc_delete($key);
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function generateKey(string $key): string
+    {
+        return sprintf('%s%s', $this->prefix, $key);
     }
 }

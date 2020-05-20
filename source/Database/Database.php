@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 01/03/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -289,8 +289,8 @@ class Database
 
         if (empty($config = $this->connections[$driver])) {
             throw new \Exception(
-                "Database connections {$driver} " .
-                "does not exist configured."
+                "Database connections {$driver} ".
+                'does not exist configured.'
             );
         }
 
