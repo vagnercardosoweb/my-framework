@@ -425,8 +425,8 @@ class Validate
     /**
      * @param mixed       $value
      * @param string      $table
-     * @param string|null $where
      * @param string|null $field
+     * @param string|null $where
      * @param string|null $driver
      *
      * @return bool
@@ -434,8 +434,8 @@ class Validate
     public static function databaseExists(
         $value,
         string $table,
-        ?string $where = null,
         ?string $field = null,
+        ?string $where = null,
         ?string $driver = null
     ): bool {
         if (!$field) {
@@ -445,18 +445,18 @@ class Validate
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
         return 1 == app()
-            ->resolve('db')
-            ->driver($driver)
-            ->query($sql, ['field' => $value])
-            ->fetch(\PDO::FETCH_OBJ)
-            ->total;
+                ->resolve('db')
+                ->driver($driver)
+                ->query($sql, ['field' => $value])
+                ->fetch(\PDO::FETCH_OBJ)
+                ->total;
     }
 
     /**
      * @param mixed       $value
      * @param string      $table
-     * @param string|null $where
      * @param string|null $field
+     * @param string|null $where
      * @param string|null $driver
      *
      * @return bool
@@ -464,11 +464,11 @@ class Validate
     public static function databaseNotExists(
         $value,
         string $table,
-        ?string $where = null,
         ?string $field = null,
+        ?string $where = null,
         ?string $driver = null
     ): bool {
-        return !self::databaseExists($value, $table, $where, $field, $driver);
+        return !self::databaseExists($value, $table, $field, $where, $driver);
     }
 
     /**
