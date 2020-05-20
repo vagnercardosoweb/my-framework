@@ -20,7 +20,6 @@ use Core\Interfaces\ServiceProvider;
 use Slim\App as SlimApp;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Interfaces\RouteInterface;
 
 /**
  * Class App.
@@ -112,7 +111,7 @@ class App extends SlimApp
         }
 
         if (!empty($middleware)) {
-            $this->addMiddlewareInRoute($route, $middleware);
+            $this->addMiddlewareInRouteOrGroup($route, $middleware);
         }
 
         return $route;
@@ -135,16 +134,28 @@ class App extends SlimApp
     public function group($pattern, $callable)
     {
         $currentNamespaces = $this->groupNamespaces;
+        $groupMiddleware = [];
 
         if (is_array($pattern)) {
+            if (!empty($pattern['middleware'])) {
+                $groupMiddleware = $pattern['middleware'];
+            }
+
             if (!empty($pattern['namespace'])) {
-                array_push($this->groupNamespaces, ucwords($pattern['namespace']));
+                array_push(
+                    $this->groupNamespaces,
+                    ucwords($pattern['namespace'])
+                );
             }
 
             $pattern = $pattern['path'] ?? $pattern['prefix'] ?? null;
         }
 
         $group = parent::group($pattern, $callable);
+
+        if (!empty($groupMiddleware)) {
+            $this->addMiddlewareInRouteOrGroup($group, $groupMiddleware);
+        }
 
         $this->groupNamespaces = $currentNamespaces;
 
@@ -410,10 +421,10 @@ class App extends SlimApp
     }
 
     /**
-     * @param \Slim\Interfaces\RouteInterface $route
-     * @param                                 $middleware
+     * @param \Slim\Interfaces\RouteInterface|\Slim\Interfaces\RouteGroupInterface $route
+     * @param string|array                                                         $middleware
      */
-    private function addMiddlewareInRoute(RouteInterface $route, $middleware): void
+    private function addMiddlewareInRouteOrGroup($route, $middleware): void
     {
         $manual = Config::get('app.middleware.manual', []);
 
@@ -424,12 +435,12 @@ class App extends SlimApp
         sort($middleware);
 
         foreach ($middleware as $middle) {
+            if (array_key_exists($middle, $manual)) {
+                $middle = $manual[$middle];
+            }
+
             if (class_exists($middle) || $middle instanceof \Closure) {
                 $route->add($middle);
-            } else {
-                if (array_key_exists($middle, $manual)) {
-                    $route->add($manual[$middle]);
-                }
             }
         }
     }
