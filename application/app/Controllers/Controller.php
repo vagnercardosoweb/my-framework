@@ -276,9 +276,9 @@ abstract class Controller
      * @param array $keys
      * @param bool  $forceKeysExists
      *
-     * @return array|mixed|null
+     * @return array
      */
-    public function getOnlyParamsFiltered(array $keys, bool $forceKeysExists = false)
+    public function getOnlyParamsFiltered(array $keys, bool $forceKeysExists = true): array
     {
         return $this->getOnlyParams($keys, $forceKeysExists, true);
     }
@@ -288,15 +288,15 @@ abstract class Controller
      * @param bool  $forceKeysExists
      * @param bool  $filter
      *
-     * @return mixed
+     * @return array
      */
-    public function getOnlyParams(array $keys, bool $forceKeysExists = false, bool $filter = false)
+    public function getOnlyParams(array $keys, bool $forceKeysExists = true, bool $filter = false): array
     {
-        $data = $this->request->getParams($keys);
+        $data = $this->request->getParams($keys) ?? [];
         $diffKeys = array_diff_key(array_flip($keys), $data);
 
         if ($forceKeysExists && !empty($diffKeys)) {
-            foreach ($diffKeys as $diffKey) {
+            foreach (array_keys($diffKeys) as $diffKey) {
                 $data[$diffKey] = null;
             }
         }
