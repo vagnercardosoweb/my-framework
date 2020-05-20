@@ -63,7 +63,7 @@ abstract class Connection extends \PDO
             $this->setAttributesAndCommands($config);
             $this->setEvents($config);
         } catch (\PDOException $e) {
-            throw new \Exception($e->getMessage(), $e->getCode());
+            throw new \Exception($e->getMessage());
         }
     }
 
