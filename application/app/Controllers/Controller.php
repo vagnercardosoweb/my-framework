@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/03/2020 Vagner Cardoso
+ * @copyright 20/05/2020 Vagner Cardoso
  */
 
 namespace App\Controllers;
@@ -68,8 +68,11 @@ abstract class Controller
      * @param \Slim\Http\Response $response
      * @param \Slim\Container     $container
      */
-    public function __construct(Request $request, Response $response, Container $container)
-    {
+    public function __construct(
+        Request $request,
+        Response $response,
+        Container $container
+    ) {
         $this->request = $request;
         $this->response = $response;
         $this->container = $container;
@@ -84,7 +87,11 @@ abstract class Controller
      */
     public function __get($name)
     {
-        return app()->resolve($name);
+        if ($this->container->has($name)) {
+            return $this->container->get($name);
+        }
+
+        return null;
     }
 
     /**
@@ -94,8 +101,11 @@ abstract class Controller
      *
      * @return \Slim\Http\Response
      */
-    public function view(string $template, array $context = [], int $status = StatusCode::HTTP_OK): Response
-    {
+    public function view(
+        string $template,
+        array $context = [],
+        int $status = StatusCode::HTTP_OK
+    ): Response {
         return $this->view->render($this->response, $template, $context, $status);
     }
 
@@ -128,8 +138,11 @@ abstract class Controller
      *
      * @return \Slim\Http\Response
      */
-    public function jsonSuccess($message = null, $data = [], int $status = StatusCode::HTTP_OK): Response
-    {
+    public function jsonSuccess(
+        $message = null,
+        $data = [],
+        int $status = StatusCode::HTTP_OK
+    ): Response {
         return json_success($message, $data, $status);
     }
 
@@ -140,8 +153,11 @@ abstract class Controller
      *
      * @return \Slim\Http\Response
      */
-    public function jsonError(\Exception $exception, array $data = [], int $status = StatusCode::HTTP_BAD_REQUEST): Response
-    {
+    public function jsonError(
+        \Exception $exception,
+        array $data = [],
+        int $status = StatusCode::HTTP_BAD_REQUEST
+    ): Response {
         return json_error($exception, $data, $status);
     }
 
@@ -153,8 +169,12 @@ abstract class Controller
      *
      * @return string
      */
-    public function pathFor(string $name, array $data = [], array $queryParams = [], string $hash = ''): string
-    {
+    public function pathFor(
+        string $name,
+        array $data = [],
+        array $queryParams = [],
+        string $hash = ''
+    ): string {
         return Router::pathFor($name, $data, $queryParams, $hash);
     }
 
@@ -250,6 +270,38 @@ abstract class Controller
             : $this->request->getParam($key);
 
         return $this->filterParams($data, $key, $filter);
+    }
+
+    /**
+     * @param array $keys
+     * @param bool  $forceKeysExists
+     *
+     * @return array|mixed|null
+     */
+    public function getOnlyParamsFiltered(array $keys, bool $forceKeysExists = false)
+    {
+        return $this->getOnlyParams($keys, $forceKeysExists, true);
+    }
+
+    /**
+     * @param array $keys
+     * @param bool  $forceKeysExists
+     * @param bool  $filter
+     *
+     * @return mixed
+     */
+    public function getOnlyParams(array $keys, bool $forceKeysExists = false, bool $filter = false)
+    {
+        $data = $this->request->getParams($keys);
+        $diffKeys = array_diff_key(array_flip($keys), $data);
+
+        if ($forceKeysExists && !empty($diffKeys)) {
+            foreach ($diffKeys as $diffKey) {
+                $data[$diffKey] = null;
+            }
+        }
+
+        return $this->filterParams($data, null, $filter);
     }
 
     /**
