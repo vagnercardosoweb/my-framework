@@ -111,7 +111,7 @@ class Database
      *
      * @throws \Exception
      *
-     * @return $this
+     * @return \Core\Database\Database
      */
     public function driver(?string $driver = null): Database
     {
