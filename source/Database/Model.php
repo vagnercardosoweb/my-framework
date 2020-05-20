@@ -109,6 +109,19 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     protected $reset = [];
 
     /**
+     * @return void
+     */
+    public function __clone()
+    {
+        $data = clone $this->toObject();
+        unset($data->{$this->primaryKey});
+
+        $this->data = $data;
+        $this->reset = [];
+        $this->statement = null;
+    }
+
+    /**
      * @param string $name
      *
      * @return mixed
@@ -155,16 +168,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @return void
+     * @return object
      */
-    public function __clone()
+    public function toObject(): object
     {
-        $data = clone $this->toObject();
-        unset($data->{$this->primaryKey});
-
-        $this->data = $data;
-        $this->reset = [];
-        $this->statement = null;
+        return Obj::fromArray($this->data);
     }
 
     /**
@@ -307,7 +315,16 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function clear(array $properties = [], bool $reset = false): self
     {
-        $notReset = array_diff(['table', 'primaryKey', 'foreignKey', 'driver', 'fetchStyle', 'statement', 'data'], $properties);
+        $notReset = array_diff([
+            'table',
+            'primaryKey',
+            'foreignKey',
+            'driver',
+            'fetchStyle',
+            'statement',
+            'data',
+        ], $properties);
+
         $reflection = new \ReflectionClass(get_class($this));
 
         foreach ($reflection->getProperties() as $property) {
@@ -486,19 +503,15 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param array|object|null $data
-     * @param bool              $validate
+     * @param array|object $data
+     * @param bool         $validate
      *
      * @throws \Exception
      *
      * @return $this
      */
-    public function save($data = null, bool $validate = true): self
+    public function save($data = [], bool $validate = true): self
     {
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
-
         if ($this->fetchById($this->getPrimaryValue())) {
             $this->update($data, $validate);
 
@@ -506,30 +519,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
         }
 
         return $this->create($data, $validate);
-    }
-
-    /**
-     * @param array|object $data
-     * @param bool         $validate
-     *
-     * @return $this
-     */
-    public function data($data, bool $validate = true): self
-    {
-        $data = array_merge(
-            Obj::toArray($this->data),
-            Obj::toArray($data)
-        );
-
-        if (method_exists($this, '_data')) {
-            $this->_data($data, $validate);
-        }
-
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
-
-        return $this;
     }
 
     /**
@@ -648,19 +637,16 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param array|object|null $data
-     * @param bool              $validate
+     * @param array|object $data
+     * @param bool         $validate
      *
      * @throws \Exception
      *
      * @return $this[]|null
      */
-    public function update($data = null, bool $validate = true): ?array
+    public function update($data = [], bool $validate = true): ?array
     {
-        if (!empty($data) && is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
-
+        $this->data($data, $validate);
         $this->mountWherePrimaryKey();
 
         if (empty($this->where)) {
@@ -698,15 +684,37 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      * @param array|object $data
      * @param bool         $validate
      *
+     * @return $this
+     */
+    public function data($data = [], bool $validate = true): self
+    {
+        $data = array_merge(
+            Obj::toArray($this->data),
+            Obj::toArray($data)
+        );
+
+        if (method_exists($this, '_data')) {
+            $this->_data($data, $validate);
+        }
+
+        foreach ($data as $key => $value) {
+            $this->{$key} = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array|object $data
+     * @param bool         $validate
+     *
      * @throws \Exception
      *
      * @return $this
      */
-    public function create($data = null, bool $validate = true): self
+    public function create($data = [], bool $validate = true): self
     {
-        if (is_array($data) || is_object($data)) {
-            $this->data($data, $validate);
-        }
+        $this->data($data, $validate);
 
         $lastInsertId = $this->db
             ->driver($this->driver)
@@ -725,14 +733,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @return object
-     */
-    public function toObject(): object
-    {
-        return Obj::fromArray($this->data);
-    }
-
-    /**
      * @return string|null
      */
     public function getForeignKey(): ?string
@@ -742,24 +742,18 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param mixed  $value
-     * @param bool   $oneResult
-     * @param int    $fetchStyle
      * @param string $column
      *
      * @throws \Exception
      *
-     * @return $this|$this[]
+     * @return $this
      */
-    public function fetchBy(string $column, $value, bool $oneResult = false, ?int $fetchStyle = null)
+    public function whereBy(string $column, $value): self
     {
-        $this->bindings[$column] = $value;
-        array_unshift($this->where, "AND {$this->table}.{$column} = :{$column}");
+        $this->where("AND {$this->table}.{$column} = :{$column}");
+        $this->bindings([$column => $value]);
 
-        if ($oneResult) {
-            return $this->fetch($fetchStyle);
-        }
-
-        return $this->fetchAll($fetchStyle);
+        return $this;
     }
 
     /**
