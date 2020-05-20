@@ -52,7 +52,7 @@ abstract class BaseModel extends Model
             $data = $this->data;
         }
 
-        if ($data instanceof BaseModel) {
+        if ($data instanceof Model) {
             $data = $data->data;
         }
 
