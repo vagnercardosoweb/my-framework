@@ -431,6 +431,25 @@ class Validate
      *
      * @return bool
      */
+    public static function databaseNotExists(
+        $value,
+        string $table,
+        ?string $field = null,
+        ?string $where = null,
+        ?string $driver = null
+    ): bool {
+        return !self::databaseExists($value, $table, $field, $where, $driver);
+    }
+
+    /**
+     * @param mixed       $value
+     * @param string      $table
+     * @param string|null $where
+     * @param string|null $field
+     * @param string|null $driver
+     *
+     * @return bool
+     */
     public static function databaseExists(
         $value,
         string $table,
@@ -445,30 +464,11 @@ class Validate
         $sql = "SELECT COUNT(1) as total FROM {$table} WHERE {$table}.{$field} = :field {$where} LIMIT 1";
 
         return 1 == app()
-                ->resolve('db')
-                ->driver($driver)
-                ->query($sql, ['field' => $value])
-                ->fetch(\PDO::FETCH_OBJ)
-                ->total;
-    }
-
-    /**
-     * @param mixed       $value
-     * @param string      $table
-     * @param string|null $field
-     * @param string|null $where
-     * @param string|null $driver
-     *
-     * @return bool
-     */
-    public static function databaseNotExists(
-        $value,
-        string $table,
-        ?string $field = null,
-        ?string $where = null,
-        ?string $driver = null
-    ): bool {
-        return !self::databaseExists($value, $table, $field, $where, $driver);
+            ->resolve('db')
+            ->driver($driver)
+            ->query($sql, ['field' => $value])
+            ->fetch(\PDO::FETCH_OBJ)
+            ->total;
     }
 
     /**
@@ -531,7 +531,7 @@ class Validate
      * @param array $data
      * @param array $conditions
      * @param bool  $exception
-     * @param bool  $forceAll
+     * @param bool  $force
      *
      * @throws \Exception
      *
@@ -541,7 +541,7 @@ class Validate
         array &$data,
         array $conditions,
         bool $exception = true,
-        bool $forceAll = false
+        bool $force = false
     ): ?array {
         self::$data = &$data;
 
@@ -558,11 +558,12 @@ class Validate
                 foreach ($items as $item) {
                     $validate = array_merge([
                         'code' => E_USER_ERROR,
-                        'force' => $forceAll,
+                        'force' => $force,
                         'check' => true,
-                        'params' => $item['params'] ?? [],
+                        'params' => [],
                         'filters' => [],
                         'message' => is_string($item) ? $item : null,
+                        'expected' => false,
                     ], is_array($item) ? $item : []);
 
                     if (!$validate['check']) {
@@ -572,7 +573,7 @@ class Validate
                     self::forceStartFieldValue($validate);
                     self::invokableFilters($validate);
 
-                    if (!self::invokableCallable($validate, $exception)) {
+                    if (self::invokableCallable($validate, $exception) === $validate['expected']) {
                         break;
                     }
                 }
