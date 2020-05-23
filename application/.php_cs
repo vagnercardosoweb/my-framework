@@ -18,9 +18,9 @@ $header = sprintf("VCWeb Networks <https://www.vcwebnetworks.com.br/>\n
 @copyright %s Vagner Cardoso", date('d/m/Y'));
 
 $finder = PhpCsFixer\Finder::create()
-  ->exclude(__DIR__.'/resources')
-  ->exclude(__DIR__.'/storage')
-  ->exclude(__DIR__.'/vendor')
+    ->exclude(__DIR__.'/resources')
+    ->exclude(__DIR__.'/storage')
+    ->exclude(__DIR__.'/vendor')
     ->in(dirname(__DIR__))
     ->name('*.php')
     ->ignoreDotFiles(true)
