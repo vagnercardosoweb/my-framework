@@ -165,6 +165,17 @@ class Curl
     }
 
     /**
+     * @return Curl
+     */
+    public function clear(): Curl
+    {
+        $this->headers = [];
+        $this->options = [];
+
+        return $this;
+    }
+
+    /**
      * @param string       $endPoint
      * @param array|string $params
      *
