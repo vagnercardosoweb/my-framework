@@ -48,7 +48,7 @@ return [
             'database' => Env::get('DB_DATABASE', null),
             'charset' => Env::get('DB_CHARSET', 'utf8mb4'),
             'collation' => Env::get('DB_COLLATE', 'utf8mb4_unicode_ci'),
-            'timezone' => Env::get('APP_TIMEZONE', null),
+            'timezone' => Env::get('DB_TIMEZONE', '+3:00'),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
@@ -65,7 +65,7 @@ return [
             'database' => Env::get('DB_DATABASE', null),
             'schema' => ['public'],
             'charset' => Env::get('DB_CHARSET', 'utf8'),
-            'timezone' => Env::get('APP_TIMEZONE', null),
+            'timezone' => Env::get('DB_TIMEZONE', '+3:00'),
             'options' => [], // Use pdo connection options \PDO::ATTR... => \PDO::...
             'attributes' => [], // Use pdo->setAttribute(key => value)
             'commands' => [], // Use pdo->exec(...command...)
