@@ -92,7 +92,12 @@ class Curl
         $error = curl_error($curl);
         curl_close($curl);
 
-        return new Response($response, $info, $error);
+        // Reset properties
+        $this->clear();
+
+        return new Response(
+            $response, $info, $error
+        );
     }
 
     /**

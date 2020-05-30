@@ -58,7 +58,7 @@ class Database
 
     /**
      * @param string $method
-     * @param mixed  ...$arguments
+     * @param mixed ...$arguments
      *
      * @return mixed
      */
@@ -75,7 +75,7 @@ class Database
 
     /**
      * @param string $driver
-     * @param array  $config
+     * @param array $config
      *
      * @return $this
      */
@@ -84,26 +84,6 @@ class Database
         $this->connections[$driver] = $config;
 
         return $this;
-    }
-
-    /**
-     * @param string $defaultDriver
-     *
-     * @return \Core\Database\Database
-     */
-    public function setDefaultDriver(string $defaultDriver): self
-    {
-        $this->defaultDriver = $defaultDriver;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultDriver(): string
-    {
-        return $this->defaultDriver;
     }
 
     /**
@@ -119,6 +99,69 @@ class Database
     }
 
     /**
+     * @param string|null $driver
+     *
+     * @throws \Exception
+     *
+     * @return \Core\Database\Database
+     */
+    public function connection(?string $driver = null): Database
+    {
+        $driver = $driver ?? $this->getDefaultDriver();
+
+        if (empty($config = $this->connections[$driver])) {
+            throw new \Exception(
+                "Database connections {$driver} ".
+                'does not exist configured.'
+            );
+        }
+
+        if ($config instanceof \PDO) {
+            $this->pdo = $config;
+
+            return $this;
+        }
+
+        $config['driver'] = $config['driver'] ?? $driver;
+
+        if (!$this->connections[$driver] instanceof \PDO) {
+            if ('pgsql' == $config['driver']) {
+                $this->connections[$driver] = (new PostgreSqlConnection($config));
+            } else if ('sqlsrv' == $config['driver']) {
+                $this->connections[$driver] = (new SqlServerConnection($config));
+            } else if ('sqlite' == $config['driver']) {
+                $this->connections[$driver] = (new SQLiteConnection($config));
+            } else {
+                $this->connections[$driver] = (new MySqlConnection($config));
+            }
+        }
+
+        $this->pdo = $this->connections[$driver];
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultDriver(): string
+    {
+        return $this->defaultDriver;
+    }
+
+    /**
+     * @param string $defaultDriver
+     *
+     * @return \Core\Database\Database
+     */
+    public function setDefaultDriver(string $defaultDriver): self
+    {
+        $this->defaultDriver = $defaultDriver;
+
+        return $this;
+    }
+
+    /**
      * @param \Closure $callback
      *
      * @throws \Exception
@@ -127,22 +170,26 @@ class Database
      */
     public function transaction(\Closure $callback)
     {
-        $param = $this;
+        $injectThis = $this;
 
         if (func_num_args() >= 2) {
-            $param = func_get_args()[1];
+            $injectThis = func_get_args()[1];
         }
 
+        $invokeCallback = function () use ($callback, $injectThis) {
+            return call_user_func_array($callback, [$injectThis, $this]);
+        };
+
         if ($this->inTransaction()) {
-            return $callback($param);
+            return $invokeCallback();
         }
 
         try {
             $this->beginTransaction();
-            $callback = $callback($param);
+            $result = $invokeCallback();
             $this->commit();
 
-            return $callback;
+            return $result;
         } catch (\Exception $e) {
             $this->rollBack();
 
@@ -151,7 +198,7 @@ class Database
     }
 
     /**
-     * @param string       $table
+     * @param string $table
      * @param array|object $data
      *
      * @throws \Exception
@@ -171,14 +218,14 @@ class Database
         $this->event("{$table}:created", $lastInsertId);
 
         return !empty($lastInsertId)
-            ? (int)$lastInsertId
+            ? (int) $lastInsertId
             : null;
     }
 
     /**
-     * @param string       $sql
+     * @param string $sql
      * @param string|array $bindings
-     * @param array        $driverOptions
+     * @param array $driverOptions
      *
      * @throws \Exception
      *
@@ -201,9 +248,9 @@ class Database
     }
 
     /**
-     * @param string       $table
+     * @param string $table
      * @param array|object $data
-     * @param string       $condition
+     * @param string $condition
      * @param array|string $bindings
      *
      * @throws \Exception
@@ -241,8 +288,8 @@ class Database
     }
 
     /**
-     * @param string       $table
-     * @param string       $condition
+     * @param string $table
+     * @param string $condition
      * @param string|array $bindings
      *
      * @throws \Exception
@@ -255,8 +302,8 @@ class Database
     }
 
     /**
-     * @param string       $table
-     * @param string       $condition
+     * @param string $table
+     * @param string $condition
      * @param string|array $bindings
      *
      * @throws \Exception
@@ -272,69 +319,6 @@ class Database
         $this->event("{$table}:deleting", $rows);
         $this->query("DELETE {$table} FROM {$table} {$condition}", $bindings);
         $this->event("{$table}:deleted", $rows);
-
-        return $rows;
-    }
-
-    /**
-     * @param string|null $driver
-     *
-     * @throws \Exception
-     *
-     * @return \Core\Database\Database
-     */
-    public function connection(?string $driver = null): Database
-    {
-        $driver = $driver ?? $this->getDefaultDriver();
-
-        if (empty($config = $this->connections[$driver])) {
-            throw new \Exception(
-                "Database connections {$driver} ".
-                'does not exist configured.'
-            );
-        }
-
-        if ($config instanceof \PDO) {
-            $this->pdo = $config;
-
-            return $this;
-        }
-
-        $config['driver'] = $config['driver'] ?? $driver;
-
-        if (!$this->connections[$driver] instanceof \PDO) {
-            if ('pgsql' == $config['driver']) {
-                $this->connections[$driver] = (new PostgreSqlConnection($config));
-            } elseif ('sqlsrv' == $config['driver']) {
-                $this->connections[$driver] = (new SqlServerConnection($config));
-            } elseif ('sqlite' == $config['driver']) {
-                $this->connections[$driver] = (new SQLiteConnection($config));
-            } else {
-                $this->connections[$driver] = (new MySqlConnection($config));
-            }
-        }
-
-        $this->pdo = $this->connections[$driver];
-
-        return $this;
-    }
-
-    /**
-     * @param string       $table
-     * @param string       $condition
-     * @param array|string $bindings
-     *
-     * @throws \Exception
-     *
-     * @return object[]
-     */
-    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null)
-    {
-        $rows = $this->read($table, $condition, $bindings)->fetchAll();
-
-        foreach ($rows as $key => $row) {
-            $rows[$key] = Obj::fromArray($row);
-        }
 
         return $rows;
     }
@@ -356,5 +340,25 @@ class Database
         }
 
         return false;
+    }
+
+    /**
+     * @param string       $table
+     * @param string       $condition
+     * @param array|string $bindings
+     *
+     * @throws \Exception
+     *
+     * @return object[]
+     */
+    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null)
+    {
+        $rows = $this->read($table, $condition, $bindings)->fetchAll();
+
+        foreach ($rows as $key => $row) {
+            $rows[$key] = Obj::fromArray($row);
+        }
+
+        return $rows;
     }
 }

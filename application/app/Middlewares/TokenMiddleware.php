@@ -26,76 +26,81 @@ use Slim\Http\Response;
 class TokenMiddleware extends Middleware
 {
     /**
-     * @param \Slim\Http\Request  $request  PSR7 request
+     * @param \Slim\Http\Request $request PSR7 request
      * @param \Slim\Http\Response $response PSR7 response
-     * @param callable            $next     Next middleware
-     *
-     * @throws \Exception
+     * @param callable $next Next middleware
      *
      * @return \Slim\Http\Response
+     * @throws \Exception
+     *
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
-        // Variáveis
-        $type = 'Bearer';
-        $token = '';
-        $authorization = $request->getHeaderLine('Authorization');
+        try {
+            $token = '';
+            $authorization = $request->getHeaderLine('Authorization');
 
-        // Verifica se tem o header || CSRF || Autenticado
-        if (empty($authorization)) {
-            $token = $this->getToken($request);
+            // Verifica se tem o header || CSRF || Autenticado
+            if (empty($authorization)) {
+                $token = $this->getToken($request);
 
-            if (empty($token) && $this->auth) {
-                $token = 'encrypted session';
-            } else {
-                throw new UnauthorizedException('Acesso não autorizado.');
-            }
-        }
-
-        // Caso tenha o header Authorization dai entra nessa condições
-        // para pegar o tipo e o token separadamente
-        if (preg_match('/^(Basic|Bearer)\s+(.*)/i', $authorization, $matches)) {
-            array_shift($matches);
-
-            if (2 !== count($matches)) {
-                throw new UnauthorizedException('Token mal formatado.');
-            }
-
-            $type = trim($matches[0]);
-            $token = trim($matches[1]);
-        }
-
-        // Tenta descriptografar o token e caso contrário verifica
-        // se é acesso normal e se o token é aceito
-        if (!$payload = $this->encryption->decrypt($token)) {
-            try {
-                $payload = $this->jwt->decode($token);
-            } catch (\Exception $e) {
-                if ($token !== Env::get('API_KEY', null)) {
-                    throw new UnauthorizedException(
-                        'Acesso negado! Realize a autenticação para continuar.'
-                    );
+                if (empty($token) && $this->auth) {
+                    $token = 'encrypted session';
+                } else {
+                    throw new UnauthorizedException('Acesso não autorizado.');
                 }
             }
+
+            // Caso tenha o header Authorization dai entra nessa condições
+            // para pegar o tipo e o token separadamente
+            if (preg_match('/^(Basic|Bearer)\s+(.*)/i', $authorization, $matches)) {
+                array_shift($matches);
+
+                if (2 !== count($matches)) {
+                    throw new UnauthorizedException('Token mal formatado.');
+                }
+
+                $type = trim($matches[0]);
+                $token = trim($matches[1]);
+            }
+
+            // Tenta descriptografar o token e caso contrário verifica
+            // se é acesso normal e se o token é aceito
+            if (!$payload = $this->encryption->decrypt($token)) {
+                try {
+                    $payload = $this->jwt->decode($token);
+                } catch (\Exception $e) {
+                    if ($token !== Env::get('API_KEY', null)) {
+                        throw new UnauthorizedException(
+                            'Acesso negado! Realize a autenticação para continuar.'
+                        );
+                    }
+                }
+            }
+
+            // Verifica se o token está expirado
+            if (!empty($payload['expired']) && $payload['expired'] < time()) {
+                throw new UnauthorizedException('Acesso negado! Token foi expirado.');
+            }
+
+            // Remove container auth
+            unset($this->container['auth']);
+
+            // Busca o usuário caso tenha o id no payload
+            if (!empty($payload['id'])) {
+                $this->container['auth'] = function () {
+                    // TODO
+                    // GET USER DATA
+                };
+            }
+
+            return $next($request, $response);
+        } catch (\Exception $e) {
+            return call_user_func_array(
+                $this->container->get('errorHandler'),
+                [$request, $response, $e]
+            );
         }
-
-        // Verifica se o token está expirado
-        if (!empty($payload['expired']) && $payload['expired'] < time()) {
-            throw new UnauthorizedException('Acesso negado! Token foi expirado.');
-        }
-
-        // Remove container auth
-        unset($this->container['auth']);
-
-        // Busca o usuário caso tenha o id no payload
-        if (!empty($payload['id'])) {
-            $this->container['auth'] = function () {
-                // TODO
-                // GET USER DATA
-            };
-        }
-
-        return $next($request, $response);
     }
 
     /**

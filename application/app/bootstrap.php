@@ -41,7 +41,10 @@ if (PHP_SAPI == 'cli-server') {
 $autoload = APP_FOLDER.'/vendor/autoload.php';
 
 if (!file_exists($autoload)) {
-    die('composer not installed');
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => true, 'message' => 'Run composer install']);
+    die;
 }
 
 require_once "{$autoload}";

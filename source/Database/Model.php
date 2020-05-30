@@ -773,7 +773,15 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function whereBy(string $column, $value): self
     {
-        $this->where("AND {$this->table}.{$column} = :{$column}");
+        $parsedColumn = $column;
+
+        if (false === strpos($column, '.')) {
+            $parsedColumn = "{$this->table}.{$column}";
+        } else {
+            list(, $column) = explode('.', $column);
+        }
+
+        $this->where("AND {$parsedColumn} = :{$column}");
         $this->bindings([$column => $value]);
 
         return $this;
