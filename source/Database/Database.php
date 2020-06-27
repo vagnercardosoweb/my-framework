@@ -58,7 +58,7 @@ class Database
 
     /**
      * @param string $method
-     * @param mixed ...$arguments
+     * @param mixed  ...$arguments
      *
      * @return mixed
      */
@@ -75,7 +75,7 @@ class Database
 
     /**
      * @param string $driver
-     * @param array $config
+     * @param array  $config
      *
      * @return $this
      */
@@ -198,7 +198,7 @@ class Database
     }
 
     /**
-     * @param string $table
+     * @param string       $table
      * @param array|object $data
      *
      * @throws \Exception
@@ -218,14 +218,14 @@ class Database
         $this->event("{$table}:created", $lastInsertId);
 
         return !empty($lastInsertId)
-            ? (int) $lastInsertId
+            ? (int)$lastInsertId
             : null;
     }
 
     /**
-     * @param string $sql
+     * @param string       $sql
      * @param string|array $bindings
-     * @param array $driverOptions
+     * @param array        $driverOptions
      *
      * @throws \Exception
      *
@@ -248,9 +248,9 @@ class Database
     }
 
     /**
-     * @param string $table
+     * @param string       $table
      * @param array|object $data
-     * @param string $condition
+     * @param string       $condition
      * @param array|string $bindings
      *
      * @throws \Exception
@@ -288,8 +288,8 @@ class Database
     }
 
     /**
-     * @param string $table
-     * @param string $condition
+     * @param string       $table
+     * @param string       $condition
      * @param string|array $bindings
      *
      * @throws \Exception
@@ -302,8 +302,8 @@ class Database
     }
 
     /**
-     * @param string $table
-     * @param string $condition
+     * @param string       $table
+     * @param string       $condition
      * @param string|array $bindings
      *
      * @throws \Exception
