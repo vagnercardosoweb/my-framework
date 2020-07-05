@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -31,11 +31,9 @@ class Str extends \Illuminate\Support\Str
             return $string;
         }
 
-        return self::substr(
-                $string, 0, strrpos(
-                    self::substr($string, 0, $limit), ' '
-                )
-            ).$end;
+        $length = strrpos(self::substr($string, 0, $limit), ' ');
+
+        return self::substr($string, 0, $length).$end;
     }
 
     /**
