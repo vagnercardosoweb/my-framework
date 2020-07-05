@@ -83,6 +83,10 @@ if (!function_exists('json_error')) {
      */
     function json_error($exception, array $data = [], $status = StatusCode::HTTP_BAD_REQUEST)
     {
+        if (method_exists($exception, 'getStatusCode')) {
+            $status = $exception->getStatusCode();
+        }
+
         return json(array_merge_recursive([
             'error' => [
                 'code' => $exception->getCode(),
@@ -96,6 +100,7 @@ if (!function_exists('json_error')) {
                     Path::resource(),
                 ], '', $exception->getFile()),
                 'line' => $exception->getLine(),
+                'trace' => explode("\n", $exception->getTraceAsString()),
             ],
         ], $data), $status);
     }
@@ -662,9 +667,9 @@ if (!function_exists('upload')) {
             $uploads[] = [
                 'name' => $name,
                 'path' => str_replace([
-                    Path::public_html(),
                     Path::app(),
                     Path::resource(),
+                    Path::public_html(),
                 ], '', $path),
                 'extension' => $extension,
                 'size' => $value['size'],
@@ -868,7 +873,7 @@ if (!function_exists('imagemTamExato')) {
      * @param $thumbnail_height
      * @param $quality
      *
-     * @return bool
+     * @return bool|resource
      */
     function imagemTamExato($imgSrc, $dest, $thumbnail_width, $thumbnail_height, $quality)
     {
