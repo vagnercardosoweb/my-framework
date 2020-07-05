@@ -13,6 +13,7 @@ namespace Core;
 
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
+use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
 /**
  * Class View.
@@ -52,12 +53,16 @@ class View
      *
      * @return Response
      */
-    public function render(Response $response, string $template, array $context = [], int $status = StatusCode::HTTP_OK): Response
-    {
-        $response = $response->withStatus($status);
+    public function render(
+        Response $response,
+        string $template,
+        array $context = [],
+        int $status =
+        StatusCode::HTTP_OK
+    ): Response {
         $response->getBody()->write($this->fetch($template, $context));
 
-        return $response;
+        return $response->withStatus($status);
     }
 
     /**
@@ -97,6 +102,18 @@ class View
     public function addExtension(\Twig\Extension\ExtensionInterface $extension)
     {
         $this->environment->addExtension($extension);
+
+        return $this;
+    }
+
+    /**
+     * @param \Twig\RuntimeLoader\RuntimeLoaderInterface $runtimeLoader
+     *
+     * @return $this
+     */
+    public function addRuntimeLoader(RuntimeLoaderInterface $runtimeLoader): View
+    {
+        $this->environment->addRuntimeLoader($runtimeLoader);
 
         return $this;
     }
@@ -148,6 +165,14 @@ class View
     public function getEnvironment()
     {
         return $this->environment;
+    }
+
+    /**
+     * @return \Twig\Loader\FilesystemLoader
+     */
+    public function getLoader(): \Twig\Loader\FilesystemLoader
+    {
+        return $this->loader;
     }
 
     /**

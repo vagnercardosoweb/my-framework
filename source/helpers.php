@@ -377,6 +377,16 @@ if (!function_exists('has_route')) {
     }
 }
 
+if (!function_exists('is_php_cli')) {
+    /**
+     * @return bool
+     */
+    function is_php_cli()
+    {
+        return App::isCli();
+    }
+}
+
 if (!function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
