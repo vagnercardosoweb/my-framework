@@ -423,6 +423,16 @@ class Validate
     }
 
     /**
+     * @param string|int|float $value
+     *
+     * @return bool
+     */
+    public static function numeric($value): bool
+    {
+        return is_numeric($value);
+    }
+
+    /**
      * @param mixed       $value
      * @param string      $table
      * @param string|null $field
