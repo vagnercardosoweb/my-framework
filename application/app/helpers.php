@@ -954,3 +954,21 @@ if (!function_exists('imagemTamExato')) {
         return false;
     }
 }
+
+if (!function_exists('check_phone')) {
+    /**
+     * @param string|int $phone
+     *
+     * @return bool|string
+     */
+    function check_phone(&$phone)
+    {
+        $phone = onlyNumber($phone);
+
+        if (strlen($phone) < 10 || strlen($phone) > 12) {
+            return false;
+        }
+
+        return $phone;
+    }
+}
