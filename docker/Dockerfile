@@ -1,6 +1,12 @@
-FROM php:7.3-apache
+FROM php:7.4-apache
 
-# Atualiza e instala dependências
+# Timezone
+ENV TZ=America/Sao_Paulo
+RUN echo $TZ > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+RUN echo date.timezone = $TZ > /usr/local/etc/php/conf.d/docker-php-ext-timezone.ini
+
+# Atualiza e instala dependências do sistema
 RUN  apt-get update \
   && apt-get upgrade -y \
   && apt-get autoremove -y \
@@ -18,25 +24,28 @@ RUN  apt-get update \
   libnotify-bin \
   libwebp-dev \
   libxpm-dev \
+  libonig-dev \
   unixodbc \
   unixodbc-dev \
   freetds-dev \
   freetds-bin \
   tdsodbc \
-  curl \
-  git \
-  vim \
-  sudo \
-  gnupg \
+  zip \
   unzip \
-  && rm -rf /var/lib/apt/lists/*
+  git \
+  curl \
+  vim \
+  gnupg \
+  && apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
-# Instala dependencia do php
-RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir
+# Configura dependencia do php
 RUN docker-php-ext-configure pdo_dblib --with-libdir=/lib/x86_64-linux-gnu
 RUN docker-php-ext-configure soap --enable-soap
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+
+# Instala dependencias do php
 RUN docker-php-ext-install \
-  gd \
+  -j$(nproc) gd \
   json \
   iconv \
   bcmath \
@@ -56,31 +65,29 @@ RUN docker-php-ext-install \
   soap
 
 # Instala composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-  && php -r "copy('https://composer.github.io/installer.sig', 'installer.sig');" \
-  && php -r "if (hash_file('SHA384', 'composer-setup.php') === trim(file_get_contents('installer.sig'))) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); unlink('installer.sig');} echo PHP_EOL;" \
-  && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-  && php -r "unlink('composer-setup.php'); unlink('installer.sig');"
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Instala xdebug
-RUN pecl -v install xdebug-beta
+# Install xdebug
+RUN pecl install xdebug
 RUN docker-php-ext-enable xdebug
+RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
+    echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
+    echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
+    echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Instala rar
 # RUN pecl -v install rar
 # RUN docker-php-ext-enable rar
 
-# Habilita modulos do apache
-RUN a2enmod rewrite
-RUN a2enmod ssl
-
 # Cria certificado SSL
 RUN openssl req -new -x509 -days 365 -nodes \
   -out /etc/ssl/certs/ssl-cert-snakeoil.pem \
   -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
-  -subj "/C=BR/ST=Paraná/L=Umuarama/O=VCWeb Networks/CN=*.localhost"
+  -subj "/CN=*.localhost"
 
-# Habilita o certificado SSL
+# Habilita modulos e site
+RUN a2enmod rewrite
+RUN a2enmod ssl
 RUN a2ensite default-ssl
 
 # Permissão de usuários

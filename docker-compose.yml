@@ -1,19 +1,20 @@
-version: '3'
+version: '3.7'
 
 networks:
-  mysql-network:
-  #  postgres-network:
-  redis-network:
+  mysql:
+  # postgres:
+  # redis:
 
 services:
   web:
     build: ./docker
     working_dir: /var/www
     restart: always
+    container_name: slimphp-api
     networks:
-      - mysql-network
-      # - redis-network
-      # - postgres-network
+      - mysql
+      # - redis
+      # - postgres
     depends_on:
       - mysql
       # - postgres
@@ -22,9 +23,10 @@ services:
       - '80:80'
       - '443:443'
     volumes:
-      - '.:/var/www'
-      - './docker/apache/000-default.conf:/etc/apache2/sites-available/000-default.conf'
-      - './docker/apache/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf'
+      - .:/var/www
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/99-php.ini
+      - ./docker/apache/vhosts/localhost.conf:/etc/apache2/sites-available/000-default.conf
+      - ./docker/apache/vhosts/localhost-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
     environment:
       - COMPOSER_ALLOW_SUPERUSER=1
       - DOCUMENT_ROOT=/var/www/public_html
@@ -33,9 +35,9 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
-    container_name: mysql
+    container_name: slimphp-mysql
     networks:
-      - mysql-network
+      - mysql
     ports:
       - '3306:3306'
     volumes:
@@ -48,9 +50,9 @@ services:
 
   #  phpmyadmin:
   #    image: phpmyadmin/phpmyadmin
-  #    container_name: phpmyadmin
+  #    container_name: slimphp-phpmyadmin
   #    networks:
-  #      - mysql-network
+  #      - mysql
   #    depends_on:
   #      - mysql
   #    environment:
@@ -60,11 +62,11 @@ services:
   #      - '8080:80'
 
   #  postgres:
-  #    image: postgres
+  #    image: postgres:alpine
+  #    container_name: slimphp-postgres
   #    restart: always
-  #    container_name: postgres
   #    networks:
-  #      - postgres-network
+  #      - postgres
   #    ports:
   #      - '5432:5432'
   #    volumes:
@@ -77,13 +79,13 @@ services:
   #  redis:
   #    image: bitnami/redis:latest
   #    restart: always
-  #    container_name: redis
+  #    container_name: slimphp-redis
   #    volumes:
   #      - ./docker/redis:/bitnami/redis/data
   #    networks:
-  #      - redis-network
+  #      - redis
   #    environment:
   #      - ALLOW_EMPTY_PASSWORD=no
-  #      - REDIS_PASSWORD=${REDIS_PASSWORD:-docker}
+  #      - REDIS_PASSWORD=root
   #    ports:
   #      - '6379:6379'
