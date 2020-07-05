@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -127,9 +127,9 @@ class Database
         if (!$this->connections[$driver] instanceof \PDO) {
             if ('pgsql' == $config['driver']) {
                 $this->connections[$driver] = (new PostgreSqlConnection($config));
-            } else if ('sqlsrv' == $config['driver']) {
+            } elseif ('sqlsrv' == $config['driver']) {
                 $this->connections[$driver] = (new SqlServerConnection($config));
-            } else if ('sqlite' == $config['driver']) {
+            } elseif ('sqlite' == $config['driver']) {
                 $this->connections[$driver] = (new SQLiteConnection($config));
             } else {
                 $this->connections[$driver] = (new MySqlConnection($config));

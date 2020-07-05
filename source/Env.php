@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -53,7 +53,7 @@ class Env
      */
     public static function get(string $key, $default = null)
     {
-        if (!$value = static::repository()->get($key)) {
+        if (!$value = self::repository()->get($key)) {
             return $default;
         }
 
@@ -99,8 +99,8 @@ class Env
      */
     protected static function repository(): RepositoryInterface
     {
-        if (null === static::$repository) {
-            static::$repository = RepositoryBuilder::create()
+        if (null === self::$repository) {
+            self::$repository = RepositoryBuilder::create()
                 ->withReaders(self::adapters())
                 ->withWriters(self::adapters())
                 ->immutable()
@@ -108,6 +108,6 @@ class Env
             ;
         }
 
-        return static::$repository;
+        return self::$repository;
     }
 }
