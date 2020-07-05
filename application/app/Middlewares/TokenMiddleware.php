@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace App\Middlewares;
@@ -26,17 +26,18 @@ use Slim\Http\Response;
 class TokenMiddleware extends Middleware
 {
     /**
-     * @param \Slim\Http\Request $request PSR7 request
+     * @param \Slim\Http\Request  $request  PSR7 request
      * @param \Slim\Http\Response $response PSR7 response
-     * @param callable $next Next middleware
+     * @param callable            $next     Next middleware
      *
-     * @return \Slim\Http\Response
      * @throws \Exception
      *
+     * @return \Slim\Http\Response
      */
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
         try {
+            $type = 'Bearer';
             $token = '';
             $authorization = $request->getHeaderLine('Authorization');
 
@@ -62,6 +63,11 @@ class TokenMiddleware extends Middleware
 
                 $type = trim($matches[0]);
                 $token = trim($matches[1]);
+            }
+
+            // Verifica se o type do token é válido
+            if (!in_array($type, ['Basic', 'Bearer'])) {
+                throw new UnauthorizedException('Acesso negado! Tipo do token não foi aceito.');
             }
 
             // Tenta descriptografar o token e caso contrário verifica
