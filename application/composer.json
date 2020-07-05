@@ -19,15 +19,15 @@
   ],
   "require": {
     "php": "^7.2",
+    "ext-gd": "*",
+    "ext-pdo": "*",
     "ext-curl": "*",
     "ext-json": "*",
     "ext-libxml": "*",
-    "ext-mbstring": "*",
     "ext-openssl": "*",
-    "ext-pdo": "*",
+    "ext-mbstring": "*",
     "ext-simplexml": "*",
     "ext-zlib": "*",
-    "ext-redis": "*",
     "illuminate/support": "^7.0",
     "monolog/monolog": "^2.0",
     "phpmailer/phpmailer": "^6.1",
@@ -53,8 +53,13 @@
   },
   "config": {
     "sort-packages": true,
-    "optimize-autoloader": true
+    "optimize-autoloader": true,
+    "process-timeout": 0
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "cs:fix": "php-cs-fixer fix ../ --config=.php_cs",
+    "cs:check": "php-cs-fixer fix ../ --dry-run --format=txt --verbose --diff --diff-format=udiff --config=.php_cs"
+  }
 }
