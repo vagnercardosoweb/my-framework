@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace App\Controllers\Api;
@@ -59,11 +59,15 @@ class ZipCodeController extends Controller
 
         // Google Maps
         if ($googleMapsKey = Env::get('GOOGLE_GEOCODE_API_KEY', null)) {
-            $map = $this->curl->get('https://maps.google.com/maps/api/geocode/json', [
-                'key' => $googleMapsKey,
-                'sensor' => true,
-                'address' => urlencode($body->endereco),
-            ])->getBody();
+            $map = $this->curl
+                ->setHeaders('Content-Type', 'application/json')
+                ->get('https://maps.google.com/maps/api/geocode/json', json_encode([
+                    'key' => $googleMapsKey,
+                    'sensor' => true,
+                    'address' => urlencode($body->endereco),
+                ]))
+                ->getBody()
+            ;
 
             if ('OK' === $map->status && !empty($map->results[0])) {
                 $location = $map->results[0]->geometry->location;
