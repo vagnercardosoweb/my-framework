@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -47,11 +47,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      * @var int
      */
     protected $fetchStyle;
-
-    /**
-     * @var \Core\Database\Connection\Statement
-     */
-    protected $statement;
 
     /**
      * @var array
@@ -118,7 +113,6 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         $this->data = $data;
         $this->reset = [];
-        $this->statement = null;
     }
 
     /**
@@ -368,13 +362,13 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function count(string $column = '1'): int
     {
-        $fetch = $this->select("COUNT({$column}) AS count")
+        $row = $this->select("COUNT({$column}) AS count")
             ->order('count DESC')->limit(1)
             ->buildSqlStatement()
             ->fetch(\PDO::FETCH_OBJ)
         ;
 
-        return $fetch ? (int)$fetch->count : 0;
+        return $row ? (int)$row->count : 0;
     }
 
     /**
@@ -566,14 +560,14 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             $fetchStyle = $this->fetchStyle;
         }
 
-        $this->buildSqlStatement();
+        $statement = $this->buildSqlStatement();
 
-        if ($this->statement->isFetchObject($fetchStyle)) {
+        if ($statement->isFetchObject($fetchStyle)) {
             $fetchStyle = \PDO::FETCH_CLASS;
             $fetchArgument = $fetchArgument ?? get_called_class();
         }
 
-        $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
+        $rows = $statement->fetchAll($fetchStyle, $fetchArgument);
 
         foreach ($rows as $index => $row) {
             if (method_exists($this, '_row')) {
@@ -583,7 +577,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             $rows[$index] = $row;
         }
 
-        $this->statement->closeCursor();
+        $statement->closeCursor();
 
         return $rows;
     }
@@ -601,13 +595,13 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             $fetchStyle = $this->fetchStyle;
         }
 
-        $this->buildSqlStatement();
+        $statement = $this->buildSqlStatement();
 
-        if ($this->statement->isFetchObject($fetchStyle)) {
+        if ($statement->isFetchObject($fetchStyle)) {
             $fetchStyle = get_called_class();
         }
 
-        $row = $this->statement->fetch($fetchStyle) ?: null;
+        $row = $statement->fetch($fetchStyle) ?: null;
 
         if ($row) {
             if (method_exists($this, '_row')) {
@@ -615,7 +609,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             }
         }
 
-        $this->statement->closeCursor();
+        $statement->closeCursor();
 
         return $row;
     }
@@ -904,7 +898,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     protected function buildSqlStatement(): Statement
     {
-        $this->statement = $this->db
+        $statement = $this->db
             ->driver($this->driver)
             ->query(
                 $this->getQuery(),
@@ -914,7 +908,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         $this->clear();
 
-        return $this->statement;
+        return $statement;
     }
 
     /**
