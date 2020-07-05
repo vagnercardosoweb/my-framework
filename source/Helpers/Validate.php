@@ -627,30 +627,25 @@ class Validate
     }
 
     /**
-     * @param string|callable $rule
+     * @param string|callable $callable
      * @param array           $params
      *
      * @return bool
      */
-    private static function invokeCallable($rule, array $params)
+    private static function invokeCallable($callable, array $params)
     {
-        /// Verify if possibility php function
-        if (is_callable($rule) && !strrpos($rule, '::')) {
-            return call_user_func_array($rule, $params);
+        // Verify if possibility php function
+        if (is_callable($callable)) {
+            $method = null;
+
+            if (is_string($callable) && false !== strpos($callable, '::')) {
+                list($callable, $method) = self::parseClassMethodCallable($callable);
+            }
+
+            return self::callCallable($callable, $method, $params);
         }
 
-        $class = self::class;
-
-        // Verify if class exists by the rule
-        if (class_exists($rule) || false !== strpos($rule, '::')) {
-            list($class, $rule) = explode('::', $rule) + [1 => '__invoke'];
-        }
-
-        try {
-            return forward_static_call_array([$class, $rule], $params);
-        } catch (\Exception $e) {
-            return call_user_func_array([new $class(), $rule], $params);
-        }
+        return self::callCallable(self::class, $callable, $params);
     }
 
     /**
@@ -691,5 +686,33 @@ class Validate
         }
 
         return true;
+    }
+
+    /**
+     * @param string|callable $callable
+     * @param string|null     $method
+     * @param array           $params
+     *
+     * @return mixed
+     */
+    private static function callCallable($callable, $method, array $params)
+    {
+        try {
+            return forward_static_call_array([$callable, $method], $params);
+        } catch (\Exception $e) {
+            $parseCallable = is_null($method) ? $callable : [new $callable(), $method];
+
+            return call_user_func_array($parseCallable, $params);
+        }
+    }
+
+    /**
+     * @param string $rule
+     *
+     * @return string[]
+     */
+    private static function parseClassMethodCallable(string $rule)
+    {
+        return explode('::', $rule) + [1 => '__invoke'];
     }
 }
