@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace Core;
@@ -120,7 +120,7 @@ class Config implements ArrayAccess
                     $config[$segment] = self::loadItems("{$path}/{$segment}");
                 }
             } else {
-                $config[$fileBasename] = require_once "{$iterator->getRealPath()}";
+                $config[$fileBasename] = require "{$iterator->getRealPath()}";
             }
 
             $iterator->next();
