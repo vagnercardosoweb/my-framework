@@ -11,6 +11,7 @@
 
 use Core\App;
 use Core\Env;
+use Core\Helpers\Path;
 use Core\Phinx\Migration;
 
 try {
@@ -34,15 +35,13 @@ try {
     // @see https://book.cakephp.org/3.0/en/phinx/configuration.html
 
     return [
+        'version_order' => 'creation',
         'migration_base_class' => Migration::class,
-
-        'templates' => [
-            'file' => __DIR__.'/storage/database/templates/Migration.php.dist',
-        ],
+        'templates' => ['file' => Path::storage('/database/templates/Migration.php.dist')],
 
         'paths' => [
-            'migrations' => __DIR__.'/storage/database/migrations',
-            'seeds' => __DIR__.'/storage/database/seeds',
+            'migrations' => Path::storage('/database/migrations'),
+            'seeds' => Path::storage('/database/seeds'),
         ],
 
         'environments' => [
@@ -88,8 +87,6 @@ try {
                 'table_suffix' => false,
             ],
         ],
-
-        'version_order' => 'creation',
     ];
 } catch (\Exception $e) {
     die("ERROR: {$e->getMessage()}\n");
