@@ -570,7 +570,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         if ($this->statement->isFetchObject($fetchStyle)) {
             $fetchStyle = \PDO::FETCH_CLASS;
-            $fetchArgument = get_called_class();
+            $fetchArgument = $fetchArgument ?? get_called_class();
         }
 
         $rows = $this->statement->fetchAll($fetchStyle, $fetchArgument);
@@ -764,8 +764,8 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param mixed  $value
      * @param string $column
+     * @param mixed  $value
      *
      * @throws \Exception
      *
