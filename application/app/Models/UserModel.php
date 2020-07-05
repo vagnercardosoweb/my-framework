@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -71,24 +71,22 @@ class UserModel extends BaseModel
             : null;
 
         // Validate
-        if ($validate) {
-            Validate::rules($data, [
-                'name' => ['required' => 'Nome não pode ser vázio.'],
-                'email' => [
-                    'email' => 'O E-mail informado não é válido.',
-                    'databaseNotExists' => [
-                        'message' => 'O e-mail digitado já foi registrado.',
-                        'params' => [$this->table, 'email', $where],
-                    ],
+        Validate::rules($data, [
+            'name' => ['required' => 'Nome não pode ser vázio.'],
+            'email' => [
+                'email' => 'O E-mail informado não é válido.',
+                'databaseNotExists' => [
+                    'message' => 'O e-mail digitado já foi registrado.',
+                    'params' => [$this->table, 'email', $where],
                 ],
-                'password' => [
-                    'required' => [
-                        'message' => 'Senha não pode ser vázio.',
-                        'check' => empty($data['id']),
-                    ],
+            ],
+            'password' => [
+                'required' => [
+                    'message' => 'Senha não pode ser vázio.',
+                    'check' => empty($data['id']),
                 ],
-            ]);
-        }
+            ],
+        ], true, $validate);
 
         // Password
         if (!empty($data['password']) && 'unknown' === $this->hash->info($data['password'])['algoName']) {

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 20/05/2020 Vagner Cardoso
+ * @copyright 05/07/2020 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -26,6 +26,7 @@ use Core\Database\Model;
  * @property \Core\Session\Flash|object   $flash
  * @property \Core\Mailer\Mailer          $mailer
  * @property \Core\Password\Password      $hash
+ * @property \Core\Password\Password      $password
  * @property \Core\Encryption             $encryption
  * @property \Core\Jwt                    $jwt
  * @property \Core\Logger                 $logger
@@ -35,7 +36,7 @@ use Core\Database\Model;
  * @property \Core\Curl\Curl              $curl
  * @property \Core\Redis                  $redis
  * @property \Core\Cache\Cache            $cache
- * @property \Core\Config                 $config
+ * @property \Core\Config                  $config
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
