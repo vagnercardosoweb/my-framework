@@ -283,13 +283,13 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
   /* Variáveis */
   var html = element.html();
   var loadding =
-    element.attr('vc-loading') !== undefined
-      ? element.attr('vc-loading')
-      ? element.attr('vc-loading')
-      : 'Aguarde...'
-      : change
-      ? false
-      : html;
+        element.attr('vc-loading') !== undefined
+          ? element.attr('vc-loading')
+          ? element.attr('vc-loading')
+          : 'Aguarde...'
+          : change
+          ? false
+          : html;
   var message;
   var headers = {};
 
@@ -403,7 +403,7 @@ export function vcAjax(element, url, formData, method, form, change, modal) {
               var diffTime = new Date().getTime() - startTime;
               var uploadPercent = parseInt((e.loaded / e.total) * 100);
               var durationTime =
-                ((100 - uploadPercent) * diffTime) / uploadPercent;
+                    ((100 - uploadPercent) * diffTime) / uploadPercent;
               // var calculateTimeFormat = calculateTimeUpload(durationTime);
 
               if (uploadPercent === 100) {
@@ -747,10 +747,10 @@ $(document).ready(function () {
 
       /* Form */
       var form =
-        elementClicked.attr('vc-form') &&
-        elementClicked.attr('vc-form').length > 0
-          ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
-          : elementClicked.closest('form');
+            elementClicked.attr('vc-form') &&
+            elementClicked.attr('vc-form').length > 0
+              ? $('form[name="' + elementClicked.attr('vc-form') + '"]')
+              : elementClicked.closest('form');
 
       /* Método */
       formData.append('_METHOD', form.attr('method') || 'POST');
