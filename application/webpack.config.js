@@ -1,10 +1,10 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserWebPackPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -12,26 +12,51 @@ const DEV_TOOL = NODE_ENV === 'development' ? 'source-map' : false;
 const ASSETS_PATH = path.join(__dirname, 'resources', 'assets');
 
 const publicFolder = path.resolve(__dirname, '..', 'public_html');
-const compileReactComponent = require('./resources/assets/react');
+const compileReactComponent = require('./resources/assets/frameworks/react/index.ts');
 
 const outputFilename = ({
   chunk: {
     name,
-    entryModule: { id },
+    entryModule: { _identifier },
   },
 }) => {
-  if (id && typeof id === 'string' && id.match(/\/react\//g)) {
+  if (_identifier.match(/\/resources\/assets\/.+\/react\//g)) {
     return `assets/react/${name}.js`;
   }
 
   return 'assets/[name]/app.js';
 };
 
+const plugins = [
+  new VueLoaderPlugin(),
+  new webpack.ProgressPlugin(),
+  new MiniCssExtractPlugin({
+    filename: 'assets/[name]/app.css',
+    chunkFilename: 'assets/[name]/app.css',
+  }),
+  new webpack.ProvidePlugin({
+    $: 'jquery',
+    jQuery: 'jquery',
+    'global.$': 'jquery',
+    'window.$': 'jquery',
+    'global.jQuery': 'jquery',
+    'window.jQuery': 'jquery',
+  }),
+];
+
+if (NODE_ENV === 'production') {
+  plugins.push(
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['static/*'],
+    }),
+  );
+}
+
 module.exports = {
   mode: NODE_ENV,
   devtool: DEV_TOOL,
   entry: {
-    web: path.resolve(ASSETS_PATH, 'app.js'),
+    web: path.resolve(ASSETS_PATH, 'web', 'index.ts'),
     ...compileReactComponent,
   },
   output: {
@@ -40,30 +65,13 @@ module.exports = {
     publicPath: '/',
   },
   optimization: {
+    minimize: true,
     minimizer: [
-      new UglifyJsPlugin({ cache: true, parallel: true }),
+      new TerserWebPackPlugin({ sourceMap: false, extractComments: false }),
       new OptimizeCssAssetsPlugin({}),
     ],
   },
-  plugins: [
-    new VueLoaderPlugin(),
-    new webpack.ProgressPlugin(),
-    new MiniCssExtractPlugin({
-      filename: 'assets/[name]/app.css',
-      chunkFilename: 'assets/[name]/app.css',
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
-      'global.$': 'jquery',
-      'window.$': 'jquery',
-      'global.jQuery': 'jquery',
-      'window.jQuery': 'jquery',
-    }),
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['static/*'],
-    }),
-  ],
+  plugins,
   module: {
     rules: [
       {
@@ -115,6 +123,11 @@ module.exports = {
         },
       },
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.vue$/,
         exclude: /(node_modules|bower_components)/,
         use: 'vue-loader',
@@ -122,7 +135,16 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.ts', '.vue', '.css', '.scss', '.sass'],
+    extensions: [
+      '.ts',
+      '.tsx',
+      '.js',
+      '.jsx',
+      '.vue',
+      '.css',
+      '.scss',
+      '.sass',
+    ],
     alias: { vue: 'vue/dist/vue.esm.js' },
   },
 };

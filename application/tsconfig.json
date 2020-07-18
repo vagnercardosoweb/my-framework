@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["resources/assets"],
+  "exclude": ["node_modules"]
+}
