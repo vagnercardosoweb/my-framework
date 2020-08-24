@@ -37,7 +37,7 @@ class TokenMiddleware extends Middleware
     public function __invoke(Request $request, Response $response, callable $next): Response
     {
         try {
-            $type = 'Bearer';
+            $type = '';
             $token = '';
             $authorization = $request->getHeaderLine('Authorization');
 
@@ -52,13 +52,11 @@ class TokenMiddleware extends Middleware
                 }
             }
 
-            // Caso tenha o header Authorization dai entra nessa condições
-            // para pegar o tipo e o token separadamente
             if (preg_match('/^(Basic|Bearer)\s+(.*)/i', $authorization, $matches)) {
                 array_shift($matches);
 
                 if (2 !== count($matches)) {
-                    throw new UnauthorizedException('Token mal formatado.');
+                    throw new UnauthorizedException('Acesso negado, formato do token inválido.');
                 }
 
                 $type = trim($matches[0]);
@@ -67,26 +65,24 @@ class TokenMiddleware extends Middleware
 
             // Verifica se o type do token é válido
             if (!in_array($type, ['Basic', 'Bearer'])) {
-                throw new UnauthorizedException('Acesso negado! Tipo do token não foi aceito.');
+                throw new UnauthorizedException('Acesso negado, formato inválido.');
             }
 
-            // Tenta descriptografar o token e caso contrário verifica
+            // Tenta decifrar o token e caso contrário verifica
             // se é acesso normal e se o token é aceito
             if (!$payload = $this->encryption->decrypt($token)) {
                 try {
                     $payload = $this->jwt->decode($token);
                 } catch (\Exception $e) {
                     if ($token !== Env::get('API_KEY', null)) {
-                        throw new UnauthorizedException(
-                            'Acesso negado! Realize a autenticação para continuar.'
-                        );
+                        throw new UnauthorizedException('Acesso não autorizado.');
                     }
                 }
             }
 
             // Verifica se o token está expirado
             if (!empty($payload['expired']) && $payload['expired'] < time()) {
-                throw new UnauthorizedException('Acesso negado! Token foi expirado.');
+                throw new UnauthorizedException('Acesso expirado, realize autenticação novamente.');
             }
 
             // Remove container auth
