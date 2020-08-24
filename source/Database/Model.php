@@ -506,7 +506,9 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function save($data = [], bool $validate = true): self
     {
-        if ($this->fetchById($this->getPrimaryValue())) {
+        $primaryValue = $this->getPrimaryValue($data);
+
+        if ($primaryValue && $this->fetchById($primaryValue)) {
             $this->update($data, $validate);
 
             return $this;
@@ -615,11 +617,19 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
+     * @param array|object $data
+     *
      * @return string|null
      */
-    public function getPrimaryValue(): ?string
+    public function getPrimaryValue($data = []): ?string
     {
-        return $this->{$this->getPrimaryKey()} ?? null;
+        $data = Obj::toArray($data);
+
+        if (!empty($data[$this->primaryKey])) {
+            return $data[$this->primaryKey];
+        }
+
+        return $this->{$this->primaryKey} ?? null;
     }
 
     /**
