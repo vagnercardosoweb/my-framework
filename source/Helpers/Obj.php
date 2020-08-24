@@ -48,7 +48,7 @@ class Obj
 
     /**
      * @param object $object
-     * @param string $name
+     * @param string|null $name
      * @param mixed  $default
      *
      * @return mixed
