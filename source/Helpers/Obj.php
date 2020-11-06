@@ -89,13 +89,13 @@ class Obj
     {
         $array = [];
 
-        if (is_array($object)) {
-            return $object;
-        }
-
-        if (!is_object($object)) {
-            return $array;
-        }
+        // if (is_array($object)) {
+        //     return $object;
+        // }
+        //
+        // if (!is_object($object)) {
+        //     return $array;
+        // }
 
         foreach ($object as $key => $value) {
             if ($value instanceof \SimpleXMLElement) {
@@ -103,7 +103,11 @@ class Obj
             }
 
             if (is_object($value) || is_array($value)) {
-                $array[$key] = self::toArray($value);
+                if ($value instanceof \JsonSerializable) {
+                    $array[$key] = $value->jsonSerialize();
+                } else {
+                    $array[$key] = self::toArray($value);
+                }
             } else {
                 if (isset($key)) {
                     $array[$key] = $value;
