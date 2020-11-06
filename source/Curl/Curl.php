@@ -44,9 +44,9 @@ class Curl
     }
 
     /**
-     * @param string       $method
-     * @param string       $endPoint
-     * @param array|string $params
+     * @param string            $method
+     * @param string            $endPoint
+     * @param array|string|null $params
      *
      * @return \Core\Curl\Response
      */

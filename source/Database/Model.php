@@ -519,7 +519,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
     /**
      * @param int|array $id
-     * @param int       $fetchStyle
+     * @param int|null  $fetchStyle
      *
      * @throws \Exception
      *

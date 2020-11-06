@@ -89,11 +89,11 @@ class App extends SlimApp
     }
 
     /**
-     * @param string|array          $methods
-     * @param string                $pattern
-     * @param string|\Closure       $callable
-     * @param string                $name
-     * @param string|array|\Closure $middleware
+     * @param string|array               $methods
+     * @param string                     $pattern
+     * @param string|\Closure            $callable
+     * @param strin|null                 $name
+     * @param string|array|\Closure|null $middleware
      *
      * @return \Slim\Interfaces\RouteInterface
      */
@@ -330,22 +330,25 @@ class App extends SlimApp
     }
 
     /**
+     * @throws \ErrorException
+     *
      * @return void
      */
     private function registerPhpConfiguration(): void
     {
-        $charset = Env::get('APP_CHARSET', 'UTF-8');
         $locale = Env::get('APP_LOCALE', 'pt_BR');
+        $charset = Env::get('APP_CHARSET', 'UTF-8');
 
         ini_set('default_charset', $charset);
         date_default_timezone_set(Env::get('APP_TIMEZONE', 'America/Sao_Paulo'));
         mb_internal_encoding($charset);
         setlocale(LC_ALL, $locale, "{$locale}.{$charset}");
 
-        ini_set('log_errors', true);
-        ini_set('error_log', sprintf(Env::get('INI_ERROR_LOG', Path::storage('/logs/php/%s.log')), date('dmY')));
-        ini_set('display_errors', Env::get('INI_DISPLAY_ERRORS', ini_get('display_errors')));
-        ini_set('display_startup_errors', Env::get('INI_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
+        ini_set('display_errors', Env::get('PHP_DISPLAY_ERRORS', ini_get('display_errors')));
+        ini_set('display_startup_errors', Env::get('PHP_DISPLAY_STARTUP_ERRORS', ini_get('display_startup_errors')));
+
+        ini_set('log_errors', Env::get('PHP_LOG_ERRORS', 'true'));
+        ini_set('error_log', sprintf(Env::get('PHP_ERROR_LOG', Path::storage('/logs/php/%s.log')), date('dmY')));
 
         if ('development' === Env::get('APP_ENV', 'development')) {
             error_reporting(E_ALL);
