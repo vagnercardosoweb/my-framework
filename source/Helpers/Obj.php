@@ -89,13 +89,9 @@ class Obj
     {
         $array = [];
 
-        // if (is_array($object)) {
-        //     return $object;
-        // }
-        //
-        // if (!is_object($object)) {
-        //     return $array;
-        // }
+        if (!is_object($object) && !is_array($object)) {
+            return $array;
+        }
 
         foreach ($object as $key => $value) {
             if ($value instanceof \SimpleXMLElement) {
