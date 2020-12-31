@@ -19,7 +19,7 @@ namespace Core\Helpers;
 class Path
 {
     /**
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
@@ -52,7 +52,27 @@ class Path
     }
 
     /**
-     * @param string $path
+     * @param string|null $path
+     *
+     * @return string
+     */
+    public static function config(?string $path = null): string
+    {
+        return self::make('CONFIG_FOLDER', 'config', self::app(), $path);
+    }
+
+    /**
+     * @param string|null $path
+     *
+     * @return string
+     */
+    public static function routes(?string $path = null): string
+    {
+        return self::make('ROUTE_FOLDER', 'routes', self::app(), $path);
+    }
+
+    /**
+     * @param string|null $path
      *
      * @return string
      */
@@ -62,7 +82,7 @@ class Path
     }
 
     /**
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
@@ -72,7 +92,7 @@ class Path
     }
 
     /**
-     * @param string $path
+     * @param string|null $path
      *
      * @return string
      */
@@ -94,7 +114,8 @@ class Path
         string $folder,
         string $root,
         ?string $path = null
-    ): string {
+    ): string
+    {
         if (!defined($name)) {
             define($name, self::normalizePath($root, $folder));
         }

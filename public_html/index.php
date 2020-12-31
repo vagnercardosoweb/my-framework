@@ -9,32 +9,21 @@
  * @copyright 05/07/2020 Vagner Cardoso
  */
 
+$documentRoot = realpath(dirname(__DIR__));
+
 if (!isset($_SERVER['DOCUMENT_ROOT'])) {
     $documentRoot = realpath($_SERVER['DOCUMENT_ROOT']);
-} else {
-    $documentRoot = realpath(dirname(__DIR__));
 }
 
-// Diretório raiz
 define('ROOT', str_ireplace('\\', '/', $documentRoot));
+define('APP_FOLDER', sprintf('%s/application', ROOT));
+define('PUBLIC_FOLDER', sprintf('%s/public_html', ROOT));
+define('CONFIG_FOLDER', sprintf('%s/config', APP_FOLDER));
+define('STORAGE_FOLDER', sprintf('%s/storage', APP_FOLDER));
+define('RESOURCE_FOLDER', sprintf('%s/resources', APP_FOLDER));
 
-// Diretório raiz da pasta publica
-define('PUBLIC_FOLDER', ROOT.'/public_html');
-
-/*
- * Diretório raiz da aplicação
- *
- * OBS: Esse diretório não pode ser acesso pela URL
- */
-
-define('APP_FOLDER', ROOT.'/application');
-
-// Diretório que armazena os recursos dos assets e views
-define('RESOURCE_FOLDER', APP_FOLDER.'/resources');
-
-// Define a URL base da aplicação
-$schema = 'http';
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+$schema = 'http';
 
 if (
     (!empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS']) ||
@@ -44,10 +33,10 @@ if (
 }
 
 define('BASE_URL', "{$schema}://{$host}");
-
-// Define a URL completa da aplicação
 define('REQUEST_URI', $_SERVER['REQUEST_URI']);
 define('FULL_URL', BASE_URL."{$_SERVER['REQUEST_URI']}");
 
-// Carrega a aplicação
-require_once APP_FOLDER.'/app/bootstrap.php';
+$bootstrapPath = sprintf('%s/app/bootstrap.php', APP_FOLDER);
+define('BOOTSTRAP_PATH', $bootstrapPath);
+
+require_once "{$bootstrapPath}";
