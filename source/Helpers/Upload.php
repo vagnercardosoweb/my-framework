@@ -23,7 +23,7 @@ class Upload
      *
      * @return array
      */
-    public static function organizeMultipleFiles(array $files)
+    public static function organizeMultipleFiles(array $files): array
     {
         $newFiles = [];
 
@@ -51,7 +51,7 @@ class Upload
      *
      * @return false|resource
      */
-    public static function fixImageRotate(string $imagePath, $image)
+    public static function fixImageRotate(string $imagePath, $image): bool
     {
         if (file_exists($imagePath) && function_exists('exif_read_data') && is_resource($image)) {
             $exif = @exif_read_data($imagePath);
@@ -81,7 +81,7 @@ class Upload
      *
      * @return string
      */
-    public static function getStringError($code, bool $english = true): ?string
+    public static function getStringError(int $code, bool $english = true): ?string
     {
         $message = null;
 

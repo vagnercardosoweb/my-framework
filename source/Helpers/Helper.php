@@ -194,15 +194,16 @@ class Helper
     /**
      * @param string|int|float $value
      *
-     * @return mixed
+     * @return float
      */
-    public static function normalizeNumberFloat($value)
+    public static function normalizeNumberFloat($value): float
     {
         if (false !== strpos($value, ',')) {
-            $value = str_replace(',', '.', str_replace('.', '', $value));
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
         }
 
-        return $value;
+        return (float)$value;
     }
 
     /**
@@ -263,19 +264,15 @@ class Helper
             case 'true':
             case '(true)':
                 return true;
-                break;
             case 'false':
             case '(false)':
                 return false;
-                break;
             case 'empty':
             case '(empty)':
                 return '';
-                break;
             case 'null':
             case '(null)':
                 return null;
-                break;
         }
 
         return $value;

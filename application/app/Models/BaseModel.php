@@ -26,7 +26,6 @@ use Core\Database\Model;
  * @property \Core\Session\Flash|object   $flash
  * @property \Core\Mailer\Mailer          $mailer
  * @property \Core\Password\Password      $hash
- * @property \Core\Password\Password      $password
  * @property \Core\Encryption             $encryption
  * @property \Core\Jwt                    $jwt
  * @property \Core\Logger                 $logger
@@ -47,7 +46,7 @@ abstract class BaseModel extends Model
      *
      * @return array
      */
-    public function toCamelCase($data = null)
+    public function toCamelCase($data = null): array
     {
         if (is_null($data)) {
             $data = $this->data;
@@ -75,7 +74,7 @@ abstract class BaseModel extends Model
      *
      * @return string
      */
-    protected function columnCamelCase($column)
+    protected function columnCamelCase(string $column): string
     {
         if (false !== strpos($column, '_')) {
             $column = ucwords(str_replace('_', ' ', strtolower($column)));

@@ -34,15 +34,15 @@ class Env
     protected static $repository;
 
     /**
-     * @param string|string[]|null $names
+     * @param string|string[]|null $name
      *
      * @return array<string|string|null>
      */
-    public static function load($names = '.env'): ?array
+    public static function load($name = '.env'): ?array
     {
-        $dirEnv = dirname(self::path());
+        $envPath = dirname(self::path());
 
-        return Dotenv::create(self::repository(), $dirEnv, $names)->load();
+        return Dotenv::create(self::repository(), $envPath, $name)->load();
     }
 
     /**
