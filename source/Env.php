@@ -87,10 +87,10 @@ class Env
     protected static function adapters(): array
     {
         return [
-            new ApacheAdapter(),
-            new EnvConstAdapter(),
-            new ServerConstAdapter(),
-            new PutenvAdapter(),
+            ServerConstAdapter::class,
+            EnvConstAdapter::class,
+            PutenvAdapter::class,
+            ApacheAdapter::class,
         ];
     }
 
@@ -100,12 +100,14 @@ class Env
     protected static function repository(): RepositoryInterface
     {
         if (null === self::$repository) {
-            self::$repository = RepositoryBuilder::create()
-                ->withReaders(self::adapters())
-                ->withWriters(self::adapters())
-                ->immutable()
-                ->make()
-            ;
+            $repository = RepositoryBuilder::createWithNoAdapters();
+
+            foreach (self::adapters() as $adapter) {
+                $repository = $repository->addWriter($adapter);
+                $repository = $repository->addAdapter($adapter);
+            }
+
+            self::$repository = $repository->immutable()->make();
         }
 
         return self::$repository;

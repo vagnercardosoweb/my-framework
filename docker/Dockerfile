@@ -68,12 +68,13 @@ RUN docker-php-ext-install \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install xdebug
-RUN pecl install xdebug
-RUN docker-php-ext-enable xdebug
-RUN echo "xdebug.remote_enable=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
-    echo "xdebug.remote_connect_back=1" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
-    echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini &&\
-    echo "xdebug.remote_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN pecl install xdebug \
+ && docker-php-ext-enable xdebug \
+ && echo 'xdebug.remote_autostart=0' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.remote_enable=1' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.remote_host=host.docker.internal' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.remote_port=9000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.remote_cookie_expire_time=36000' >>  /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install redis
 RUN pecl install redis
@@ -89,10 +90,11 @@ RUN openssl req -new -x509 -days 365 -nodes \
   -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
   -subj "/CN=*.localhost"
 
-# Habilita modulos e site
+# Apache config
 RUN a2enmod rewrite
 RUN a2enmod ssl
 RUN a2ensite default-ssl
+RUN echo "ServerName docker" >> /etc/apache2/apache2.conf
 
 # Permissão de usuários
 RUN usermod -u 1000 www-data
