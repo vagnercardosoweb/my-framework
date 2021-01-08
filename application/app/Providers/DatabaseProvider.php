@@ -13,6 +13,7 @@ namespace App\Providers;
 
 use Core\Config;
 use Core\Database\Database;
+use Core\Database\Model;
 
 /**
  * Class DatabaseProvider.
@@ -46,5 +47,13 @@ class DatabaseProvider extends Provider
 
             return $database->connection();
         };
+    }
+
+    /**
+     * @return void
+     */
+    public function boot(): void
+    {
+        Model::setDatabase($this->database);
     }
 }

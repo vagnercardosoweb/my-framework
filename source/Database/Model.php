@@ -104,6 +104,11 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     protected $reset = [];
 
     /**
+     * @var \Core\Database\Database
+     */
+    protected static $database = null;
+
+    /**
      * @return void
      */
     public function __clone()
@@ -139,6 +144,10 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function __set(string $name, $value): void
     {
+        if ('database' === $name) {
+            return;
+        }
+
         $this->data = Obj::fromArray($this->data);
         $this->data->{$name} = $value;
     }
@@ -159,6 +168,16 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     public function __unset(string $name): void
     {
         unset($this->data->{$name});
+    }
+
+    /**
+     * @param \Core\Database\Database $database
+     */
+    public static function setDatabase(Database $database): void
+    {
+        if (is_null(static::$database)) {
+            static::$database = $database;
+        }
     }
 
     /**
@@ -377,7 +396,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @return $this
      */
-    public function limit($limit, $offset = 0): self
+    public function limit(int $limit, $offset = 0): self
     {
         if (is_numeric($limit)) {
             $this->limit = (int)$limit;
@@ -395,7 +414,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @return $this
      */
-    public function offset($offset): self
+    public function offset(int $offset): self
     {
         $this->offset = (int)$offset;
 
@@ -431,7 +450,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     }
 
     /**
-     * @param string $table
+     * @param string|null $table
      *
      * @return $this|string
      */
@@ -491,7 +510,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function transaction(\Closure $callback)
     {
-        $db = $this->db->driver($this->driver);
+        $db = static::$database->driver($this->driver);
 
         return $db->transaction($callback, $this);
     }
@@ -556,7 +575,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @return $this[]
      */
-    public function fetchAll($fetchStyle = null, $fetchArgument = null)
+    public function fetchAll($fetchStyle = null, $fetchArgument = null): array
     {
         if (empty($fetchStyle) && $this->fetchStyle) {
             $fetchStyle = $this->fetchStyle;
@@ -605,10 +624,8 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
 
         $row = $statement->fetch($fetchStyle) ?: null;
 
-        if ($row) {
-            if (method_exists($this, '_row')) {
-                $this->_row($row);
-            }
+        if ($row && method_exists($this, '_row')) {
+            $this->_row($row);
         }
 
         $statement->closeCursor();
@@ -659,7 +676,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             );
         }
 
-        $rows = $this->db
+        $rows = static::$database
             ->driver($this->driver)
             ->update(
                 $this->table,
@@ -720,7 +737,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
     {
         $this->data($data, $validate);
 
-        $lastInsertId = $this->db
+        $lastInsertId = static::$database
             ->driver($this->driver)
             ->create($this->table, $this->data)
         ;
@@ -854,7 +871,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
             );
         }
 
-        $rows = $this->db
+        $rows = static::$database
             ->driver($this->driver)
             ->delete(
                 $this->table,
@@ -883,7 +900,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     public function getStatement(): Statement
     {
-        $statement = $this->db->driver($this->driver)->prepare($this->getQuery());
+        $statement = static::$database->driver($this->driver)->prepare($this->getQuery());
         $statement->bindValues($this->bindings);
 
         return $statement;
@@ -908,7 +925,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      */
     protected function buildSqlStatement(): Statement
     {
-        $statement = $this->db
+        $statement = static::$database
             ->driver($this->driver)
             ->query(
                 $this->getQuery(),
@@ -942,13 +959,13 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @return string
      */
-    protected function replaceQueryBindings($sql)
+    protected function replaceQueryBindings(string $sql): string
     {
         $keys = array_keys($this->bindings);
         $keys = explode(',', ':'.implode(',:', $keys));
         $values = array_map(function ($bind) {
             if (!is_numeric($bind)) {
-                $bind = $this->db->quote($bind);
+                $bind = static::$database->quote($bind);
             }
 
             return $bind;
@@ -963,7 +980,7 @@ abstract class Model implements \ArrayAccess, \JsonSerializable
      *
      * @return void
      */
-    protected function mountProperty($conditions, $property): void
+    protected function mountProperty($conditions, string $property): void
     {
         if (!is_array($this->{$property})) {
             $this->{$property} = [];

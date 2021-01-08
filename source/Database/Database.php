@@ -87,7 +87,7 @@ class Database
     }
 
     /**
-     * @param string $driver
+     * @param string|null $driver
      *
      * @throws \Exception
      *
@@ -288,9 +288,9 @@ class Database
     }
 
     /**
-     * @param string       $table
-     * @param string       $condition
-     * @param string|array $bindings
+     * @param string      $table
+     * @param string|null $condition
+     * @param null        $bindings
      *
      * @throws \Exception
      *
@@ -351,7 +351,7 @@ class Database
      *
      * @return object[]
      */
-    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null)
+    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null): array
     {
         $rows = $this->read($table, $condition, $bindings)->fetchAll();
 
