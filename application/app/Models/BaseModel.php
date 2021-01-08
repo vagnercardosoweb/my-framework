@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -35,7 +35,8 @@ use Core\Database\Model;
  * @property \Core\Curl\Curl              $curl
  * @property \Core\Redis                  $redis
  * @property \Core\Cache\Cache            $cache
- * @property \Core\Config                  $config
+ * @property \Core\Config                 $config
+ * @property \Core\Translator             $translator
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */

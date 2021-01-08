@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 use Core\App;
@@ -16,7 +16,7 @@ use Core\Config;
 $autoload = APP_FOLDER.'/vendor/autoload.php';
 
 if (!file_exists($autoload)) {
-    die('composer not installed');
+    exit('composer not installed');
 }
 
 require_once "{$autoload}";

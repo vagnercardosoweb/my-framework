@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 $documentRoot = realpath(dirname(__DIR__));
@@ -26,8 +26,8 @@ $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
 $schema = 'http';
 
 if (
-    (!empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS']) ||
-    (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && 'https' == $_SERVER['HTTP_X_FORWARDED_PROTO'])
+    (!empty($_SERVER['HTTPS']) && 'on' == $_SERVER['HTTPS'])
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && 'https' == $_SERVER['HTTP_X_FORWARDED_PROTO'])
 ) {
     $schema = 'https';
 }

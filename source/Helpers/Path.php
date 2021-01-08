@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -114,8 +114,7 @@ class Path
         string $folder,
         string $root,
         ?string $path = null
-    ): string
-    {
+    ): string {
         if (!defined($name)) {
             define($name, self::normalizePath($root, $folder));
         }

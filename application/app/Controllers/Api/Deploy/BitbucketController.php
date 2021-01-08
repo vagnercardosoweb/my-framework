@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 namespace App\Controllers\Api\Deploy;
@@ -64,7 +64,7 @@ class BitbucketController extends Controller
 
             switch ($lastChange['name']) {
                 case 'master':
-                    `git fetch origin && git reset --hard origin/master 2>&1`;
+                    shell_exec('git fetch origin && git reset --hard origin/master 2>&1');
                     break;
                 default:
                     throw new \Exception('Branch undefined.');

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 use Core\Env;
@@ -67,6 +67,7 @@ return [
         \App\Providers\NotFoundProvider::class,
         \App\Providers\NotAllowedProvider::class,
         \App\Providers\EnvironmentProvider::class,
+        \App\Providers\TranslatorProvider::class,
     ],
 
     // Register middleware

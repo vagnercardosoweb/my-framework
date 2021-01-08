@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 05/07/2020 Vagner Cardoso
+ * @copyright 08/01/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -336,7 +336,7 @@ class App extends SlimApp
      */
     private function registerPhpConfiguration(): void
     {
-        $locale = Env::get('APP_LOCALE', 'pt_BR');
+        $locale = Env::get('APP_LOCALE', 'pt-br');
         $charset = Env::get('APP_CHARSET', 'UTF-8');
 
         ini_set('default_charset', $charset);
