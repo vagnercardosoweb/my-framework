@@ -188,14 +188,16 @@ if (!function_exists('json')) {
      */
     function json($data, int $status = StatusCode::HTTP_OK): Response
     {
+        $option = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+
         if (response()) {
-            return response()->withJson($data, $status);
+            return response()->withJson($data, $status, $option);
         }
 
         http_response_code($status);
         header('Content-type: application/json');
 
-        $json = json_encode($data);
+        $json = json_encode($data, $option);
 
         if (0 !== ob_get_level()) {
             ob_clean();

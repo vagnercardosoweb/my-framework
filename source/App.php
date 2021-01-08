@@ -92,12 +92,12 @@ class App extends SlimApp
      * @param string|array               $methods
      * @param string                     $pattern
      * @param string|\Closure            $callable
-     * @param strin|null                 $name
+     * @param string|null                $name
      * @param string|array|\Closure|null $middleware
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public function route($methods, $pattern, $callable, $name = null, $middleware = null)
+    public function route($methods, string $pattern, $callable, $name = null, $middleware = null): \Slim\Interfaces\RouteInterface
     {
         $methods = '*' == $methods ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] : $methods;
         $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
