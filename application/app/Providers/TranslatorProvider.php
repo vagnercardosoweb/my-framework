@@ -36,10 +36,10 @@ class TranslatorProvider extends Provider
     {
         /** @var \Slim\Http\Request $request */
         $request = $this->container->get('request');
-        $language = $request->getHeaderLine('Accept-Language') ?? $request->getQueryParam('language');
+        $language = $request->getQueryParam('language') ?? $request->getHeaderLine('Accept-Language');
 
-        Translator::setLanguage($language);
         Translator::setFallback(Env::get('APP_LOCALE', 'pt-br'));
+        Translator::setLanguage($language);
 
         return function () {
             return new Translator();

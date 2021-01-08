@@ -35,13 +35,13 @@ class Translator
     protected static $fallback = 'en';
 
     /**
-     * @param string $language
+     * @param string $fallback
      *
      * @throws \Exception
      */
-    public static function setFallback(string $language): void
+    public static function setFallback(string $fallback): void
     {
-        self::$fallback = self::parseLanguage($language);
+        self::$fallback = self::resolveLanguageName($fallback);
     }
 
     /**
@@ -59,7 +59,7 @@ class Translator
      */
     public static function setLanguage(string $language): void
     {
-        self::$language = self::parseLanguage($language);
+        self::$language = self::parseLanguageName($language);
     }
 
     /**
@@ -137,20 +137,77 @@ class Translator
 
         self::$data[$file] = [];
 
-        $language = self::$language;
-        $languagePath = Path::resource('/languages/%s/%s.php');
+        $path =
+            self::existsFile(self::$language, $file) ??
+            self::existsFile(self::$fallback, $file);
 
-        if (!file_exists(sprintf($languagePath, $language, $file))) {
-            $language = self::$fallback;
-        }
-
-        if (!file_exists(sprintf($languagePath, $language, $file))) {
+        if (!$path) {
             return;
         }
 
-        $languagePath = sprintf($languagePath, $language, $file);
+        self::$data[$file] = require "{$path}";
+    }
 
-        self::$data[$file] = require "{$languagePath}";
+    /**
+     * @param string $language
+     *
+     * @return string|null
+     */
+    protected static function existsFolder(string $language): ?string
+    {
+        $path = sprintf(Path::resource('/languages/%s'), $language);
+
+        if (!is_dir($path)) {
+            return null;
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param string $language
+     * @param string $file
+     *
+     * @return string|null
+     */
+    protected static function existsFile(string $language, string $file): ?string
+    {
+        $path = sprintf(Path::resource('/languages/%s/%s.php'), $language, $file);
+
+        if (!file_exists($path)) {
+            return null;
+        }
+
+        return $path;
+    }
+
+    /**
+     * @param string $header
+     *
+     * @return string
+     */
+    protected static function parseLanguageName(string $header): string
+    {
+        $splitHeader = explode(',', $header);
+        $splitHeader = array_map(function (string $name) {
+            list($name) = explode(';', $name);
+
+            return trim($name);
+        }, $splitHeader);
+
+        foreach ($splitHeader as $language) {
+            $language = self::resolveLanguageName($language);
+
+            if ('*' === $language) {
+                break;
+            }
+
+            if (self::existsFolder($language)) {
+                return $language;
+            }
+        }
+
+        return self::$fallback;
     }
 
     /**
@@ -158,7 +215,7 @@ class Translator
      *
      * @return string
      */
-    protected static function parseLanguage(string $language): string
+    protected static function resolveLanguageName(string $language): string
     {
         return str_replace('_', '-', strtolower($language));
     }
