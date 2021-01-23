@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 08/01/2021 Vagner Cardoso
+ * @copyright 23/01/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -55,7 +55,7 @@ class CallableResolver
      *
      * @return array
      */
-    protected static function resolveClassName($callable, $injectThis = null, $contract = null)
+    protected static function resolveClassName($callable, $injectThis = null, $contract = null): array
     {
         list($class, $method) = self::parseClassName($callable);
 
@@ -81,7 +81,7 @@ class CallableResolver
      *
      * @return array
      */
-    protected static function parseClassName($callable)
+    protected static function parseClassName(string $callable): array
     {
         if (preg_match(self::CALLABLE_PATTERN, $callable, $matches)) {
             return [$matches[1], $matches[2]];

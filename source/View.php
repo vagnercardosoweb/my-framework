@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 08/01/2021 Vagner Cardoso
+ * @copyright 23/01/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -71,7 +71,7 @@ class View
      *
      * @return string
      */
-    public function fetch(string $template, array $context = [])
+    public function fetch(string $template, array $context = []): string
     {
         $removedExtension = $this->removeExtension($template);
 
@@ -99,7 +99,7 @@ class View
      *
      * @return $this
      */
-    public function addExtension(\Twig\Extension\ExtensionInterface $extension)
+    public function addExtension(\Twig\Extension\ExtensionInterface $extension): View
     {
         $this->environment->addExtension($extension);
 
@@ -125,7 +125,7 @@ class View
      *
      * @return $this
      */
-    public function addFunction(string $name, $callable, array $options = ['is_safe' => ['all']])
+    public function addFunction(string $name, $callable, array $options = ['is_safe' => ['all']]): View
     {
         $this->environment->addFunction(new \Twig\TwigFunction($name, $callable, $options));
 
@@ -139,7 +139,7 @@ class View
      *
      * @return $this
      */
-    public function addFilter(string $name, $callable, array $options = ['is_safe' => ['all']])
+    public function addFilter(string $name, $callable, array $options = ['is_safe' => ['all']]): View
     {
         $this->environment->addFilter(new \Twig\TwigFilter($name, $callable, $options));
 
@@ -152,7 +152,7 @@ class View
      *
      * @return $this
      */
-    public function addGlobal(string $name, $value)
+    public function addGlobal(string $name, $value): View
     {
         $this->environment->addGlobal($name, $value);
 
@@ -162,7 +162,7 @@ class View
     /**
      * @return \Twig\Environment
      */
-    public function getEnvironment()
+    public function getEnvironment(): \Twig\Environment
     {
         return $this->environment;
     }
@@ -205,7 +205,7 @@ class View
      *
      * @return \Twig\Loader\FilesystemLoader
      */
-    private function createLoader(array $paths)
+    private function createLoader(array $paths): \Twig\Loader\FilesystemLoader
     {
         $loader = new \Twig\Loader\FilesystemLoader();
 
