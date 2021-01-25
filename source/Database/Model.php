@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Database;
@@ -270,7 +270,8 @@ abstract class Model implements ArrayAccess, JsonSerializable
             ->query(
                 $this->getQuery(),
                 $this->bindings
-            );
+            )
+        ;
 
         $this->clear();
 
@@ -351,7 +352,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return string
      */
-    protected function normalizeProperty(array|string $string): string
+    protected function normalizeProperty(array | string $string): string
     {
         if (is_array($string)) {
             $string = implode(' ', $string);
@@ -387,6 +388,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      * @param bool  $reset
      *
      * @throws \ReflectionException
+     *
      * @return $this
      */
     public function clear(array $properties = [], bool $reset = false): self
@@ -429,6 +431,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      * @param array $properties
      *
      * @throws \ReflectionException
+     *
      * @return $this
      */
     public function reset(array $properties = []): self
@@ -448,7 +451,8 @@ abstract class Model implements ArrayAccess, JsonSerializable
         $row = $this->select("COUNT({$column}) AS count")
             ->order('count DESC')->limit(1)
             ->buildSqlStatement()
-            ->fetch(PDO::FETCH_OBJ);
+            ->fetch(PDO::FETCH_OBJ)
+        ;
 
         return $row ? (int)$row->count : 0;
     }
@@ -489,7 +493,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function order(array|string $order): self
+    public function order(array | string $order): self
     {
         $this->mountProperty($order, 'order');
 
@@ -502,7 +506,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return void
      */
-    protected function mountProperty(array|string|null $conditions, string $property): void
+    protected function mountProperty(array | string | null $conditions, string $property): void
     {
         if (!is_array($this->{$property})) {
             $this->{$property} = [];
@@ -536,7 +540,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this|string
      */
-    public function table(?string $table = null): string|self
+    public function table(?string $table = null): string | self
     {
         if (!empty($table)) {
             $this->table = (string)$table;
@@ -552,7 +556,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function join(array|string $join): self
+    public function join(array | string $join): self
     {
         $this->mountProperty($join, 'join');
 
@@ -564,7 +568,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function group(array|string $group): self
+    public function group(array | string $group): self
     {
         $this->mountProperty($group, 'group');
 
@@ -576,7 +580,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function having(array|string $having): self
+    public function having(array | string $having): self
     {
         $this->mountProperty($having, 'having');
 
@@ -645,7 +649,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     public function fetchById(int $id, ?int $fetchStyle = null): ?self
     {
         if (empty($this->primaryKey)) {
-            throw new \Exception(sprintf("Primary key is not configured in the model (%s).", self::class));
+            throw new \Exception(sprintf('Primary key is not configured in the model (%s).', self::class));
         }
 
         array_unshift($this->where, "AND {$this->table}.{$this->primaryKey} = :u{$this->primaryKey}");
@@ -661,7 +665,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this|array|null
      */
-    public function fetch($fetchStyle = null): array|self|null
+    public function fetch($fetchStyle = null): array | self | null
     {
         if (empty($fetchStyle) && $this->fetchStyle) {
             $fetchStyle = $this->fetchStyle;
@@ -705,7 +709,8 @@ abstract class Model implements ArrayAccess, JsonSerializable
                 $this->data,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            );
+            )
+        ;
 
         $this->clear();
 
@@ -727,6 +732,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      * @param bool         $validate
      *
      * @throws \Exception
+     *
      * @return $this
      */
     public function data($data = [], bool $validate = true): self
@@ -780,7 +786,8 @@ abstract class Model implements ArrayAccess, JsonSerializable
 
         $lastInsertId = static::$database
             ->driver($this->driver)
-            ->create($this->table, $this->data);
+            ->create($this->table, $this->data)
+        ;
 
         $new = clone $this;
 
@@ -798,6 +805,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      * @param int|null $fetchStyle
      *
      * @throws \Exception
+     *
      * @return self[]
      */
     public function fetchByIds(array $ids, ?int $fetchStyle = null): array
@@ -855,6 +863,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      * @param mixed  $value
      *
      * @throws \Exception
+     *
      * @return $this
      */
     public function whereBy(string $column, mixed $value): self
@@ -879,7 +888,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function where(array|string $where, $bindings = null): self
+    public function where(array | string $where, $bindings = null): self
     {
         $this->mountProperty($where, 'where');
         $this->bindings($bindings);
@@ -892,7 +901,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * @return $this
      */
-    public function bindings(array|string|null $bindings): self
+    public function bindings(array | string | null $bindings): self
     {
         Helper::parseStr($bindings, $this->bindings);
 
@@ -942,7 +951,8 @@ abstract class Model implements ArrayAccess, JsonSerializable
                 $this->table,
                 "WHERE {$this->normalizeProperty($this->where)}",
                 $this->bindings
-            );
+            )
+        ;
 
         if (!$rows) {
             return null;

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -53,9 +53,10 @@ class Event
      * @param callable|string $callable
      *
      * @throws \Exception
+     *
      * @return void
      */
-    public function on(string $name, callable|string $callable): void
+    public function on(string $name, callable | string $callable): void
     {
         if (!isset($this->events[$name])) {
             $this->events[$name] = [];

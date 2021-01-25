@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -210,7 +210,7 @@ class Helper
      * @param array|string|null $encoded
      * @param array|string      $result
      */
-    public static function parseStr(array|string|null $encoded, array|string &$result)
+    public static function parseStr(array | string | null $encoded, array | string &$result)
     {
         if (!empty($encoded)) {
             if (is_string($encoded)) {

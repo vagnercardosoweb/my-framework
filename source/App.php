@@ -134,7 +134,7 @@ class App extends SlimApp
      *
      * @return \Slim\Interfaces\RouteInterface
      */
-    public function route(array|string $methods, string $pattern, string|Closure $callable, $name = null, $middleware = null): RouteInterface
+    public function route(array | string $methods, string $pattern, string | Closure $callable, $name = null, $middleware = null): RouteInterface
     {
         $methods = '*' == $methods ? ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] : $methods;
         $methods = (is_string($methods) ? explode(',', mb_strtoupper($methods)) : $methods);
@@ -159,7 +159,7 @@ class App extends SlimApp
      *
      * @return \Closure
      */
-    private function handleCallableRouter(callable|string $callable): Closure
+    private function handleCallableRouter(callable | string $callable): Closure
     {
         if ($callable instanceof Closure) {
             return $callable;
@@ -228,7 +228,7 @@ class App extends SlimApp
      * @param \Slim\Interfaces\RouteInterface|\Slim\Interfaces\RouteGroupInterface $route
      * @param string|array                                                         $middleware
      */
-    private function addMiddlewareInRouteOrGroup($route, array|string $middleware): void
+    private function addMiddlewareInRouteOrGroup($route, array | string $middleware): void
     {
         $manual = Config::get('app.middleware.manual', []);
 

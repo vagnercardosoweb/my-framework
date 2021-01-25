@@ -129,7 +129,7 @@ class Statement extends \PDOStatement
     /**
      * @param array|string|object|null $bindings
      */
-    public function bindValues(object|array|string|null $bindings): void
+    public function bindValues(object | array | string | null $bindings): void
     {
         if (empty($bindings)) {
             return;
