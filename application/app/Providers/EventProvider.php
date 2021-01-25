@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace App\Providers;
 
+use Core\Database\Database;
 use Core\Event;
 
 /**
@@ -34,6 +35,7 @@ class EventProvider extends Provider
     public function register(): \Closure
     {
         $event = Event::getInstance();
+        Database::setEvent($event);
 
         if ($this->view) {
             $this->view->addFunction('event_emit', [$event, 'emit']);

@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
@@ -24,12 +24,12 @@ class Statement extends \PDOStatement
     /**
      * @var \PDO
      */
-    protected $pdo;
+    protected \PDO $pdo;
 
     /**
      * @var array
      */
-    protected $bindings = [];
+    protected array $bindings = [];
 
     /**
      * Statement constructor.
@@ -54,7 +54,7 @@ class Statement extends \PDOStatement
      *
      * @return string
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string
     {
         return $this->pdo->lastInsertId($name);
     }
@@ -74,59 +74,23 @@ class Statement extends \PDOStatement
     }
 
     /**
-     * @param int   $fetchStyle
-     * @param mixed $fetchArgument
-     * @param array $ctorArgs
-     *
-     * @return array|object
-     */
-    public function fetchAll($fetchStyle = null, $fetchArgument = null, $ctorArgs = null)
-    {
-        if (!empty($fetchStyle) || !empty($fetchArgument)) {
-            if (class_exists($fetchStyle)) {
-                $fetchArgument = $fetchStyle;
-                $fetchStyle = \PDO::FETCH_CLASS;
-            }
-
-            if (!empty($fetchArgument)) {
-                $fetchStyle = \PDO::FETCH_CLASS;
-                $fetchArgument = !class_exists($fetchArgument)
-                    ? 'stdClass'
-                    : $fetchArgument;
-            }
-
-            if (\PDO::FETCH_CLASS === $fetchStyle) {
-                return parent::fetchAll($fetchStyle, $fetchArgument, $ctorArgs);
-            }
-
-            if (in_array($fetchStyle, [\PDO::FETCH_ASSOC, \PDO::FETCH_NUM, \PDO::FETCH_OBJ])) {
-                return parent::fetchAll($fetchStyle);
-            }
-
-            return parent::fetchAll($fetchStyle, $fetchArgument);
-        }
-
-        return parent::fetchAll();
-    }
-
-    /**
-     * @param mixed $fetchStyle
+     * @param mixed $mode
      * @param int   $cursorOrientation
      * @param int   $cursorOffset
      *
      * @return mixed
      */
-    public function fetch($fetchStyle = null, $cursorOrientation = \PDO::FETCH_ORI_NEXT, $cursorOffset = 0)
+    public function fetch($mode = null, $cursorOrientation = \PDO::FETCH_ORI_NEXT, $cursorOffset = 0): mixed
     {
-        if ($this->isFetchObject($fetchStyle) || class_exists($fetchStyle)) {
-            if (!class_exists($fetchStyle)) {
-                $fetchStyle = 'stdClass';
+        if ($this->isFetchObject($mode) || class_exists($mode)) {
+            if (!class_exists($mode)) {
+                $mode = 'stdClass';
             }
 
-            return parent::fetchObject($fetchStyle);
+            return parent::fetchObject($mode);
         }
 
-        return parent::fetch($fetchStyle, $cursorOrientation, $cursorOffset);
+        return parent::fetch($mode, $cursorOrientation, $cursorOffset);
     }
 
     /**
@@ -163,10 +127,14 @@ class Statement extends \PDOStatement
     }
 
     /**
-     * @param array|string $bindings
+     * @param array|string|object|null $bindings
      */
-    public function bindValues($bindings): void
+    public function bindValues(object|array|string|null $bindings): void
     {
+        if (empty($bindings)) {
+            return;
+        }
+
         if (is_object($bindings)) {
             $bindings = Obj::toArray($bindings);
         }
@@ -175,17 +143,20 @@ class Statement extends \PDOStatement
             Helper::parseStr($bindings, $bindings);
         }
 
-        if (!empty($bindings)) {
-            foreach ($bindings as $key => $value) {
-                if (is_string($key) && in_array($key, ['limit', 'offset', 'l', 'o'])) {
-                    $value = (int)$value;
-                }
-
-                $key = (is_string($key) ? ":{$key}" : ((int)$key + 1));
-                $value = !empty($value) || '0' == $value ? filter_var($value, FILTER_DEFAULT) : null;
-                $this->bindValue($key, $value, (is_int($value) ? \PDO::PARAM_INT : (is_bool($value) ? \PDO::PARAM_BOOL : \PDO::PARAM_STR)));
-                $this->bindings[$key] = $value;
+        foreach ($bindings as $key => $value) {
+            if (is_string($key) && in_array($key, ['limit', 'offset', 'l', 'o'])) {
+                $value = (int)$value;
             }
+
+            $key = (is_string($key) ? ":{$key}" : ((int)$key + 1));
+            $value = !empty($value) || '0' == $value ? filter_var($value, FILTER_DEFAULT) : null;
+
+            $this->bindValue($key, $value, (is_int($value)
+                ? \PDO::PARAM_INT
+                : (is_bool($value) ? \PDO::PARAM_BOOL
+                    : \PDO::PARAM_STR)));
+
+            $this->bindings[$key] = $value;
         }
     }
 }

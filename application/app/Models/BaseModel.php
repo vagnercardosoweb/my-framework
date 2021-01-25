@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -77,7 +77,7 @@ abstract class BaseModel extends Model
      */
     protected function columnCamelCase(string $column): string
     {
-        if (false !== strpos($column, '_')) {
+        if (str_contains($column, '_')) {
             $column = ucwords(str_replace('_', ' ', strtolower($column)));
             $column = str_replace(' ', '', lcfirst($column));
         }

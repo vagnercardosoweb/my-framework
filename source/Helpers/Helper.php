@@ -207,10 +207,10 @@ class Helper
     }
 
     /**
-     * @param string|array $encoded
-     * @param array|string $result
+     * @param array|string|null $encoded
+     * @param array|string      $result
      */
-    public static function parseStr($encoded, &$result)
+    public static function parseStr(array|string|null $encoded, array|string &$result)
     {
         if (!empty($encoded)) {
             if (is_string($encoded)) {

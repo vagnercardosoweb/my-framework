@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace App\Models;
@@ -23,12 +23,12 @@ class UserModel extends BaseModel
     /**
      * @var string
      */
-    protected $table = 'users';
+    protected string $table = 'users';
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $primaryKey = 'id';
+    protected ?string $primaryKey = 'id';
 
     /**
      * @param \App\Models\UserModel $row
@@ -57,7 +57,7 @@ class UserModel extends BaseModel
      *
      * @throws \Exception
      */
-    protected function _data(array &$data, $validate)
+    protected function _data(array &$data, bool $validate)
     {
         // AQUI PASSA TODOS DADOS DE ENTRADA, UPDATE, SAVE, CREATE
         // PODENDO AQUI FAZER VERIFICAÇÕES NO BANCO, ADICIONAR CAMPOS DEFAULT,

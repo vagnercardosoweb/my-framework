@@ -6,11 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Database;
 
+use BadMethodCallException;
+use Closure;
 use Core\Database\Connection\MySqlConnection;
 use Core\Database\Connection\PostgreSqlConnection;
 use Core\Database\Connection\SQLiteConnection;
@@ -19,69 +21,85 @@ use Core\Database\Connection\Statement;
 use Core\Event;
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
+use Exception;
+use InvalidArgumentException;
+use PDO;
 
 /**
  * Class Database.
  *
- * @method \PDO beginTransaction()
- * @method \PDO commit()
- * @method \PDO errorCode()
- * @method \PDO errorInfo()
- * @method \PDO exec(string $statement)
- * @method \PDO getAttribute(int $attribute)
- * @method \PDO getAvailableDrivers()
- * @method \PDO inTransaction()
- * @method \PDO lastInsertId(string $name = null)
- * @method \Core\Database\Connection\Statement prepare(string $statement, array $driver_options = array())
- * @method \PDO quote(string $string, int $parameter_type = \PDO::PARAM_STR)
- * @method \PDO rollBack()
- * @method \PDO setAttribute(int $attribute, mixed $value)
+ * @method PDO beginTransaction()
+ * @method PDO commit()
+ * @method PDO errorCode()
+ * @method PDO errorInfo()
+ * @method PDO exec(string $statement)
+ * @method PDO getAttribute(int $attribute)
+ * @method PDO getAvailableDrivers()
+ * @method PDO inTransaction()
+ * @method PDO lastInsertId(string $name = null)
+ * @method Statement prepare(string $statement, array $driver_options = array())
+ * @method PDO quote(string $string, int $parameter_type = PDO::PARAM_STR)
+ * @method PDO rollBack()
+ * @method PDO setAttribute(int $attribute, mixed $value)
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
 class Database
 {
     /**
-     * @var \PDO
+     * @var \Core\Event|null
      */
-    protected $pdo;
+    protected static ?Event $event = null;
+
+    /**
+     * @var \PDO|null
+     */
+    protected ?PDO $pdo = null;
 
     /**
      * @var array
      */
-    protected $connections = [];
+    protected array $connections = [];
 
     /**
      * @var string
      */
-    protected $defaultDriver = 'mysql';
+    protected string $defaultDriver = 'mysql';
+
+    /**
+     * @param \Core\Event|null $event
+     */
+    public static function setEvent(?Event $event): void
+    {
+        self::$event = $event;
+    }
 
     /**
      * @param string $method
-     * @param mixed  ...$arguments
+     * @param mixed  $arguments
      *
      * @return mixed
      */
-    public function __call(string $method, $arguments)
+    public function __call(string $method, mixed $arguments): mixed
     {
-        if ($this->pdo instanceof \PDO && method_exists($this->pdo, $method)) {
+        if ($this->pdo instanceof PDO && method_exists($this->pdo, $method)) {
             return $this->pdo->{$method}(...$arguments);
         }
 
-        throw new \BadMethodCallException(
+        throw new BadMethodCallException(
             sprintf('Call to undefined method %s::%s()', get_class(), $method)
         );
     }
 
     /**
      * @param string $driver
-     * @param array  $config
+     * @param array  $connection
      *
      * @return $this
      */
-    public function addConnection(string $driver, array $config): self
+    public function addConnection(string $driver, array $connection): self
     {
-        $this->connections[$driver] = $config;
+        $this->connections[$driver] = $connection;
 
         return $this;
     }
@@ -109,30 +127,29 @@ class Database
     {
         $driver = $driver ?? $this->getDefaultDriver();
 
-        if (empty($config = $this->connections[$driver])) {
-            throw new \Exception(
-                "Database connections {$driver} ".
-                'does not exist configured.'
-            );
+        if (empty($this->connections[$driver])) {
+            throw new Exception("Database connections ({$driver}) does not exist configured.");
         }
 
-        if ($config instanceof \PDO) {
-            $this->pdo = $config;
+        $connection = $this->connections[$driver];
+
+        if ($connection instanceof PDO) {
+            $this->pdo = $connection;
 
             return $this;
         }
 
-        $config['driver'] = $config['driver'] ?? $driver;
+        $connection['driver'] = $connection['driver'] ?? $driver;
 
-        if (!$this->connections[$driver] instanceof \PDO) {
-            if ('pgsql' == $config['driver']) {
-                $this->connections[$driver] = (new PostgreSqlConnection($config));
-            } elseif ('sqlsrv' == $config['driver']) {
-                $this->connections[$driver] = (new SqlServerConnection($config));
-            } elseif ('sqlite' == $config['driver']) {
-                $this->connections[$driver] = (new SQLiteConnection($config));
+        if (!$this->connections[$driver] instanceof PDO) {
+            if ('pgsql' == $connection['driver']) {
+                $this->connections[$driver] = (new PostgreSqlConnection($connection));
+            } else if ('sqlsrv' == $connection['driver']) {
+                $this->connections[$driver] = (new SqlServerConnection($connection));
+            } else if ('sqlite' == $connection['driver']) {
+                $this->connections[$driver] = (new SQLiteConnection($connection));
             } else {
-                $this->connections[$driver] = (new MySqlConnection($config));
+                $this->connections[$driver] = (new MySqlConnection($connection));
             }
         }
 
@@ -162,13 +179,29 @@ class Database
     }
 
     /**
+     * @return \PDO
+     */
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConnections(): array
+    {
+        return $this->connections;
+    }
+
+    /**
      * @param \Closure $callback
      *
      * @throws \Exception
      *
      * @return mixed
      */
-    public function transaction(\Closure $callback)
+    public function transaction(Closure $callback): mixed
     {
         $injectThis = $this;
 
@@ -190,7 +223,7 @@ class Database
             $this->commit();
 
             return $result;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->rollBack();
 
             throw $e;
@@ -202,10 +235,9 @@ class Database
      * @param array|object $data
      *
      * @throws \Exception
-     *
      * @return int|null
      */
-    public function create(string $table, $data): ?int
+    public function create(string $table, object|array $data): ?int
     {
         $data = Obj::fromArray($data);
         $data = $bindings = ($this->event("{$table}:creating", $data) ?: $data);
@@ -223,6 +255,20 @@ class Database
     }
 
     /**
+     * @param string|null $name
+     *
+     * @return mixed
+     */
+    private function event(?string $name = null): mixed
+    {
+        if (self::$event && !empty($name)) {
+            return self::$event->emit($name, ...array_slice(func_get_args(), 1));
+        }
+
+        return null;
+    }
+
+    /**
      * @param string       $sql
      * @param string|array $bindings
      * @param array        $driverOptions
@@ -234,7 +280,7 @@ class Database
     public function query(string $sql, $bindings = null, array $driverOptions = []): Statement
     {
         if (empty($sql)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Parameter $sql can not be empty.'
             );
         }
@@ -251,13 +297,12 @@ class Database
      * @param string       $table
      * @param array|object $data
      * @param string       $condition
-     * @param array|string $bindings
+     * @param null         $bindings
      *
      * @throws \Exception
-     *
      * @return object[]|null
      */
-    public function update(string $table, $data, string $condition, $bindings = null): ?array
+    public function update(string $table, object|array $data, string $condition, $bindings = null): ?array
     {
         if (!$rows = $this->findAndTransformRowsObject($table, $condition, $bindings)) {
             return null;
@@ -283,6 +328,26 @@ class Database
         $statement = sprintf("UPDATE {$table} SET %s {$condition}", implode(', ', $set));
         $this->query($statement, $bindings);
         $this->event("{$table}:updated", $rows);
+
+        return $rows;
+    }
+
+    /**
+     * @param string       $table
+     * @param string       $condition
+     * @param array|string $bindings
+     *
+     * @throws \Exception
+     *
+     * @return object[]
+     */
+    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null): array
+    {
+        $rows = $this->read($table, $condition, $bindings)->fetchAll();
+
+        foreach ($rows as $key => $row) {
+            $rows[$key] = Obj::fromArray($row);
+        }
 
         return $rows;
     }
@@ -319,45 +384,6 @@ class Database
         $this->event("{$table}:deleting", $rows);
         $this->query("DELETE {$table} FROM {$table} {$condition}", $bindings);
         $this->event("{$table}:deleted", $rows);
-
-        return $rows;
-    }
-
-    /**
-     * @param string|null $name
-     *
-     * @return mixed
-     */
-    private function event(?string $name = null)
-    {
-        $event = Event::getInstance();
-
-        if (!empty($name)) {
-            return $event->emit(
-                $name,
-                ...array_slice(func_get_args(), 1)
-            );
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string       $table
-     * @param string       $condition
-     * @param array|string $bindings
-     *
-     * @throws \Exception
-     *
-     * @return object[]
-     */
-    private function findAndTransformRowsObject(string $table, string $condition, $bindings = null): array
-    {
-        $rows = $this->read($table, $condition, $bindings)->fetchAll();
-
-        foreach ($rows as $key => $row) {
-            $rows[$key] = Obj::fromArray($row);
-        }
 
         return $rows;
     }

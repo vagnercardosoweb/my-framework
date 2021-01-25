@@ -19,20 +19,20 @@ namespace Core;
 class Event
 {
     /**
-     * @var Event
+     * @var \Core\Event|null
      */
-    protected static $instance;
+    public static ?Event $instance = null;
 
     /**
      * @var array
      */
-    protected $events = [];
+    protected array $events = [];
 
     private function __construct()
     {
     }
 
-    private function __wakeup()
+    public function __wakeup()
     {
     }
 
@@ -53,10 +53,9 @@ class Event
      * @param callable|string $callable
      *
      * @throws \Exception
-     *
      * @return void
      */
-    public function on(string $name, $callable): void
+    public function on(string $name, callable|string $callable): void
     {
         if (!isset($this->events[$name])) {
             $this->events[$name] = [];
@@ -79,7 +78,7 @@ class Event
      *
      * @return mixed
      */
-    public function emit(string $name)
+    public function emit(string $name): mixed
     {
         $result = null;
 
@@ -100,11 +99,11 @@ class Event
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      *
      * @return mixed
      */
-    public function events(string $name = null)
+    public function events(string $name = null): mixed
     {
         if (!empty($name)) {
             if (isset($this->events[$name])) {
@@ -118,7 +117,7 @@ class Event
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      *
      * @return void
      */
