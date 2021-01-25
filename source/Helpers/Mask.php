@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -32,24 +32,18 @@ class Mask
      *
      * @return string
      */
-    public static function create($value, string $mask): string
+    public static function create(string $value, string $mask): string
     {
-        $newValue = self::remove($value);
-        $valueLength = strlen($newValue);
-        $maskLength = strlen(preg_replace('/[^#]/m', '', $mask));
-        $maskCalculateLength = $maskLength - $valueLength;
+        $normalizeValue = self::normalizeValue($value);
+        $normalizeMask = preg_replace('/[^#]/m', '', $mask);
 
-        if ($maskCalculateLength > 0) {
-            $mask = substr($mask, 0, -$maskCalculateLength);
-        }
-
-        if ($valueLength > $maskLength) {
+        if (strlen($normalizeValue) !== strlen($normalizeMask)) {
             return $value;
         }
 
         return vsprintf(
             str_replace('#', '%s', $mask),
-            str_split($newValue)
+            str_split($normalizeValue)
         );
     }
 
@@ -58,7 +52,7 @@ class Mask
      *
      * @return string
      */
-    public static function remove($value): string
+    public static function normalizeValue(string $value): string
     {
         return preg_replace(
             '/[\-\|\(\)\/\.\: ]/',
@@ -72,7 +66,7 @@ class Mask
      *
      * @return string
      */
-    public static function cep($value): string
+    public static function cep(string $value): string
     {
         return self::create(
             Helper::onlyNumber($value),
@@ -85,7 +79,7 @@ class Mask
      *
      * @return string
      */
-    public static function phone($value): string
+    public static function phone(string $value): string
     {
         $value = Helper::onlyNumber($value);
         $mask = 10 == strlen($value) ? self::MASK_PHONE[0] : self::MASK_PHONE[1];
@@ -98,7 +92,7 @@ class Mask
      *
      * @return string
      */
-    public static function cpfOrCnpj($value): string
+    public static function cpfOrCnpj(string $value): string
     {
         if (11 === strlen($value)) {
             return self::cpf($value);
@@ -112,7 +106,7 @@ class Mask
      *
      * @return string
      */
-    public static function cpf($value): string
+    public static function cpf(string $value): string
     {
         return self::create(
             Helper::onlyNumber($value),
@@ -125,7 +119,7 @@ class Mask
      *
      * @return string
      */
-    public static function cnpj($value): string
+    public static function cnpj(string $value): string
     {
         return self::create(
             Helper::onlyNumber($value),

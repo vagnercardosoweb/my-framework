@@ -40,7 +40,6 @@ class View
      */
     public function __construct($path, array $options = [])
     {
-        $path = is_string($path) ? [$path] : $path;
         $this->loader = $this->createLoader($path);
         $this->environment = new \Twig\Environment($this->loader, $options);
     }
@@ -199,21 +198,22 @@ class View
     }
 
     /**
-     * @param array $paths
+     * @param string|array $path
      *
      * @throws \Twig\Error\LoaderError
      *
      * @return \Twig\Loader\FilesystemLoader
      */
-    private function createLoader(array $paths): \Twig\Loader\FilesystemLoader
+    private function createLoader($path): \Twig\Loader\FilesystemLoader
     {
+        $paths = is_string($path) ? [$path] : $path;
         $loader = new \Twig\Loader\FilesystemLoader();
 
-        foreach ($paths as $namespace => $path) {
+        foreach ($paths as $namespace => $location) {
             if (is_string($namespace)) {
-                $loader->setPaths($path, $namespace);
+                $loader->setPaths($location, $namespace);
             } else {
-                $loader->addPath($path);
+                $loader->addPath($location);
             }
         }
 
