@@ -18,11 +18,10 @@
     }
   ],
   "require": {
-    "php": "^7.2",
+    "php": "^8.0",
     "ext-gd": "*",
     "ext-pdo": "*",
     "ext-curl": "*",
-    "ext-json": "*",
     "ext-redis": "*",
     "ext-libxml": "*",
     "ext-openssl": "*",
