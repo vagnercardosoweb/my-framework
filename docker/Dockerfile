@@ -1,4 +1,4 @@
-FROM php:7.4-apache
+FROM php:8-apache
 
 # Timezone
 ENV TZ=America/Sao_Paulo
@@ -45,8 +45,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
 # Instala dependencias do php
 RUN docker-php-ext-install \
-  -j$(nproc) gd \
-  json \
+  gd \
   iconv \
   bcmath \
   xml \
@@ -61,8 +60,7 @@ RUN docker-php-ext-install \
   opcache \
   intl \
   xsl \
-  exif \
-  soap
+  exif
 
 # Instala composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -70,10 +68,10 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Install xdebug
 RUN pecl install xdebug \
  && docker-php-ext-enable xdebug \
- && echo 'xdebug.remote_autostart=0' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.remote_enable=1' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.remote_host=host.docker.internal' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.remote_port=9000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.start_with_request=no' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.mode=debug' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.client_host=host.docker.internal' >> /usr/local/etc/php/conf.d/xdebug.ini \
+ && echo 'xdebug.client_port=9000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
  && echo 'xdebug.remote_cookie_expire_time=36000' >>  /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install redis
