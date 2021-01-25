@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 23/01/2021 Vagner Cardoso
+ * @copyright 25/01/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -238,7 +238,7 @@ class Validate
      *
      * @return bool
      */
-    public static function length($value, $length): bool
+    public static function length($value, int $length): bool
     {
         return strlen($value) == $length;
     }
@@ -249,7 +249,7 @@ class Validate
      *
      * @return bool
      */
-    public static function minLength($value, $length): bool
+    public static function minLength($value, int $length): bool
     {
         return strlen($value) >= $length;
     }
@@ -260,7 +260,7 @@ class Validate
      *
      * @return bool
      */
-    public static function maxLength($value, $length): bool
+    public static function maxLength($value, int $length): bool
     {
         return strlen($value) <= $length;
     }
@@ -632,7 +632,7 @@ class Validate
      *
      * @return bool
      */
-    private static function invokeCallable($callable, array $params)
+    private static function invokeCallable($callable, array $params): bool
     {
         // Verify if possibility php function
         if (is_callable($callable)) {
@@ -695,7 +695,7 @@ class Validate
      *
      * @return mixed
      */
-    private static function callCallable($callable, $method, array $params)
+    private static function callCallable($callable, ?string $method, array $params)
     {
         try {
             return forward_static_call_array([$callable, $method], $params);
@@ -711,8 +711,8 @@ class Validate
      *
      * @return string[]
      */
-    private static function parseClassMethodCallable(string $rule)
+    private static function parseClassMethodCallable(string $rule): array
     {
-        return explode('::', $rule) + [1 => '__invoke'];
+        return explode('::', $rule, 2) + [1 => '__invoke'];
     }
 }
