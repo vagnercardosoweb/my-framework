@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 26/01/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -21,16 +21,7 @@ class Jwt
     /**
      * @var string
      */
-    protected $key;
-
-    /**
-     * @var array
-     */
-    protected $algorithms = [
-        'HS256' => ['hash_hmac', 'SHA256'],
-        'HS512' => ['hash_hmac', 'SHA512'],
-        'HS384' => ['hash_hmac', 'SHA384'],
-    ];
+    protected string $key;
 
     /**
      * @param string $key
@@ -45,19 +36,18 @@ class Jwt
     }
 
     /**
-     * @param array  $payload
-     * @param string $algorithm
-     * @param array  $header
+     * @param array $payload
+     * @param array $header
      *
      * @return string
      */
-    public function encode(array $payload, string $algorithm = 'HS256', array $header = []): string
+    public function encode(array $payload, array $header = []): string
     {
         $array = [];
-        $header = array_merge($header, ['typ' => 'Jwt', 'alg' => $algorithm]);
+        $header = array_merge($header, ['typ' => 'JWT', 'alg' => 'HS512']);
         $array[] = base64_encode(json_encode($header));
         $array[] = base64_encode(json_encode($payload));
-        $signature = $this->signature(implode('.', $array), $algorithm);
+        $signature = $this->signature(implode('.', $array));
         $array[] = base64_encode($signature);
 
         return implode('.', $array);
@@ -78,7 +68,6 @@ class Jwt
             throw new \InvalidArgumentException('The token does not contain a valid format.');
         }
 
-        // Separate the token
         list($header64, $payload64, $signature) = $split;
 
         if (!$header = json_decode(base64_decode($header64), true, 512, JSON_BIGINT_AS_STRING)) {
@@ -97,11 +86,11 @@ class Jwt
             throw new \UnexpectedValueException('Empty algorithm.');
         }
 
-        if (!array_key_exists($header['alg'], $this->algorithms)) {
+        if ('HS512' !== $header['alg']) {
             throw new \UnexpectedValueException("Algorithm {$header['alg']} is not supported.");
         }
 
-        if (!$this->validate("{$header64}.{$payload64}", $signature, $header['alg'])) {
+        if (!$this->validate("{$header64}.{$payload64}", $signature)) {
             throw new \Exception('Signature verification failed.');
         }
 
@@ -110,54 +99,28 @@ class Jwt
 
     /**
      * @param string $value
-     * @param string $algorithm
      *
      * @return string
      */
-    private function signature(string $value, string $algorithm = 'HS256'): string
+    private function signature(string $value): string
     {
-        if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException(
-                "Algorithm {$algorithm} is not supported."
-            );
-        }
-
-        list($function, $algorithm) = $this->algorithms[$algorithm];
-
-        switch ($function) {
-            case 'hash_hmac':
-                return hash_hmac($algorithm, $value, $this->key, true);
-                break;
-        }
+        return hash_hmac('sha512', $value, $this->key, true);
     }
 
     /**
      * @param string $value
      * @param string $signature
-     * @param string $algorithm
      *
      * @return bool
      */
-    private function validate(string $value, string $signature, string $algorithm = 'HS256'): bool
+    private function validate(string $value, string $signature): bool
     {
-        if (!array_key_exists($algorithm, $this->algorithms)) {
-            throw new \InvalidArgumentException("Algorithm {$algorithm} is not supported.");
+        $hashed = hash_hmac('sha512', $value, $this->key, true);
+
+        if (function_exists('hash_equals')) {
+            return hash_equals($signature, $hashed);
         }
 
-        list($function, $algorithm) = $this->algorithms[$algorithm];
-
-        switch ($function) {
-            case 'hash_hmac':
-                $hashed = hash_hmac($algorithm, $value, $this->key, true);
-
-                if (function_exists('hash_equals')) {
-                    return hash_equals($signature, $hashed);
-                }
-
-                return $signature === $hashed;
-                break;
-        }
-
-        return false;
+        return $signature === $hashed;
     }
 }
