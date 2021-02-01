@@ -111,7 +111,7 @@ class Config implements ArrayAccess
                 $directory = sprintf('%s%s', $directory, DIRECTORY_SEPARATOR);
             }
 
-            if (false !== strpos($directory, DIRECTORY_SEPARATOR)) {
+            if (str_contains($directory, DIRECTORY_SEPARATOR)) {
                 foreach (explode(DIRECTORY_SEPARATOR, $directory) as $segment) {
                     if (empty($segment) || !is_dir("{$path}/{$segment}")) {
                         continue;
