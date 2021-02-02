@@ -1,12 +1,12 @@
 <?php
 
 /*
- * VCWeb Networks <https://www.vcwebnetworks.com.br/>
+ * Vagner Cardoso <https://github.com/vagnercardosoweb>
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 02/02/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -22,22 +22,20 @@ class Translator
     /**
      * @var array
      */
-    protected static $data = [];
+    protected static array $data = [];
+
+    /**
+     * @var string|null
+     */
+    protected static ?string $language = null;
 
     /**
      * @var string
      */
-    protected static $language = null;
-
-    /**
-     * @var string
-     */
-    protected static $fallback = 'en';
+    protected static string $fallback = 'en';
 
     /**
      * @param string $fallback
-     *
-     * @throws \Exception
      */
     public static function setFallback(string $fallback): void
     {
@@ -54,8 +52,6 @@ class Translator
 
     /**
      * @param string $language
-     *
-     * @throws \Exception
      */
     public static function setLanguage(string $language): void
     {
@@ -75,55 +71,37 @@ class Translator
     }
 
     /**
-     * @param string $key
-     *
-     * @throws \Exception
+     * @param string $message
      *
      * @return string|array
      */
-    public static function get(string $key)
+    public static function get(string $message): array | string
     {
-        list($file, $key) = explode('.', $key, 2);
-        self::loadData($file);
-
-        $value = 'unknown';
-        $language = self::$language;
-        $fallback = self::$fallback;
-        $translated = Arr::get(self::$data[$file], $key, null);
-
-        if (!$translated) {
-            return "message {$value}";
+        if (count(func_get_args()) > 2) {
+            throw new \UnexpectedValueException('You can only pass two parameters.');
         }
+
+        list($file, $message) = explode('.', $message, 2) + [null, null];
+        self::loadData($file);
 
         $args = func_get_args();
         array_shift($args);
 
-        if (!empty($args[0])) {
-            if (!empty($args[0][$language])) {
-                $value = $args[0][$language];
-            } elseif (!empty($args[0][$fallback])) {
-                $value = $args[0][$fallback];
-            }
-        }
+        $message = Arr::get(self::$data[$file], $message, $message);
+        $message = self::replacementsMessage($message, $args);
 
-        $translated = str_replace(':language:', $value, $translated);
+        return self::sprintfMessage($message, $args);
+    }
 
-        if (
-            !empty($args)
-            && !is_array($translated)
-            && false !== strpos($translated, '%')
-        ) {
-            try {
-                if (is_array($args[0])) {
-                    $args = $args[0]['args'] ?? $args[0];
-                }
-
-                return sprintf($translated, ...$args);
-            } catch (\Exception $e) {
-            }
-        }
-
-        return $translated;
+    /**
+     * @param string $file
+     * @param string $message
+     *
+     * @return array|string
+     */
+    public static function byFile(string $file, string $message): array | string
+    {
+        return self::get("{$file}.{$message}", ...array_slice(func_get_args(), 2));
     }
 
     /**
@@ -137,11 +115,7 @@ class Translator
 
         self::$data[$file] = [];
 
-        $path =
-            self::existsFile(self::$language, $file) ??
-            self::existsFile(self::$fallback, $file);
-
-        if (!$path) {
+        if (!$path = self::existsFile(self::$language, $file) ?? self::existsFile(self::$fallback, $file)) {
             return;
         }
 
@@ -218,5 +192,67 @@ class Translator
     protected static function resolveLanguageName(string $language): string
     {
         return str_replace('_', '-', strtolower($language));
+    }
+
+    /**
+     * @param mixed $message
+     * @param array $args
+     *
+     * @return mixed
+     */
+    protected static function replacementsMessage(mixed $message, array &$args): mixed
+    {
+        $language = self::$language;
+        $fallback = self::$fallback;
+
+        if (!empty($args[0])) {
+            $value = null;
+
+            if (!empty($args[0][$language])) {
+                $value = $args[0][$language];
+                unset($args[0][$language]);
+            } elseif (!empty($args[0][$fallback])) {
+                $value = $args[0][$fallback];
+                unset($args[0][$fallback]);
+            }
+
+            if ($value) {
+                $message = str_replace('{language}', $value, $message);
+            }
+        }
+
+        if (!empty($args[0]['replacements'])) {
+            foreach ($args[0]['replacements'] as $key => $replacement) {
+                $message = str_replace("{{$key}}", $replacement, $message);
+            }
+
+            unset($args[0]['replacements']);
+        }
+
+        return $message;
+    }
+
+    /**
+     * @param mixed $message
+     * @param array $args
+     *
+     * @return mixed
+     */
+    protected static function sprintfMessage(mixed $message, array &$args): mixed
+    {
+        if (
+            !empty($args)
+            && !is_array($message)
+            && str_contains($message, '%')
+        ) {
+            try {
+                $args = $args[0]['arguments'] ?? $args[0];
+
+                return sprintf($message, ...$args);
+            } catch (\Exception) {
+            }
+        }
+
+        return $message;
     }
 }

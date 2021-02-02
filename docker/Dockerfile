@@ -45,7 +45,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg
 
 # Instala dependencias do php
 RUN docker-php-ext-install \
-  gd \
+  -j$(nproc) gd \
   iconv \
   bcmath \
   xml \
@@ -60,7 +60,8 @@ RUN docker-php-ext-install \
   opcache \
   intl \
   xsl \
-  exif
+  exif \
+  soap
 
 # Instala composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
