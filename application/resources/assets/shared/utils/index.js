@@ -37,21 +37,20 @@ export function parsedHtmlDataset(dataset) {
  * @param {String} path
  * @param {RequestInit} init
  *
- * @returns {Promise<Response>}
+ * @returns {Promise<any>}
  */
 export function fetchAsync(path, init) {
   return new Promise((resolve, reject) => {
     fetch(path, init)
-      .then(async response => {
-        if (response.ok === false || response.status >= 400) {
+      .then(async (response) => {
           const body = await response.json();
+        body['statusTex'] = response.statusTex;
+        body['statusCode'] = response.status;
 
-          reject({
-            ...(body?.error ?? {}),
-            message: body?.error?.message ?? response.statusText,
-          });
+        if (response.ok === false || response.status >= 400) {
+          reject(body);
         } else {
-          resolve(await response.json());
+          resolve(body);
         }
       })
       .catch(reject);

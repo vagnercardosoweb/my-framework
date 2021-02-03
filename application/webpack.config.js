@@ -14,13 +14,8 @@ const ASSETS_PATH = path.join(__dirname, 'resources', 'assets');
 const publicFolder = path.resolve(__dirname, '..', 'public_html');
 const compileReactComponent = require('./resources/assets/frameworks/react/index.ts');
 
-const outputFilename = ({
-  chunk: {
-    name,
-    entryModule: { _identifier },
-  },
-}) => {
-  if (_identifier.match(/\/resources\/assets\/.+\/react\//g)) {
+const outputFilename = ({ chunk: { name } }) => {
+  if (name in compileReactComponent) {
     return `assets/react/${name}.js`;
   }
 
@@ -106,7 +101,7 @@ module.exports = {
         },
       },
       {
-        test: /\.(ttf|eot|woff(2)?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        test: /\.(ttf|eot|svg|gif|woff|woff2)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         loader: 'file-loader',
         options: {
           name: 'static/fonts/[name]-[hash:8].[ext]',
