@@ -18,16 +18,15 @@ $header = sprintf("VCWeb Networks <https://www.vcwebnetworks.com.br/>\n
 @copyright %s Vagner Cardoso", date('d/m/Y'));
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude(__DIR__.'/resources')
-    ->exclude(__DIR__.'/storage')
-    ->exclude(__DIR__.'/vendor')
+    ->exclude(__DIR__ . '/resources')
+    ->exclude(__DIR__ . '/storage')
+    ->exclude(__DIR__ . '/vendor')
     ->in(dirname(__DIR__))
     ->name('*.php')
     ->ignoreDotFiles(true)
-    ->ignoreVCS(true)
-;
+    ->ignoreVCS(true);
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setFinder($finder)
     ->setUsingCache(false)
     ->setRiskyAllowed(true)
@@ -70,5 +69,4 @@ return PhpCsFixer\Config::create()
             'commentType' => 'comment',
             'location' => 'after_open',
         ],
-    ])
-;
+    ]);

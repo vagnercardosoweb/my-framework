@@ -39,7 +39,7 @@
     "predis/predis": "^1.1"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.16"
+    "friendsofphp/php-cs-fixer": "^2.19"
   },
   "autoload": {
     "files": [
@@ -59,8 +59,8 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "scripts": {
-    "cs:fix": "php-cs-fixer fix ../ --config=.php_cs",
-    "cs:check": "php-cs-fixer fix ../ --dry-run --format=txt --verbose --diff --diff-format=udiff --config=.php_cs",
+    "cs:fix": "php-cs-fixer fix ../ --config=.php-cs-fixer.php",
+    "cs:check": "php-cs-fixer fix ../ --dry-run --format=txt --verbose --diff --diff-format=udiff --config=.php-cs-fixer.php",
     "server": "php -S 0.0.0.0:8080 -t ../public_html"
   }
 }

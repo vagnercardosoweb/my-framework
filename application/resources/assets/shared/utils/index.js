@@ -43,7 +43,7 @@ export function fetchAsync(path, init) {
   return new Promise((resolve, reject) => {
     fetch(path, init)
       .then(async (response) => {
-          const body = await response.json();
+        const body = await response.json();
         body['statusTex'] = response.statusTex;
         body['statusCode'] = response.status;
 

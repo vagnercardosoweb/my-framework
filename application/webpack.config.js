@@ -12,7 +12,8 @@ const DEV_TOOL = NODE_ENV === 'development' ? 'source-map' : false;
 const ASSETS_PATH = path.join(__dirname, 'resources', 'assets');
 
 const publicFolder = path.resolve(__dirname, '..', 'public_html');
-const compileReactComponent = require('./resources/assets/frameworks/react/index.ts');
+const compileReactComponent = require(
+  './resources/assets/frameworks/react/index.ts');
 
 const outputFilename = ({ chunk: { name } }) => {
   if (name in compileReactComponent) {
@@ -62,7 +63,10 @@ module.exports = {
   optimization: {
     minimize: true,
     minimizer: [
-      new TerserWebPackPlugin({ sourceMap: false, extractComments: false }),
+      new TerserWebPackPlugin({
+        parallel: true,
+        extractComments: false,
+      }),
       new OptimizeCssAssetsPlugin({}),
     ],
   },
