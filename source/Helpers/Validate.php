@@ -6,10 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
+
+use Exception;
+use InvalidArgumentException;
+use PDO;
 
 /**
  * Class Validate.
@@ -286,7 +290,7 @@ class Validate
         }
 
         if (!is_numeric($value)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('%s: value must be an integer', self::$field)
             );
         }
@@ -477,7 +481,7 @@ class Validate
             ->resolve('db')
             ->driver($driver)
             ->query($sql, ['field' => $value])
-            ->fetch(\PDO::FETCH_OBJ)
+            ->fetch(PDO::FETCH_OBJ)
             ->total;
     }
 
@@ -506,7 +510,7 @@ class Validate
         if ($url = parse_url($value, PHP_URL_HOST)) {
             try {
                 return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return false;
             }
         }
@@ -649,6 +653,34 @@ class Validate
     }
 
     /**
+     * @param string $rule
+     *
+     * @return string[]
+     */
+    private static function parseClassMethodCallable(string $rule): array
+    {
+        return explode('::', $rule, 2) + [1 => '__invoke'];
+    }
+
+    /**
+     * @param string|callable $callable
+     * @param string|null     $method
+     * @param array           $params
+     *
+     * @return mixed
+     */
+    private static function callCallable($callable, ?string $method, array $params)
+    {
+        try {
+            return forward_static_call_array([$callable, $method], $params);
+        } catch (Exception $e) {
+            $parseCallable = is_null($method) ? $callable : [new $callable(), $method];
+
+            return call_user_func_array($parseCallable, $params);
+        }
+    }
+
+    /**
      * @param array $validate
      * @param bool  $exception
      *
@@ -674,7 +706,7 @@ class Validate
             }
 
             if ($exception) {
-                throw new \InvalidArgumentException($validate['message'], $validate['code']);
+                throw new InvalidArgumentException($validate['message'], $validate['code']);
             }
 
             self::$errors[$field] = [
@@ -686,33 +718,5 @@ class Validate
         }
 
         return true;
-    }
-
-    /**
-     * @param string|callable $callable
-     * @param string|null     $method
-     * @param array           $params
-     *
-     * @return mixed
-     */
-    private static function callCallable($callable, ?string $method, array $params)
-    {
-        try {
-            return forward_static_call_array([$callable, $method], $params);
-        } catch (\Exception $e) {
-            $parseCallable = is_null($method) ? $callable : [new $callable(), $method];
-
-            return call_user_func_array($parseCallable, $params);
-        }
-    }
-
-    /**
-     * @param string $rule
-     *
-     * @return string[]
-     */
-    private static function parseClassMethodCallable(string $rule): array
-    {
-        return explode('::', $rule, 2) + [1 => '__invoke'];
     }
 }

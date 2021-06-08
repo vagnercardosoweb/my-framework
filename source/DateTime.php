@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
 
 use Core\Helpers\Helper;
+use DateTimeZone;
 
 /**
  * Class DateTime.
@@ -26,7 +27,7 @@ class DateTime extends \DateTime
      *
      * @throws \Exception
      */
-    public function __construct(string $time = 'now', \DateTimeZone $timezone = null)
+    public function __construct(string $time = 'now', DateTimeZone $timezone = null)
     {
         parent::__construct(
             Helper::normalizeDateFormat($time),
@@ -41,7 +42,7 @@ class DateTime extends \DateTime
      *
      * @return \DateTime|false
      */
-    public static function createFromFormat($format, $time, \DateTimeZone $timezone = null)
+    public static function createFromFormat($format, $time, DateTimeZone $timezone = null)
     {
         return parent::createFromFormat(
             Helper::normalizeDateFormat($format),
@@ -58,7 +59,7 @@ class DateTime extends \DateTime
      *
      * @return \DateTime
      */
-    public static function createFromTimestamp(int $timestamp, \DateTimeZone $timezone = null): \DateTime
+    public static function createFromTimestamp(int $timestamp, DateTimeZone $timezone = null): \DateTime
     {
         $date = new self('now', $timezone);
 

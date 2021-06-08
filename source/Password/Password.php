@@ -6,10 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Password;
+
+use RuntimeException;
 
 /**
  * Class Password.
@@ -56,25 +58,12 @@ abstract class Password
         );
 
         if (false === $hashed) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf('%s password not supported.', __CLASS__)
             );
         }
 
         return $hashed;
-    }
-
-    /**
-     * @param string $hash
-     * @param array  $options
-     *
-     * @return bool
-     */
-    public function needsRehash(string $hash, array $options = []): bool
-    {
-        return password_needs_rehash(
-            $hash, $this->algorithm(), $this->getOptions($options)
-        );
     }
 
     /**
@@ -88,4 +77,17 @@ abstract class Password
      * @return array
      */
     abstract protected function getOptions(array $options): array;
+
+    /**
+     * @param string $hash
+     * @param array  $options
+     *
+     * @return bool
+     */
+    public function needsRehash(string $hash, array $options = []): bool
+    {
+        return password_needs_rehash(
+            $hash, $this->algorithm(), $this->getOptions($options)
+        );
+    }
 }

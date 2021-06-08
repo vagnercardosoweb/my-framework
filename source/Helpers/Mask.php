@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -25,6 +25,19 @@ class Mask
     const MASK_PHONE = ['(##)####-####', '(##)#####-####'];
 
     const MASK_CEP = '##.###-###';
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function cep(string $value): string
+    {
+        return self::create(
+            Helper::onlyNumber($value),
+            self::MASK_CEP
+        );
+    }
 
     /**
      * @param string $value
@@ -58,19 +71,6 @@ class Mask
             '/[\-\|\(\)\/\.\: ]/',
             '',
             $value
-        );
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function cep(string $value): string
-    {
-        return self::create(
-            Helper::onlyNumber($value),
-            self::MASK_CEP
         );
     }
 

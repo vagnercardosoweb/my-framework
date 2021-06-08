@@ -6,20 +6,24 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
 
 use Core\Helpers\CallableResolver;
 use Core\Interfaces\ConnectionEvent;
+use Exception;
+use InvalidArgumentException;
+use PDO;
+use PDOException;
 
 /**
  * Class Connection.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-abstract class Connection extends \PDO
+abstract class Connection extends PDO
 {
     /**
      * Default options.
@@ -27,13 +31,13 @@ abstract class Connection extends \PDO
      * @var array
      */
     protected array $options = [
-        \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
-        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-        \PDO::ATTR_ORACLE_NULLS => \PDO::NULL_NATURAL,
-        \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ,
-        \PDO::ATTR_PERSISTENT => false,
-        \PDO::ATTR_STRINGIFY_FETCHES => false,
-        \PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+        PDO::ATTR_PERSISTENT => false,
+        PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_EMULATE_PREPARES => false,
     ];
 
     /**
@@ -62,28 +66,9 @@ abstract class Connection extends \PDO
             $this->setTimezone($config);
             $this->setAttributesAndCommands($config);
             $this->setEvents($config);
-        } catch (\PDOException $e) {
-            throw new \Exception($e->getMessage());
+        } catch (PDOException $e) {
+            throw new Exception($e->getMessage());
         }
-    }
-
-    /**
-     * @return array
-     */
-    public static function getAvailableDrivers(): array
-    {
-        return array_intersect(
-            self::getSupportedDrivers(),
-            str_replace(['pdo_dblib'], 'dblib', \PDO::getAvailableDrivers())
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public static function getSupportedDrivers(): array
-    {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
     }
 
     /**
@@ -95,25 +80,25 @@ abstract class Connection extends \PDO
         $className = array_pop($classSplit);
 
         if (empty($config['host'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('%s: host not configured.', $className)
             );
         }
 
         if (empty($config['username'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('%s: username not configured.', $className)
             );
         }
 
         if (empty($config['password']) && empty($config['notPassword'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('%s: password not configured.', $className)
             );
         }
 
         if (empty($config['database']) && empty($config['notDatabase'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('%s: database not configured.', $className)
             );
         }
@@ -144,7 +129,7 @@ abstract class Connection extends \PDO
     protected function setStatement(): void
     {
         $this->setAttribute(
-            \PDO::ATTR_STATEMENT_CLASS,
+            PDO::ATTR_STATEMENT_CLASS,
             [Statement::class, [$this]]
         );
     }
@@ -194,5 +179,24 @@ abstract class Connection extends \PDO
                 call_user_func($callable, $this);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAvailableDrivers(): array
+    {
+        return array_intersect(
+            self::getSupportedDrivers(),
+            str_replace(['pdo_dblib'], 'dblib', PDO::getAvailableDrivers())
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function getSupportedDrivers(): array
+    {
+        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv', 'dblib'];
     }
 }

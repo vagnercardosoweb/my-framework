@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -46,27 +46,6 @@ class Env
     }
 
     /**
-     * @param string $key
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    public static function get(string $key, $default = null)
-    {
-        if (!$value = self::repository()->get($key)) {
-            return $default;
-        }
-
-        $value = Helper::normalizeValueType($value);
-
-        if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
-            return $matches[2];
-        }
-
-        return is_string($value) ? trim($value) : $value;
-    }
-
-    /**
      * @return string
      */
     public static function path(): string
@@ -79,19 +58,6 @@ class Env
         }
 
         return $env;
-    }
-
-    /**
-     * @return array
-     */
-    protected static function adapters(): array
-    {
-        return [
-            ServerConstAdapter::class,
-            EnvConstAdapter::class,
-            PutenvAdapter::class,
-            ApacheAdapter::class,
-        ];
     }
 
     /**
@@ -111,5 +77,39 @@ class Env
         }
 
         return self::$repository;
+    }
+
+    /**
+     * @return array
+     */
+    protected static function adapters(): array
+    {
+        return [
+            ServerConstAdapter::class,
+            EnvConstAdapter::class,
+            PutenvAdapter::class,
+            ApacheAdapter::class,
+        ];
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public static function get(string $key, $default = null)
+    {
+        if (!$value = self::repository()->get($key)) {
+            return $default;
+        }
+
+        $value = Helper::normalizeValueType($value);
+
+        if (preg_match('/\A([\'"])(.*)\1\z/', $value, $matches)) {
+            return $matches[2];
+        }
+
+        return is_string($value) ? trim($value) : $value;
     }
 }

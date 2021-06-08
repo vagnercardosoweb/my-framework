@@ -1,7 +1,7 @@
 version: '3.7'
 
 networks:
-  slimphp-network:
+  slim3.network:
     driver: bridge
 
 services:
@@ -9,9 +9,9 @@ services:
     build: ./docker
     working_dir: /var/www
     restart: always
-    container_name: slimphp-api
+    container_name: slim3.api
     networks:
-      - slimphp-network
+      - slim3.network
     depends_on:
       - mysql
       # - postgres
@@ -32,9 +32,9 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
-    container_name: slimphp-mysql
+    container_name: slim3.mysql
     networks:
-      - slimphp-network
+      - slim3.network
     ports:
       - '3306:3306'
     volumes:
@@ -47,9 +47,9 @@ services:
 
   #  phpmyadmin:
   #    image: phpmyadmin/phpmyadmin
-  #    container_name: slimphp-phpmyadmin
+  #    container_name: slim3.phpmyadmin
   #    networks:
-  #      - slimphp-network
+  #      - slim3.network
   #    depends_on:
   #      - mysql
   #    environment:
@@ -60,10 +60,10 @@ services:
 
   #  postgres:
   #    image: postgres:alpine
-  #    container_name: slimphp-postgres
+  #    container_name: slim3.postgres
   #    restart: always
   #    networks:
-  #      - slimphp-network
+  #      - slim3.network
   #    ports:
   #      - '5432:5432'
   #    volumes:
@@ -76,11 +76,11 @@ services:
   #  redis:
   #    image: bitnami/redis:latest
   #    restart: always
-  #    container_name: slimphp-redis
+  #    container_name: slim3.redis
   #    volumes:
   #      - ./docker/redis:/bitnami/redis/data
   #    networks:
-  #      - slimphp-network
+  #      - slim3.network
   #    environment:
   #      - ALLOW_EMPTY_PASSWORD=no
   #      - REDIS_PASSWORD=root

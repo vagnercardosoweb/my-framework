@@ -6,10 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
+
+use Exception;
 
 /**
  * Class Event.
@@ -37,18 +39,6 @@ class Event
     }
 
     /**
-     * @return Event
-     */
-    public static function getInstance(): Event
-    {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * @param string          $name
      * @param callable|string $callable
      *
@@ -67,10 +57,22 @@ class Event
         }
 
         if (!is_callable($callable)) {
-            throw new \Exception("Callable invalid in event {$name}.");
+            throw new Exception("Callable invalid in event {$name}.");
         }
 
         $this->events[$name][] = $callable;
+    }
+
+    /**
+     * @return Event
+     */
+    public static function getInstance(): Event
+    {
+        if (is_null(self::$instance)) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     /**

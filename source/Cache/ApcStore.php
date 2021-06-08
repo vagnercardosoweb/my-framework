@@ -6,12 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Cache;
 
+use Closure;
 use Core\Interfaces\CacheStore;
+use UnexpectedValueException;
 
 /**
  * Class ApcStore.
@@ -41,7 +43,7 @@ class ApcStore implements CacheStore
         $this->apcu = function_exists('apcu_fetch');
 
         if (!$this->apcu && !function_exists('apc_fetch')) {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 'Install php extension [ext-apcu].'
             );
         }
@@ -60,7 +62,7 @@ class ApcStore implements CacheStore
         $value = $this->apcu ? apcu_fetch($nKey) : apc_fetch($nKey);
 
         if (empty($value)) {
-            $value = $default instanceof \Closure ? $default() : $default;
+            $value = $default instanceof Closure ? $default() : $default;
 
             if ($seconds > 0) {
                 $this->set($key, $value, $seconds);
@@ -68,6 +70,16 @@ class ApcStore implements CacheStore
         }
 
         return $value;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function generateKey(string $key): string
+    {
+        return sprintf('%s%s', $this->prefix, $key);
     }
 
     /**
@@ -140,15 +152,5 @@ class ApcStore implements CacheStore
         $key = $this->generateKey($key);
 
         return $this->apcu ? apcu_delete($key) : apc_delete($key);
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function generateKey(string $key): string
-    {
-        return sprintf('%s%s', $this->prefix, $key);
     }
 }

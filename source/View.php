@@ -6,14 +6,19 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
 
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
+use Twig\Environment;
+use Twig\Extension\ExtensionInterface;
+use Twig\Loader\FilesystemLoader;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Class View.
@@ -41,7 +46,30 @@ class View
     public function __construct($path, array $options = [])
     {
         $this->loader = $this->createLoader($path);
-        $this->environment = new \Twig\Environment($this->loader, $options);
+        $this->environment = new Environment($this->loader, $options);
+    }
+
+    /**
+     * @param string|array $path
+     *
+     * @throws \Twig\Error\LoaderError
+     *
+     * @return \Twig\Loader\FilesystemLoader
+     */
+    private function createLoader($path): FilesystemLoader
+    {
+        $paths = is_string($path) ? [$path] : $path;
+        $loader = new FilesystemLoader();
+
+        foreach ($paths as $namespace => $location) {
+            if (is_string($namespace)) {
+                $loader->setPaths($location, $namespace);
+            } else {
+                $loader->addPath($location);
+            }
+        }
+
+        return $loader;
     }
 
     /**
@@ -86,6 +114,16 @@ class View
     /**
      * @param string $template
      *
+     * @return string
+     */
+    private function removeExtension(string $template): string
+    {
+        return preg_replace('/\.twig$/', '', $template);
+    }
+
+    /**
+     * @param string $template
+     *
      * @return bool
      */
     public function exists(string $template): bool
@@ -94,11 +132,24 @@ class View
     }
 
     /**
+     * @param string $template
+     *
+     * @return string
+     */
+    private function normalizeExtension(string $template): string
+    {
+        $template = $this->removeExtension($template);
+        $template = str_replace('.', '/', $template);
+
+        return sprintf('%s.%s', $template, 'twig');
+    }
+
+    /**
      * @param \Twig\Extension\ExtensionInterface $extension
      *
      * @return $this
      */
-    public function addExtension(\Twig\Extension\ExtensionInterface $extension): View
+    public function addExtension(ExtensionInterface $extension): View
     {
         $this->environment->addExtension($extension);
 
@@ -126,7 +177,7 @@ class View
      */
     public function addFunction(string $name, $callable, array $options = ['is_safe' => ['all']]): View
     {
-        $this->environment->addFunction(new \Twig\TwigFunction($name, $callable, $options));
+        $this->environment->addFunction(new TwigFunction($name, $callable, $options));
 
         return $this;
     }
@@ -140,7 +191,7 @@ class View
      */
     public function addFilter(string $name, $callable, array $options = ['is_safe' => ['all']]): View
     {
-        $this->environment->addFilter(new \Twig\TwigFilter($name, $callable, $options));
+        $this->environment->addFilter(new TwigFilter($name, $callable, $options));
 
         return $this;
     }
@@ -161,7 +212,7 @@ class View
     /**
      * @return \Twig\Environment
      */
-    public function getEnvironment(): \Twig\Environment
+    public function getEnvironment(): Environment
     {
         return $this->environment;
     }
@@ -169,54 +220,8 @@ class View
     /**
      * @return \Twig\Loader\FilesystemLoader
      */
-    public function getLoader(): \Twig\Loader\FilesystemLoader
+    public function getLoader(): FilesystemLoader
     {
         return $this->loader;
-    }
-
-    /**
-     * @param string $template
-     *
-     * @return string
-     */
-    private function normalizeExtension(string $template): string
-    {
-        $template = $this->removeExtension($template);
-        $template = str_replace('.', '/', $template);
-
-        return sprintf('%s.%s', $template, 'twig');
-    }
-
-    /**
-     * @param string $template
-     *
-     * @return string
-     */
-    private function removeExtension(string $template): string
-    {
-        return preg_replace('/\.twig$/', '', $template);
-    }
-
-    /**
-     * @param string|array $path
-     *
-     * @throws \Twig\Error\LoaderError
-     *
-     * @return \Twig\Loader\FilesystemLoader
-     */
-    private function createLoader($path): \Twig\Loader\FilesystemLoader
-    {
-        $paths = is_string($path) ? [$path] : $path;
-        $loader = new \Twig\Loader\FilesystemLoader();
-
-        foreach ($paths as $namespace => $location) {
-            if (is_string($namespace)) {
-                $loader->setPaths($location, $namespace);
-            } else {
-                $loader->addPath($location);
-            }
-        }
-
-        return $loader;
     }
 }

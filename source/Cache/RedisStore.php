@@ -6,13 +6,15 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Cache;
 
+use Closure;
 use Core\Helpers\Helper;
 use Core\Interfaces\CacheStore;
+use Core\Redis;
 
 /**
  * Class RedisStore.
@@ -31,7 +33,7 @@ class RedisStore implements CacheStore
      *
      * @param \Core\Redis $client
      */
-    public function __construct(\Core\Redis $client)
+    public function __construct(Redis $client)
     {
         $this->redis = $client;
     }
@@ -48,7 +50,7 @@ class RedisStore implements CacheStore
         $value = $this->redis->get($key);
 
         if (empty($value)) {
-            $value = $default instanceof \Closure ? $default() : $default;
+            $value = $default instanceof Closure ? $default() : $default;
 
             if ($seconds > 0) {
                 $this->set($key, $value, $seconds);

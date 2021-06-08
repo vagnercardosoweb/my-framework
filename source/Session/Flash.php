@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Session;
 
 use Core\Helpers\Obj;
+use stdClass;
 
 /**
  * Class Flash.
@@ -56,7 +57,7 @@ class Flash
             $this->data = $this->storage;
         }
 
-        $this->storage = new \stdClass();
+        $this->storage = new stdClass();
     }
 
     /**
@@ -67,6 +68,16 @@ class Flash
     public function __isset(string $name): bool
     {
         return $this->has($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->data->{$name});
     }
 
     /**
@@ -88,26 +99,6 @@ class Flash
     public function __set(string $name, $value): void
     {
         $this->set($name, $value);
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return void
-     */
-    public function __unset(string $name): void
-    {
-        $this->remove($name);
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function has(string $name): bool
-    {
-        return isset($this->data->{$name});
     }
 
     /**
@@ -145,6 +136,16 @@ class Flash
      *
      * @return void
      */
+    public function __unset(string $name): void
+    {
+        $this->remove($name);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return void
+     */
     public function remove(string $name): void
     {
         if ($this->has($name)) {
@@ -165,7 +166,7 @@ class Flash
      */
     public function clear(): void
     {
-        $this->data = new \stdClass();
+        $this->data = new stdClass();
         $this->storage = $this->data;
     }
 }

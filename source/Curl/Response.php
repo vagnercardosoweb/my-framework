@@ -6,20 +6,21 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Curl;
 
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
+use JsonSerializable;
 
 /**
  * Class Response.
  *
  * @author  Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class Response implements \JsonSerializable
+class Response implements JsonSerializable
 {
     /**
      * @var mixed
@@ -57,30 +58,39 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * @param string $name
+     * @param string $body
      *
-     * @return mixed
+     * @return object|string|null
      */
-    public function __get(string $name)
+    private function buildBody(string $body)
     {
-        $body = Obj::fromArray($this->body);
-
-        if (isset($body->{$name})) {
-            return $body->{$name};
+        if ($xml = Helper::parseXml($body)) {
+            return $xml;
         }
 
-        return null;
+        if ($json = Helper::decodeJson($body)) {
+            return $json;
+        }
+
+        return $body;
     }
 
     /**
-     * @param string $name
-     * @param mixed  $value
+     * @param string $error
+     *
+     * @return object|null
      */
-    public function __set($name, $value)
+    private function buildError(string $error): ?object
     {
-        if (is_object($this->body)) {
-            $this->body->{$name} = $value;
+        if (empty($error) && (!$this->isClientError() && !$this->isServerError())) {
+            return null;
         }
+
+        return (object)[
+            'error' => true,
+            'status' => $this->getStatus(),
+            'message' => $error ?: ($this->isServerError() ? 'Server error.' : 'Client error.'),
+        ];
     }
 
     /**
@@ -107,6 +117,33 @@ class Response implements \JsonSerializable
     public function isServerError(): bool
     {
         return $this->getStatus() >= 500 && $this->getStatus() < 600;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function __get(string $name)
+    {
+        $body = Obj::fromArray($this->body);
+
+        if (isset($body->{$name})) {
+            return $body->{$name};
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function __set($name, $value)
+    {
+        if (is_object($this->body)) {
+            $this->body->{$name} = $value;
+        }
     }
 
     /**
@@ -147,41 +184,5 @@ class Response implements \JsonSerializable
     public function jsonSerialize()
     {
         return $this->body;
-    }
-
-    /**
-     * @param string $body
-     *
-     * @return object|string|null
-     */
-    private function buildBody(string $body)
-    {
-        if ($xml = Helper::parseXml($body)) {
-            return $xml;
-        }
-
-        if ($json = Helper::decodeJson($body)) {
-            return $json;
-        }
-
-        return $body;
-    }
-
-    /**
-     * @param string $error
-     *
-     * @return object|null
-     */
-    private function buildError(string $error): ?object
-    {
-        if (empty($error) && (!$this->isClientError() && !$this->isServerError())) {
-            return null;
-        }
-
-        return (object)[
-            'error' => true,
-            'status' => $this->getStatus(),
-            'message' => $error ?: ($this->isServerError() ? 'Server error.' : 'Client error.'),
-        ];
     }
 }

@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
 
 use Core\Helpers\Helper;
+use Exception;
 use Slim\Http\Response;
 use Slim\Http\StatusCode;
 
@@ -103,7 +104,7 @@ class Router
     {
         try {
             $location = self::pathFor($name, $data, $queryParams, $hash);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $queryParams = Helper::httpBuildQuery(array_merge_recursive($data, $queryParams));
             $location = "{$name}{$queryParams}{$hash}";
         }

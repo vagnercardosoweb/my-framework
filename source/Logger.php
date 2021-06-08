@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -56,10 +56,36 @@ class Logger extends Monolog
     /**
      * @return void
      */
-    public function __clone()
+    protected function initProcessor(): void
     {
-        $this->processors = [];
-        $this->handlers = [];
+        $this->pushProcessor(new MemoryUsageProcessor());
+
+        $this->pushProcessor(function ($record) {
+            if (isset($_SERVER['REMOTE_ADDR'])) {
+                $record['extra']['ip'] = $ip = Helper::getIpAddress();
+                $record['extra']['hostname'] = gethostbyaddr($ip);
+            }
+
+            if (isset($_SERVER['HTTP_USER_AGENT'])) {
+                $record['extra']['useragent'] = Helper::getUserAgent();
+            }
+
+            return $record;
+        });
+    }
+
+    /**
+     * @return void
+     */
+    protected function initHandler(): void
+    {
+        $path = sprintf('%s/%s.log', $this->getDirectory(), date('Ymd'));
+        $streamHandle = new StreamHandler($path);
+        $separate = str_repeat('=', 150);
+        $format = "{$separate}\n[%datetime%] %channel%.%level_name%: %message% \n%context% \n%extra%\n{$separate}\n\n";
+        $lineFormatter = new LineFormatter($format);
+        $streamHandle->setFormatter($lineFormatter);
+        $this->pushHandler($streamHandle);
     }
 
     /**
@@ -72,6 +98,15 @@ class Logger extends Monolog
         }
 
         return sprintf('%s/%s', $this->directory, $this->filename);
+    }
+
+    /**
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->processors = [];
+        $this->handlers = [];
     }
 
     /**
@@ -134,40 +169,5 @@ class Logger extends Monolog
         $this->pushHandler($streamHandle);
 
         return $this;
-    }
-
-    /**
-     * @return void
-     */
-    protected function initProcessor(): void
-    {
-        $this->pushProcessor(new MemoryUsageProcessor());
-
-        $this->pushProcessor(function ($record) {
-            if (isset($_SERVER['REMOTE_ADDR'])) {
-                $record['extra']['ip'] = $ip = Helper::getIpAddress();
-                $record['extra']['hostname'] = gethostbyaddr($ip);
-            }
-
-            if (isset($_SERVER['HTTP_USER_AGENT'])) {
-                $record['extra']['useragent'] = Helper::getUserAgent();
-            }
-
-            return $record;
-        });
-    }
-
-    /**
-     * @return void
-     */
-    protected function initHandler(): void
-    {
-        $path = sprintf('%s/%s.log', $this->getDirectory(), date('Ymd'));
-        $streamHandle = new StreamHandler($path);
-        $separate = str_repeat('=', 150);
-        $format = "{$separate}\n[%datetime%] %channel%.%level_name%: %message% \n%context% \n%extra%\n{$separate}\n\n";
-        $lineFormatter = new LineFormatter($format);
-        $streamHandle->setFormatter($lineFormatter);
-        $this->pushHandler($streamHandle);
     }
 }

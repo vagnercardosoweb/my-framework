@@ -6,10 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
+
+use InvalidArgumentException;
 
 /**
  * Class SQLiteConnection.
@@ -38,13 +40,13 @@ class SQLiteConnection extends Connection
     protected function validateConfig(array $config): void
     {
         if (empty($config['database'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "'sqlite' database not configured."
             );
         }
 
         if ('memory' !== $config['database'] && !realpath($config['database'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "'sqlite' database not exists in path {$config['database']}"
             );
         }

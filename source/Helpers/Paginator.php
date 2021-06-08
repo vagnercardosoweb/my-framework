@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
@@ -270,6 +270,21 @@ class Paginator
     }
 
     /**
+     * @param int  $number
+     * @param bool $current
+     *
+     * @return array
+     */
+    protected function createItem(int $number = 0, bool $current = false): array
+    {
+        return [
+            'number' => ($number > 0 ? $number : '...'),
+            'pattern' => ($number > 0 ? "{$this->getLink()}{$number}" : false),
+            'current' => $current,
+        ];
+    }
+
+    /**
      * @return string
      */
     public function getLink(): string
@@ -311,20 +326,5 @@ class Paginator
         $html .= '</ul>';
 
         return $html;
-    }
-
-    /**
-     * @param int  $number
-     * @param bool $current
-     *
-     * @return array
-     */
-    protected function createItem(int $number = 0, bool $current = false): array
-    {
-        return [
-            'number' => ($number > 0 ? $number : '...'),
-            'pattern' => ($number > 0 ? "{$this->getLink()}{$number}" : false),
-            'current' => $current,
-        ];
     }
 }

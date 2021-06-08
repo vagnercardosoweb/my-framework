@@ -6,10 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
+
+use Closure;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Class CallableResolver.
@@ -38,7 +42,7 @@ class CallableResolver
 
         if (is_string($callable)) {
             $callable = self::resolveClassName($callable, $injectThis, $contract);
-        } elseif ($callable instanceof \Closure) {
+        } elseif ($callable instanceof Closure) {
             /** @var \Closure $callable */
             $callable = $callable->bindTo($injectThis);
         }
@@ -60,13 +64,13 @@ class CallableResolver
         list($class, $method) = self::parseClassName($callable);
 
         if (!class_exists($class)) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf('Callable %s does not exist', $class)
             );
         }
 
         if ($contract && !is_a($class, $contract, true)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('Callable %s must be an instance of %s', $class, $contract)
             );
         }
@@ -98,7 +102,7 @@ class CallableResolver
     protected static function assertCallable($callable)
     {
         if (!is_callable($callable)) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 sprintf(
                     '%s is not resolvable',
                     is_array($callable) || is_object($callable)

@@ -6,13 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Cache;
 
 use Core\Interfaces\CacheStore;
 use Core\Redis;
+use InvalidArgumentException;
 
 /**
  * Class Cache.
@@ -75,7 +76,7 @@ class Cache
         $method = sprintf('create%sDriver', ucfirst($driver));
 
         if (!method_exists($this, $method)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Driver [{$driver}] not supported in cache."
             );
         }
@@ -88,6 +89,14 @@ class Cache
     }
 
     /**
+     * @return string
+     */
+    protected function getDefaultDriver(): string
+    {
+        return $this->config['default'] ?? 'file';
+    }
+
+    /**
      * @param string $driver
      *
      * @return array
@@ -95,20 +104,12 @@ class Cache
     protected function getStoreConfig(string $driver): array
     {
         if (!isset($this->config['stores'][$driver])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 "Driver [{$driver}] does not have the settings defined."
             );
         }
 
         return $this->config['stores'][$driver];
-    }
-
-    /**
-     * @return string
-     */
-    protected function getDefaultDriver(): string
-    {
-        return $this->config['default'] ?? 'file';
     }
 
     /**

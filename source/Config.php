@@ -6,7 +6,7 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
@@ -18,6 +18,7 @@ use Core\Helpers\Path;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use UnexpectedValueException;
 
 /**
  * Class Config.
@@ -62,26 +63,6 @@ class Config implements ArrayAccess
         }
 
         return Arr::get(self::$items, $key, $default);
-    }
-
-    /**
-     * @param array $keys
-     *
-     * @return array
-     */
-    public static function getMany($keys)
-    {
-        $config = [];
-
-        foreach ($keys as $key => $default) {
-            if (is_numeric($key)) {
-                throw new \UnexpectedValueException('the key must be a string');
-            }
-
-            $config[$key] = Arr::get(self::$items, $key, $default);
-        }
-
-        return $config;
     }
 
     /**
@@ -131,6 +112,44 @@ class Config implements ArrayAccess
         self::$items = self::normalize($config);
 
         return self::$items;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    protected static function normalize(array $config): array
+    {
+        foreach ($config as $key => $value) {
+            if (is_array($value)) {
+                $config[$key] = self::normalize($value);
+            } else {
+                $config[$key] = Helper::normalizeValueType($value);
+            }
+        }
+
+        return $config;
+    }
+
+    /**
+     * @param array $keys
+     *
+     * @return array
+     */
+    public static function getMany($keys)
+    {
+        $config = [];
+
+        foreach ($keys as $key => $default) {
+            if (is_numeric($key)) {
+                throw new UnexpectedValueException('the key must be a string');
+            }
+
+            $config[$key] = Arr::get(self::$items, $key, $default);
+        }
+
+        return $config;
     }
 
     /**
@@ -234,23 +253,5 @@ class Config implements ArrayAccess
     public function offsetUnset($key)
     {
         self::set($key, null);
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected static function normalize(array $config): array
-    {
-        foreach ($config as $key => $value) {
-            if (is_array($value)) {
-                $config[$key] = self::normalize($value);
-            } else {
-                $config[$key] = Helper::normalizeValueType($value);
-            }
-        }
-
-        return $config;
     }
 }

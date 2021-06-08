@@ -6,11 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Mailer;
 
+use InvalidArgumentException;
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
@@ -42,13 +43,13 @@ abstract class Auth
     protected function validate(array &$options): void
     {
         if (empty($options['host'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Host not configured.'
             );
         }
 
         if (empty($options['username']) || empty($options['password'])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'User and password not configured.'
             );
         }

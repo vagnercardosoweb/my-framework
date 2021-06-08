@@ -6,12 +6,13 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 use Core\App;
 use Core\Config;
 use Core\Env;
+use Core\Helpers\Asset;
 use Core\Helpers\CallableResolver;
 use Core\Helpers\Helper;
 use Core\Logger;
@@ -82,7 +83,7 @@ if (!function_exists('asset')) {
             $baseUrl = defined('BASE_URL') ? constant('BASE_URL') : '';
         }
 
-        return \Core\Helpers\Asset::path($file, $baseUrl, $version);
+        return Asset::path($file, $baseUrl, $version);
     }
 }
 
@@ -94,7 +95,7 @@ if (!function_exists('asset_source')) {
      */
     function asset_source($files): ?string
     {
-        return \Core\Helpers\Asset::source($files);
+        return Asset::source($files);
     }
 }
 
@@ -412,7 +413,7 @@ if (!function_exists('retry')) {
 
         try {
             return call_user_func(CallableResolver::resolve($callback), $attempts);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($times < 1 || ($when && !$when($e))) {
                 throw $e;
             }

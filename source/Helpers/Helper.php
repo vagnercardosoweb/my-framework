@@ -6,10 +6,12 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
+
+use Exception;
 
 /**
  * Class Helper.
@@ -192,21 +194,6 @@ class Helper
     }
 
     /**
-     * @param string|int|float $value
-     *
-     * @return float
-     */
-    public static function normalizeNumberFloat($value): float
-    {
-        if (false !== strpos($value, ',')) {
-            $value = str_replace('.', '', $value);
-            $value = str_replace(',', '.', $value);
-        }
-
-        return (float)$value;
-    }
-
-    /**
      * @param array|string|null $encoded
      * @param array|string      $result
      */
@@ -276,6 +263,21 @@ class Helper
         }
 
         return $value;
+    }
+
+    /**
+     * @param string|int|float $value
+     *
+     * @return float
+     */
+    public static function normalizeNumberFloat($value): float
+    {
+        if (false !== strpos($value, ',')) {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+        }
+
+        return (float)$value;
     }
 
     /**
@@ -402,7 +404,7 @@ class Helper
 
         try {
             return is_numeric($value) ? (int)$value : unserialize($value);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $value;
         }
     }

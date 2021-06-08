@@ -6,10 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Helpers;
+
+use JsonSerializable;
+use SimpleXMLElement;
+use stdClass;
 
 /**
  * Class Obj.
@@ -25,7 +29,7 @@ class Obj
      */
     public static function fromArray($array)
     {
-        $object = new \stdClass();
+        $object = new stdClass();
 
         if (is_object($array)) {
             return $array;
@@ -94,12 +98,12 @@ class Obj
         }
 
         foreach ($object as $key => $value) {
-            if ($value instanceof \SimpleXMLElement) {
+            if ($value instanceof SimpleXMLElement) {
                 $value = strval($value);
             }
 
             if (is_object($value) || is_array($value)) {
-                if ($value instanceof \JsonSerializable) {
+                if ($value instanceof JsonSerializable) {
                     $array[$key] = $value->jsonSerialize();
                 } else {
                     $array[$key] = self::toArray($value);

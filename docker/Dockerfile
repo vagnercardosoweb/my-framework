@@ -67,16 +67,16 @@ RUN docker-php-ext-install \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install xdebug
-RUN pecl install xdebug \
- && docker-php-ext-enable xdebug \
- && echo 'xdebug.start_with_request=no' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.mode=debug' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.client_host=host.docker.internal' >> /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.client_port=9000' >>  /usr/local/etc/php/conf.d/xdebug.ini \
- && echo 'xdebug.remote_cookie_expire_time=36000' >>  /usr/local/etc/php/conf.d/xdebug.ini
+RUN pecl install xdebug
+RUN docker-php-ext-enable xdebug
+RUN echo "xdebug.mode=debug" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    echo "xdebug.discover_client_host=true" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    echo "xdebug.idekey=\"PHPSTORM\"" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && \
+    echo "xdebug.client_port=9001" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# Install redis
-RUN pecl install redis
+# Instala redis
+RUN pecl -v install redis
 RUN docker-php-ext-enable redis
 
 # Instala rar
@@ -89,7 +89,7 @@ RUN openssl req -new -x509 -days 365 -nodes \
   -keyout /etc/ssl/private/ssl-cert-snakeoil.key \
   -subj "/CN=*.localhost"
 
-# Apache config
+# Habilita modulos e site
 RUN a2enmod rewrite
 RUN a2enmod ssl
 RUN a2ensite default-ssl

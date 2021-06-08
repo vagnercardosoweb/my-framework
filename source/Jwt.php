@@ -6,10 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 26/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
+
+use Exception;
+use InvalidArgumentException;
+use UnexpectedValueException;
 
 /**
  * Class Jwt.
@@ -31,7 +35,7 @@ class Jwt
         $this->key = (string)$key;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException('Jwt empty key.');
+            throw new InvalidArgumentException('Jwt empty key.');
         }
     }
 
@@ -54,6 +58,16 @@ class Jwt
     }
 
     /**
+     * @param string $value
+     *
+     * @return string
+     */
+    private function signature(string $value): string
+    {
+        return hash_hmac('sha512', $value, $this->key, true);
+    }
+
+    /**
      * @param string $token
      *
      * @throws \Exception
@@ -65,46 +79,36 @@ class Jwt
         $split = explode('.', $token);
 
         if (3 != count($split)) {
-            throw new \InvalidArgumentException('The token does not contain a valid format.');
+            throw new InvalidArgumentException('The token does not contain a valid format.');
         }
 
         list($header64, $payload64, $signature) = $split;
 
         if (!$header = json_decode(base64_decode($header64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException('Invalid header encoding.');
+            throw new UnexpectedValueException('Invalid header encoding.');
         }
 
         if (!$payload = json_decode(base64_decode($payload64), true, 512, JSON_BIGINT_AS_STRING)) {
-            throw new \UnexpectedValueException('Invalid payload encoding.');
+            throw new UnexpectedValueException('Invalid payload encoding.');
         }
 
         if (!$signature = base64_decode($signature)) {
-            throw new \UnexpectedValueException('Invalid signature encoding.');
+            throw new UnexpectedValueException('Invalid signature encoding.');
         }
 
         if (empty($header['alg'])) {
-            throw new \UnexpectedValueException('Empty algorithm.');
+            throw new UnexpectedValueException('Empty algorithm.');
         }
 
         if ('HS512' !== $header['alg']) {
-            throw new \UnexpectedValueException("Algorithm {$header['alg']} is not supported.");
+            throw new UnexpectedValueException("Algorithm {$header['alg']} is not supported.");
         }
 
         if (!$this->validate("{$header64}.{$payload64}", $signature)) {
-            throw new \Exception('Signature verification failed.');
+            throw new Exception('Signature verification failed.');
         }
 
         return $payload;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    private function signature(string $value): string
-    {
-        return hash_hmac('sha512', $value, $this->key, true);
     }
 
     /**

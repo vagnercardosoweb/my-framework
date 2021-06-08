@@ -6,25 +6,27 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core\Database\Connection;
 
 use Core\Helpers\Helper;
 use Core\Helpers\Obj;
+use PDO;
+use PDOStatement;
 
 /**
  * Class Statement.
  *
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  */
-class Statement extends \PDOStatement
+class Statement extends PDOStatement
 {
     /**
      * @var \PDO
      */
-    protected \PDO $pdo;
+    protected PDO $pdo;
 
     /**
      * @var array
@@ -36,7 +38,7 @@ class Statement extends \PDOStatement
      *
      * @param \PDO $pdo
      */
-    protected function __construct(\PDO $pdo)
+    protected function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
@@ -44,7 +46,7 @@ class Statement extends \PDOStatement
     /**
      * @return \PDO
      */
-    public function getPdo(): \PDO
+    public function getPdo(): PDO
     {
         return $this->pdo;
     }
@@ -80,7 +82,7 @@ class Statement extends \PDOStatement
      *
      * @return mixed
      */
-    public function fetch($mode = null, $cursorOrientation = \PDO::FETCH_ORI_NEXT, $cursorOffset = 0): mixed
+    public function fetch($mode = null, $cursorOrientation = PDO::FETCH_ORI_NEXT, $cursorOffset = 0): mixed
     {
         if ($this->isFetchObject($mode) || class_exists($mode)) {
             if (!class_exists($mode)) {
@@ -100,8 +102,8 @@ class Statement extends \PDOStatement
      */
     public function isFetchObject($style = null): bool
     {
-        $allowed = [\PDO::FETCH_OBJ, \PDO::FETCH_CLASS];
-        $fetchMode = $style ?: $this->pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
+        $allowed = [PDO::FETCH_OBJ, PDO::FETCH_CLASS];
+        $fetchMode = $style ?: $this->pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE);
 
         if (in_array($fetchMode, $allowed)) {
             return true;
@@ -152,9 +154,9 @@ class Statement extends \PDOStatement
             $value = !empty($value) || '0' == $value ? filter_var($value, FILTER_DEFAULT) : null;
 
             $this->bindValue($key, $value, (is_int($value)
-                ? \PDO::PARAM_INT
-                : (is_bool($value) ? \PDO::PARAM_BOOL
-                    : \PDO::PARAM_STR)));
+                ? PDO::PARAM_INT
+                : (is_bool($value) ? PDO::PARAM_BOOL
+                    : PDO::PARAM_STR)));
 
             $this->bindings[$key] = $value;
         }

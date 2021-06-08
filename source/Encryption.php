@@ -6,10 +6,14 @@
  * @author Vagner Cardoso <vagnercardosoweb@gmail.com>
  * @link https://github.com/vagnercardosoweb
  * @license http://www.opensource.org/licenses/mit-license.html MIT License
- * @copyright 25/01/2021 Vagner Cardoso
+ * @copyright 08/06/2021 Vagner Cardoso
  */
 
 namespace Core;
+
+use InvalidArgumentException;
+use function openssl_decrypt;
+use function openssl_encrypt;
 
 /**
  * Class Encryption.
@@ -38,7 +42,7 @@ class Encryption
         $this->cipher = $cipher;
 
         if (empty($this->key)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Encryption empty key.'
             );
         }
@@ -54,7 +58,7 @@ class Encryption
     {
         $iv = $this->generateRandomBytes(openssl_cipher_iv_length($this->cipher));
 
-        $value = \openssl_encrypt(
+        $value = openssl_encrypt(
             $serialize ? serialize($value) : $value,
             $this->cipher, $this->key, 0, $iv
         );
@@ -74,6 +78,35 @@ class Encryption
     }
 
     /**
+     * @param int $length
+     *
+     * @throws \Exception
+     *
+     * @return string
+     */
+    protected function generateRandomBytes($length = 16)
+    {
+        if (function_exists('random_bytes')) {
+            $bytes = random_bytes($length);
+        } else {
+            $bytes = openssl_random_pseudo_bytes($length);
+        }
+
+        return $bytes;
+    }
+
+    /**
+     * @param string $iv
+     * @param mixed  $value
+     *
+     * @return string
+     */
+    protected function hash(string $iv, string $value): string
+    {
+        return hash_hmac('sha256', $iv.$value, $this->key);
+    }
+
+    /**
      * @param string $payload
      * @param bool   $unserialize
      *
@@ -88,24 +121,13 @@ class Encryption
         }
 
         $iv = base64_decode($payload['iv']);
-        $decrypted = \openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
+        $decrypted = openssl_decrypt($payload['value'], $this->cipher, $this->key, 0, $iv);
 
         if (false === $decrypted) {
             return null;
         }
 
         return $unserialize ? unserialize($decrypted) : $decrypted;
-    }
-
-    /**
-     * @param string $iv
-     * @param mixed  $value
-     *
-     * @return string
-     */
-    protected function hash(string $iv, string $value): string
-    {
-        return hash_hmac('sha256', $iv.$value, $this->key);
     }
 
     /**
@@ -153,24 +175,6 @@ class Encryption
             hash_hmac('sha256', $payload['mac'], $bytes, true),
             $calculated
         );
-    }
-
-    /**
-     * @param int $length
-     *
-     * @throws \Exception
-     *
-     * @return string
-     */
-    protected function generateRandomBytes($length = 16)
-    {
-        if (function_exists('random_bytes')) {
-            $bytes = random_bytes($length);
-        } else {
-            $bytes = openssl_random_pseudo_bytes($length);
-        }
-
-        return $bytes;
     }
 
     /**
