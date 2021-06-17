@@ -599,19 +599,20 @@ abstract class Model implements ArrayAccess, JsonSerializable
      */
     public function save($data = [], bool $validate = true): self
     {
-        $primaryValue = $this->getPrimaryValue($data);
+        $this->data($data);
+        $primaryValue = $this->getPrimaryValue($this->data);
 
         if (!$primaryValue && !empty($this->bindings[$this->getPrimaryKey()])) {
             $primaryValue = $this->bindings[$this->getPrimaryKey()];
         }
 
         if ($primaryValue && $row = $this->fetchById($primaryValue)) {
-            $row->update($data, $validate);
+            $row->update($this->data, $validate);
 
             return $row;
         }
 
-        return $this->create($data, $validate);
+        return $this->create($this->data, $validate);
     }
 
     /**
